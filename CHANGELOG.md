@@ -2,19 +2,19 @@
 
 ## 1.3.0
 
-**Your words, not mine**
+**Support for Custom Wording**
 - Every phrase the mod writes can now be reworded: about 150 of them, from "took solid wounds" to "burned by fire".
   Want it darker, stricter, or just different? See "Your own wording" in the README.
+- Could be useful for translations.
 
-**Less judging**
+**Bug Fixes and Enhancements**
 - Someone killed without fighting is no longer called "an innocent". The summary says they were "not actively engaged
   in combat" and leaves the rest to the story. Thanks to nan0bug00 for the change.
 - An enemy cut down before he could draw his sword no longer counts as someone who wasn't fighting.
-
-**Less guessing**
 - When the mod can't tell what hurt someone, it says so plainly: a wolf's bite is no longer "harmful magic".
 - A spell, potion or weapon is only named when the attacker actually used it. No more odd internal names.
-- Three wolves doing the same thing are told once, not three times.
+- Multiple actors with the same name doing the same thing are told once, not three times (example: 3 wolves
+  attacking you).
 
 ## 1.2.0
 
