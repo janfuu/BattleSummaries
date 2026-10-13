@@ -359,6 +359,13 @@ namespace
 		b.Damage(kBandit1, kHero, 75, 0.0f, 3);
 		b.Death(kBandit1, kHero, 3);
 		b.Armed(kBandit2);  // swung and missed: a fighter all the same
+		// a hostile who had turned on the party but was cut down before his sword was out (reported by a player: a
+		// Dawnguard told as an innocent)
+		b.Join(Info(kAtronach, "Dawnguard", Side::kEnemy, 150));
+		b.Find(kAtronach)->info.lawful = true;
+		b.CameToFight(kAtronach);
+		b.Damage(kAtronach, kHero, 150, 0.0f, 3.5);
+		b.Death(kAtronach, kHero, 3.5);
 		b.Damage(kBandit2, kLydia, 250, 0.0f, 4);
 		b.Death(kBandit2, kLydia, 4);
 		b.Damage(kMage, kHero, 100, 0.0f, 5);  // never drew, but no hold's law covers a bandit
@@ -369,10 +376,10 @@ namespace
 
 		const auto hero = SummaryText(BuildSummary(b, kHero, "Kaira", {}));
 		Check(Has(hero, "Heimskr, who was not actively engaged in combat, was killed by Kaira."), "the death of someone who was not fighting is said outright", hero);
-		Check(Has(hero, "Kaira and Lydia fought against Whiterun Guard x2 and Bandit.") && Has(hero, "All 3 enemies were killed."), "someone who was not fighting is not one of the enemies", hero);
+		Check(Has(hero, "Kaira and Lydia fought against Whiterun Guard x2, Bandit and Dawnguard.") && Has(hero, "All 4 enemies were killed.") && !Has(hero, "Dawnguard, who was not"), "someone who was not fighting is not one of the enemies", hero);
 		Check(Has(hero, "Also caught up in it: Heimskr."), "but was caught up in it", hero);
 		Check(Has(hero, "Lydia was killed by Kaira, by accident: they were on the same side."), "an ally killed by their own side", hero);
-		Check(Has(hero, "Kaira killed 2 of the 3 who died on the other side"), "and is not one of the killer's enemy kills", hero);
+		Check(Has(hero, "Kaira killed 3 of the 4 who died on the other side"), "and is not one of the killer's enemy kills", hero);
 
 		Battle m;  // nothing but a murder is still something to tell
 		m.Join(Info(kHero, "Kaira", Side::kPlayer, 200));

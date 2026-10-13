@@ -184,9 +184,14 @@ namespace BSM
 		if (auto* p = Find(a_id)) p->armed = true;
 	}
 
+	void Battle::CameToFight(ActorId a_id)
+	{
+		if (auto* p = Find(a_id)) p->cameToFight = true;
+	}
+
 	bool Battle::Innocent(const Participant& a_p) const
 	{
-		if (a_p.info.side == Side::kPlayer || !a_p.info.lawful || a_p.armed || a_p.damageDealt > 0.0f || !a_p.kills.empty()) return false;
+		if (a_p.info.side == Side::kPlayer || !a_p.info.lawful || a_p.armed || a_p.cameToFight || a_p.damageDealt > 0.0f || !a_p.kills.empty()) return false;
 		if (a_p.damageTaken <= 0.0f && !a_p.dead) return false;  // nobody touched them
 		for (const auto& q : participants) {
 			for (const auto& e : q.effects) {

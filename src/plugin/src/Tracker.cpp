@@ -88,6 +88,8 @@ namespace BSM::Tracker
 			float           damageSince{ 0.0f };
 			float           pendingLoss{ 0.0f };  // health lost last tick that no damage report explained (yet)
 			std::set<RE::FormID> injuriesSeen;    // injury effects found on them so far, the ones they came with included
+			int             fightSamples{ 0 };       // times seen in combat and not fleeing while nobody had struck them yet
+			bool            enteredUnstruck{ false };  // the game reported them entering combat before anyone had struck them
 		};
 		std::unordered_map<ActorId, Live> g_live;
 
@@ -276,6 +278,35 @@ namespace BSM::Tracker
 			return out;
 		}
 
+		// ---- who came to fight (caller holds g_lock, main thread) ----
+		// A lawful person killed without ever raising a weapon is told as "not actively engaged in combat". That must not
+		// catch someone who had turned on the party and was cut down before the sword was out (a player's report: a
+		// Dawnguard). The game's combat state alone does not tell them from a townsman running away, who is "in combat"
+		// too; its combat controller does: it knows who is fleeing.
+		bool InCombatNotFleeing(RE::Actor* a_actor)
+		{
+			if (!a_actor || a_actor->IsDead() || !a_actor->IsInCombat()) return false;
+			const auto* cc = a_actor->GetActorRuntimeData().combatController;
+			return cc && cc->state && !cc->state->isFleeing;
+		}
+
+		void MarkCameToFight(Participant& a_p, const char* a_why)
+		{
+			if (a_p.cameToFight) return;
+			a_p.cameToFight = true;
+			SKSE::log::debug("Battle {}: {} ({:08X}) came to fight ({})", g_current->id, a_p.info.name, a_p.info.id, a_why);
+		}
+
+		// Counts only while nobody has struck them: what someone does after the first blow (flee, or fight back with a
+		// weapon drawn) is read from that. Twice, a tick apart: a townsman's first instant in combat can come before the
+		// game has decided he will run.
+		void SampleIntent(RE::Actor* a_actor, Participant& a_p)
+		{
+			if (a_p.cameToFight || a_p.damageTaken > 0.0f || a_p.info.side == Side::kPlayer) return;
+			if (!InCombatNotFleeing(a_actor)) return;
+			if (++g_live[a_p.info.id].fightSamples >= 2) MarkCameToFight(a_p, "in combat and not fleeing");
+		}
+
 		// ---- injuries from injury mods (caller holds g_lock, main thread) ----
 		// Found by looking at the fighter's effects, not from the magic-effect event: Blade and Blunt's injuries are
 		// abilities, which are added without one. a_joining: what they have now, they came with (unless it is seconds old:
@@ -435,7 +466,9 @@ namespace BSM::Tracker
 				live.pendingLoss = 0.0f;
 				SKSE::log::debug("Battle {}: {} ({:08X}) joined, side {}", g_current->id, p.info.name, p.info.id, static_cast<int>(p.info.side));
 				ScanInjuries(a_actor, true, Now());
-				return g_current->Find(a_actor->GetFormID());
+				auto* joined = g_current->Find(a_actor->GetFormID());
+				if (joined) SampleIntent(a_actor, *joined);
+				return joined;
 			}
 			return &p;
 		}
@@ -578,6 +611,7 @@ namespace BSM::Tracker
 					Begin(a_r.at);
 				}
 				JoinPair(a, b, pc);
+				if (auto* p = g_current->Find(a_r.a); p && p->damageTaken <= 0.0f && !p->dead) g_live[a_r.a].enteredUnstruck = true;
 				break;
 
 			case Report::Type::kDamage: {
@@ -603,6 +637,14 @@ namespace BSM::Tracker
 				}
 				JoinPair(a, b, pc);
 				if (!InBattle(a)) return;
+				// Cut down within moments of turning on the party, before two looks could confirm it: go by their nature. One
+				// the game has set to attack on sight came to fight; a townsman who had only just been startled did not.
+				if (auto* v = g_current->Find(a_r.a); v && !v->dead && !v->cameToFight && v->info.side != Side::kPlayer) {
+					const auto& live = g_live[a_r.a];
+					if ((live.enteredUnstruck || live.fightSamples > 0) && a->AsActorValueOwner()->GetActorValue(RE::ActorValue::kAggression) >= 1.0f) {
+						MarkCameToFight(*v, "entered combat unstruck, aggressive by nature");
+					}
+				}
 				g_current->Death(a_r.a, a_r.b, a_r.at);
 				// with what: the spell the killer's harmful magic came from just before, else the weapon in the killer's hand
 				if (auto* v = g_current->Find(a_r.a); v && v->dead && v->killer != 0 && v->killedWith.empty()) {
@@ -766,6 +808,7 @@ namespace BSM::Tracker
 						}
 						if (scanInjuries) ScanInjuries(actor, false, now);
 						if (!g_current->participants[i].armed && actor->AsActorState()->IsWeaponDrawn()) g_current->Armed(id);
+						SampleIntent(actor, g_current->participants[i]);
 
 						const float hp = HealthOf(actor), max = MaxHealthOf(actor);
 						g_current->participants[i].info.maxHealth = max;
@@ -1114,7 +1157,8 @@ namespace BSM::Tracker
 				s += std::format(" [{} {:08X} side {}{} taken {:.0f}/{:.0f} dealt {:.0f} healed {:.0f} min {:.0f}% downs {}{}{}]", p.info.name, p.info.id,
 					static_cast<int>(b.EffectiveSide(p)), b.Involved(p) ? (p.engaged ? "" : " (at one remove)") : " uninvolved", p.damageTaken, p.info.maxHealth, p.damageDealt, p.healingReceived,
 					p.minHealthPct * 100.0f, p.downs, p.nearDeath ? " neardeath" : "", p.dead ? " dead" : "");
-				if (b.Innocent(p)) s.insert(s.size() - 1, " innocent");
+				if (b.Innocent(p)) s.insert(s.size() - 1, " notfighting");
+				if (p.cameToFight) s.insert(s.size() - 1, " cametofight");
 				if (p.beheaded) s.insert(s.size() - 1, " beheaded");
 				else if (p.dismembered) s.insert(s.size() - 1, " dismembered");
 				for (const auto& i : p.injuries) s.insert(s.size() - 1, std::format(" injury:{}{}", i.name, i.carried ? "(carried)" : ""));

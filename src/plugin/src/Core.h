@@ -96,6 +96,9 @@ namespace BSM
 		// seen with a weapon, spell or fists raised during the battle
 		bool armed{ false };
 
+		// entered combat against someone of their own accord, before anyone had struck them, and was not running away
+		bool cameToFight{ false };
+
 		bool engaged{ false };
 		// ...or fought someone who did. Anything further removed (prey of a predator that never touched the party) is not
 		// part of this battle's story, whatever combat state the game put it in.
@@ -140,6 +143,7 @@ namespace BSM
 		// the dead participant's body lost a limb (a_beheaded: the head)
 		void Dismember(ActorId a_id, bool a_beheaded);
 		void Armed(ActorId a_id);
+		void CameToFight(ActorId a_id);
 		void Down(ActorId a_id, double a_now);
 		void Up(ActorId a_id);
 		void Death(ActorId a_victim, ActorId a_killer, double a_now);
@@ -152,7 +156,8 @@ namespace BSM
 		// fought someone who did (a deer that only bolted is not an enemy, and neither is a crab a wolf killed nearby).
 		[[nodiscard]] bool Involved(const Participant& a_p) const;
 
-		// A lawful person who was attacked without fighting: never raised a weapon, struck nobody, cast nothing harmful.
+		// A lawful person who was attacked without fighting: never raised a weapon, never came at anyone, struck nobody,
+		// cast nothing harmful. (Told as "not actively engaged in combat": whether they were innocent is for the story.)
 		// Not one of the enemies, whatever the game made of them once they were struck.
 		[[nodiscard]] bool Innocent(const Participant& a_p) const;
 

@@ -4,6 +4,7 @@
 
 - Someone killed without fighting is no longer called "an innocent": the summary says they were "not actively engaged
   in combat" and leaves the judging to the story. Thanks to nan0bug00 for the change.
+- An enemy cut down before he could draw is no longer told as someone who wasn't fighting.
 
 ## 1.2.0
 
