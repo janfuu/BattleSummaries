@@ -368,11 +368,11 @@ namespace
 		b.endedAt = 10;
 
 		const auto hero = SummaryText(BuildSummary(b, kHero, "Kaira", {}));
-		Check(Has(hero, "Heimskr, an innocent who was not fighting anyone, was killed by Kaira."), "an innocent's death is said outright", hero);
-		Check(Has(hero, "Kaira and Lydia fought against Whiterun Guard x2 and Bandit.") && Has(hero, "All 3 enemies were killed."), "an innocent is not one of the enemies", hero);
+		Check(Has(hero, "Heimskr, who was not actively engaged in combat, was killed by Kaira."), "the death of someone who was not fighting is said outright", hero);
+		Check(Has(hero, "Kaira and Lydia fought against Whiterun Guard x2 and Bandit.") && Has(hero, "All 3 enemies were killed."), "someone who was not fighting is not one of the enemies", hero);
 		Check(Has(hero, "Also caught up in it: Heimskr."), "but was caught up in it", hero);
 		Check(Has(hero, "Lydia was killed by Kaira, by accident: they were on the same side."), "an ally killed by their own side", hero);
-		Check(Has(hero, "Kaira killed 2 of the 3 who died on the other side"), "the innocent is not one of the killer's enemy kills", hero);
+		Check(Has(hero, "Kaira killed 2 of the 3 who died on the other side"), "and is not one of the killer's enemy kills", hero);
 
 		Battle m;  // nothing but a murder is still something to tell
 		m.Join(Info(kHero, "Kaira", Side::kPlayer, 200));
@@ -381,7 +381,7 @@ namespace
 		m.Damage(kBandit1, kHero, 75, 0.0f, 1);
 		m.Death(kBandit1, kHero, 1);
 		m.endedAt = 2;
-		Check(Significant(m, 3, 30.0) && Has(BuildMemory(m, {}), "Heimskr, an innocent who was not fighting anyone, was killed by Kaira."), "a murder is remembered", BuildMemory(m, {}));
+		Check(Significant(m, 3, 30.0) && Has(BuildMemory(m, {}), "Heimskr, who was not actively engaged in combat, was killed by Kaira."), "a murder is remembered", BuildMemory(m, {}));
 	}
 
 	// Seen in a brawl of spawned monsters in Windhelm: a monster that killed the one that had downed a townsman was

@@ -22,7 +22,7 @@
   "languages": [
     "en"
   ],
-  "version": "1.2.0",
-  "changelog": "Friendly fire is told as an accident, or left out: your choice. Settings are now on SkyrimNet's own settings page. Several enemies killed in one stroke get a mention.",
+  "version": "1.2.1",
+  "changelog": "Someone killed without fighting is no longer called \"an innocent\": they were \"not actively engaged in combat\", and the story decides the rest.",
   "min_skyrimnet_version": "0.25.0"
 }
