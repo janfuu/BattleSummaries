@@ -524,7 +524,7 @@ namespace BSM
 			}
 			for (const auto* p : others) {
 				if (!p->dead || !a_b.Innocent(*p)) continue;
-				out.push_back(std::format("{}, an innocent who was not fighting anyone, {}.", p->info.name, KilledBy(a_b, p->killer)));
+				out.push_back(std::format("{}, who was not actively engaged in combat, {}.", p->info.name, KilledBy(a_b, p->killer)));
 			}
 			for (auto& m : KilledAtOnce(a_b)) out.push_back(std::move(m));
 			for (auto& m : Maimings(a_b)) out.push_back(std::move(m));
