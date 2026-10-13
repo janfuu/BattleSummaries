@@ -89,6 +89,8 @@ namespace BSM::Tracker
 			float           pendingLoss{ 0.0f };  // health lost last tick that no damage report explained (yet)
 			std::set<RE::FormID> injuriesSeen;    // injury effects found on them so far, the ones they came with included
 			int             fightSamples{ 0 };       // times seen in combat and not fleeing while nobody had struck them yet
+			double          fightSeenAt{ -1.0 };     // the first of those
+			bool            fleeLogged{ false };
 			bool            enteredUnstruck{ false };  // the game reported them entering combat before anyone had struck them
 		};
 		std::unordered_map<ActorId, Live> g_live;
@@ -283,11 +285,13 @@ namespace BSM::Tracker
 		// catch someone who had turned on the party and was cut down before the sword was out (a player's report: a
 		// Dawnguard). The game's combat state alone does not tell them from a townsman running away, who is "in combat"
 		// too; its combat controller does: it knows who is fleeing.
-		bool InCombatNotFleeing(RE::Actor* a_actor)
+		// 1: in combat and standing their ground; -1: in combat but fleeing; 0: not in combat (or not known)
+		int CombatIntent(RE::Actor* a_actor)
 		{
-			if (!a_actor || a_actor->IsDead() || !a_actor->IsInCombat()) return false;
+			if (!a_actor || a_actor->IsDead() || !a_actor->IsInCombat()) return 0;
 			const auto* cc = a_actor->GetActorRuntimeData().combatController;
-			return cc && cc->state && !cc->state->isFleeing;
+			if (!cc || !cc->state) return 0;
+			return cc->state->isFleeing ? -1 : 1;
 		}
 
 		void MarkCameToFight(Participant& a_p, const char* a_why)
@@ -303,8 +307,18 @@ namespace BSM::Tracker
 		void SampleIntent(RE::Actor* a_actor, Participant& a_p)
 		{
 			if (a_p.cameToFight || a_p.damageTaken > 0.0f || a_p.info.side == Side::kPlayer) return;
-			if (!InCombatNotFleeing(a_actor)) return;
-			if (++g_live[a_p.info.id].fightSamples >= 2) MarkCameToFight(a_p, "in combat and not fleeing");
+			auto&      live = g_live[a_p.info.id];
+			const int  intent = CombatIntent(a_actor);
+			const auto now = Now();
+			if (intent < 0 && !live.fleeLogged) {
+				live.fleeLogged = true;
+				SKSE::log::debug("Battle {}: {} ({:08X}) is in combat but fleeing: not counted as coming to fight", g_current->id, a_p.info.name, a_p.info.id);
+			}
+			if (intent <= 0) return;
+			++live.fightSamples;
+			if (live.fightSeenAt < 0.0) live.fightSeenAt = now;
+			// (two looks in the same tick, on joining and in the tick's own round, are one look)
+			else if (now - live.fightSeenAt >= 0.2) MarkCameToFight(a_p, "in combat and not fleeing");
 		}
 
 		// ---- injuries from injury mods (caller holds g_lock, main thread) ----
