@@ -1,17 +1,20 @@
 # Changelog
 
-## Next release
+## 1.3.0
 
-- **Reword anything.** Every piece of text the mod writes (about 150 phrases, from "took solid wounds" to "burned by
-  fire") can now be changed. `BattleSummaries_Text.default.ini` lists them all; copy the lines you want to change into
-  your own `BattleSummaries_Text.ini` beside it. Updates never touch your file, and a line the mod cannot use falls
-  back to the built-in wording.
-- Someone killed without fighting is no longer called "an innocent": the summary says they were "not actively engaged
-  in combat" and leaves the judging to the story. Thanks to nan0bug00 for the change.
-- When the mod cannot tell what harmed someone, it says less: "hurt by a harmful effect" (it used to say "harmful
-  magic", even for a wolf's bite), and the source is only named when it is something the attacker knowingly used.
-- The same effect from several attackers of one name is told once.
-- An enemy cut down before he could draw is no longer told as someone who wasn't fighting.
+**Your words, not mine**
+- Every phrase the mod writes can now be reworded: about 150 of them, from "took solid wounds" to "burned by fire".
+  Want it darker, stricter, or just different? See "Your own wording" in the README.
+
+**Less judging**
+- Someone killed without fighting is no longer called "an innocent". The summary says they were "not actively engaged
+  in combat" and leaves the rest to the story. Thanks to nan0bug00 for the change.
+- An enemy cut down before he could draw his sword no longer counts as someone who wasn't fighting.
+
+**Less guessing**
+- When the mod can't tell what hurt someone, it says so plainly: a wolf's bite is no longer "harmful magic".
+- A spell, potion or weapon is only named when the attacker actually used it. No more odd internal names.
+- Three wolves doing the same thing are told once, not three times.
 
 ## 1.2.0
 

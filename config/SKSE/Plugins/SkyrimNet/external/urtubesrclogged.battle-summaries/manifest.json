@@ -22,7 +22,7 @@
   "languages": [
     "en"
   ],
-  "version": "1.2.0",
-  "changelog": "Someone killed without fighting is no longer called \"an innocent\": they were \"not actively engaged in combat\", and the story decides the rest.",
+  "version": "1.3.0",
+  "changelog": "Every phrase the mod writes can now be reworded in your own text file. Someone killed without fighting is no longer called \"an innocent\". When the mod can't tell what hurt someone, it says less instead of guessing.",
   "min_skyrimnet_version": "0.25.0"
 }
