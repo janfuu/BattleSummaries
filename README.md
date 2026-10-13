@@ -104,22 +104,38 @@ Everything is also in `SKSE/Plugins/BattleSummaries.ini`, read at game start:
 
 ## Your own wording
 
-Every piece of text the mod writes can be reworded: a darker tone, a stricter one, or simply phrases you like better.
+Every phrase the mod writes can be reworded: a darker tone, a stricter one, or just words you like better.
 
-- `SKSE/Plugins/BattleSummaries_Text.default.ini` lists every phrase with its built-in wording. It is a reference:
-  each update replaces it, so do not edit it.
-- Create `SKSE/Plugins/BattleSummaries_Text.ini` next to it and copy in only the lines you want to change. That file
-  is yours; the mod never ships or overwrites it.
-- Words in `{braces}` are filled in by the mod. You may leave one out, but not use one the phrase does not have.
-- A line the mod cannot use (an unknown name, a placeholder the phrase lacks) is ignored and the built-in wording is
-  used; `BattleSummaries.log` names it.
-- Your file is read again whenever a battle begins, so a change can be tried without restarting the game.
+**Step by step**
 
-For example, to call someone killed without fighting an innocent again:
+1. Find the mod's folder in your mod manager and open `SKSE/Plugins`. You will see
+   `BattleSummaries_Text.default.ini`. It lists every phrase, grouped under headings. Leave this file as it is:
+   each update replaces it.
+2. In that same folder, create a new text file named `BattleSummaries_Text.ini`.
+3. Copy the lines you want to change from the default file into yours, and reword them. Only the lines you copy are
+   affected; everything else keeps its built-in wording.
+4. Start a battle. Your file is read whenever a battle begins, so there is no need to restart the game.
+
+**Example.** To call someone who was killed without fighting an innocent, your file needs just this one line:
 
 ```
 killed.not_fighting = {name}, an innocent, {killed}.
 ```
+
+**Rules**
+
+- Words in `{braces}` are filled in by the mod. You may leave one out, but you cannot add one the phrase does not
+  have in the default file.
+- Keep each phrase on one line, and keep the name before the `=` exactly as it is.
+- The `[headings]` are only there to help you find things. You do not need them in your file.
+
+**Did it work?** Open `BattleSummaries.log` (see Troubleshooting). It says how many of your phrases are in force, and
+names any line it could not use and why. A line it cannot use is skipped and the built-in wording is told.
+
+**Undo.** Delete a line to get that phrase's built-in wording back, or delete your file to get all of it back.
+
+Updating the mod never touches `BattleSummaries_Text.ini`. If an update adds or renames a phrase, the new default
+file shows it.
 
 The framing around the summary, and the rule NPCs are given about it, is in the prompt file (see "How it works").
 
