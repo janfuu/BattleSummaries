@@ -252,15 +252,34 @@ namespace BSM::Tracker
 			return c ? c->GetFormID() : 0;
 		}
 
-		std::string SourceName(const RE::MagicItem* a_item, const RE::EffectSetting* a_effect)
+		// What carried an effect, by name, when it is something a fighter knowingly used: a spell they know, a power, a
+		// shout, a potion, a poison, a scroll, an enchanted weapon or staff. Anything else is left unnamed: effects that a
+		// perk or a script puts on a target behind the scenes carry names never meant to be read ("AnimalBleedAttack
+		// Wolf Version" for a wolf's bite, seen in play), and when in doubt the summary says less.
+		std::string SourceName(const RE::MagicItem* a_item, ActorId a_caster)
 		{
-			if (a_item) {
-				if (const char* n = a_item->GetFullName(); n && *n) return n;
+			if (!a_item) return {};
+			const char* n = a_item->GetFullName();
+			if (!n || !*n) return {};
+			using Type = RE::MagicSystem::SpellType;
+			switch (a_item->GetSpellType()) {
+			case Type::kSpell: {
+				auto* caster = Lookup(a_caster);
+				auto* spell = a_item->Is(RE::FormType::Spell) ? const_cast<RE::SpellItem*>(static_cast<const RE::SpellItem*>(a_item)) : nullptr;
+				return caster && spell && caster->HasSpell(spell) ? std::string(n) : std::string();
 			}
-			if (a_effect) {
-				if (const char* n = a_effect->GetFullName(); n && *n) return n;
+			case Type::kPower:
+			case Type::kLesserPower:
+			case Type::kVoicePower:
+			case Type::kPoison:
+			case Type::kPotion:
+			case Type::kScroll:
+			case Type::kStaffEnchantment:
+			case Type::kEnchantment:
+				return n;
+			default:
+				return {};
 			}
-			return {};
 		}
 
 		OnTarget FindOnTarget(RE::Actor* a_target, const RE::EffectSetting* a_effect, ActorId a_caster)
@@ -277,7 +296,7 @@ namespace BSM::Tracker
 				out.item = ae->spell;
 				out.found = true;
 			});
-			out.source = SourceName(out.item, a_effect);
+			out.source = SourceName(out.item, out.caster != 0 ? out.caster : a_caster);
 			return out;
 		}
 
@@ -736,7 +755,7 @@ namespace BSM::Tracker
 			ForEachEffect(a_actor, [&](RE::ActiveEffect* ae) {
 				if (ae->flags.any(RE::ActiveEffect::Flag::kInactive, RE::ActiveEffect::Flag::kDispelled)) return;
 				const auto* base = ae->GetBaseObject();
-				if (Effects::RestoresHealth(base)) add(CasterOf(ae), SourceName(ae->spell, base));
+				if (Effects::RestoresHealth(base)) add(CasterOf(ae), SourceName(ae->spell, CasterOf(ae) != 0 ? CasterOf(ae) : id));
 			});
 			for (const auto& h : g_recentHeals) {
 				if (h.target == id && a_now - h.at <= 1.5) add(h.healer, h.source);

@@ -300,7 +300,10 @@ namespace BSM
 			for (const auto& e : a_p.effects) {
 				if (e.hostile != a_hostile) continue;
 				if (e.hostile && OwnSide(a_b, a_p, e.by)) continue;  // friendly fire: told apart (FriendlyFire), or not at all
-				if (static_cast<int>(items.size()) < a_max) items.push_back(EffectPhrase(a_b, a_p, e));
+				// the same thing from several attackers of one name (three wolves) is told once
+				auto phrase = EffectPhrase(a_b, a_p, e);
+				if (std::ranges::find(items, phrase) != items.end()) continue;
+				if (static_cast<int>(items.size()) < a_max) items.push_back(std::move(phrase));
 				else ++more;
 			}
 			if (items.empty()) return {};
@@ -351,7 +354,9 @@ namespace BSM
 		{
 			std::vector<std::string> items;
 			for (const auto& e : a_p.effects) {
-				if (e.hostile && OwnSide(a_b, a_p, e.by) && static_cast<int>(items.size()) < a_max) items.push_back(EffectPhrase(a_b, a_p, e));
+				if (!e.hostile || !OwnSide(a_b, a_p, e.by) || static_cast<int>(items.size()) >= a_max) continue;
+				auto phrase = EffectPhrase(a_b, a_p, e);
+				if (std::ranges::find(items, phrase) == items.end()) items.push_back(std::move(phrase));
 			}
 			return JoinList(items);
 		}

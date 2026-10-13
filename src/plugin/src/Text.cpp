@@ -174,7 +174,7 @@ namespace BSM::Text
 			{ "EffectNames", "fx.frozen", "frozen by frost", "" },
 			{ "EffectNames", "fx.shocked", "shocked by lightning", "" },
 			{ "EffectNames", "fx.drained_life", "drained of life", "" },
-			{ "EffectNames", "fx.hurt", "hurt by harmful magic", "" },
+			{ "EffectNames", "fx.hurt", "hurt by a harmful effect", "harm to health the mod cannot place: a spell, a bleed, a bite; it does not guess which" },
 			{ "EffectNames", "fx.drained_stamina", "drained of stamina", "" },
 			{ "EffectNames", "fx.drained_magicka", "drained of magicka", "" },
 			{ "EffectNames", "fx.armor_weakened", "armor weakened", "" },

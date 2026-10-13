@@ -8,6 +8,9 @@
   back to the built-in wording.
 - Someone killed without fighting is no longer called "an innocent": the summary says they were "not actively engaged
   in combat" and leaves the judging to the story. Thanks to nan0bug00 for the change.
+- When the mod cannot tell what harmed someone, it says less: "hurt by a harmful effect" (it used to say "harmful
+  magic", even for a wolf's bite), and the source is only named when it is something the attacker knowingly used.
+- The same effect from several attackers of one name is told once.
 - An enemy cut down before he could draw is no longer told as someone who wasn't fighting.
 
 ## 1.2.0

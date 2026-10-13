@@ -535,6 +535,24 @@ namespace
 			"the reference file lists every phrase under its heading", ref.substr(0, 400));
 	}
 
+	// Seen in play: three wolves of one name each left the same effect, told three times over; and a bite read as
+	// "harmful magic" under a name never meant to be read.
+	void TestSayLessWhenInDoubt()
+	{
+		Battle b;
+		b.startedAt = 0;
+		b.Join(Info(kHero, "Kaira", Side::kPlayer, 200));
+		for (const auto id : { kBandit1, kBandit2, kChief }) {
+			b.Join(Info(id, "Caged Wolf", Side::kEnemy, 60));
+			b.Damage(kHero, id, 10, 0.9f, 1);
+			b.Effect(kHero, id, Text::Get("fx.hurt"), "", true, 1);  // the tracker leaves an unknowable source unnamed
+		}
+		b.Effect(kHero, kBandit1, "burned by fire", "Flames", true, 2);
+		b.endedAt = 5;
+		const auto told = SummaryText(BuildSummary(b, kHero, "Kaira", {}));
+		Check(Has(told, "Kaira suffered: hurt by a harmful effect by Caged Wolf and burned by fire by Caged Wolf (Flames)."), "the same thing from same-named attackers is told once, and nothing is guessed", told);
+	}
+
 	void TestDuration()
 	{
 		const auto is = [](double a_s, const char* a_want) { Check(DurationText(a_s) == a_want, a_want, DurationText(a_s)); };
@@ -613,6 +631,7 @@ int main(int argc, char** argv)
 	TestFriendlyFire();
 	TestKilledAtOnce();
 	TestOwnWording();
+	TestSayLessWhenInDoubt();
 	TestDuration();
 	TestEdges();
 	std::printf("%d checks, %d failed\n", g_checks, g_failed);
