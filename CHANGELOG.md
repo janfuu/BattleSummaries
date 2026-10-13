@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.1
+## Next release
 
 - Someone killed without fighting is no longer called "an innocent": the summary says they were "not actively engaged
   in combat" and leaves the judging to the story. Thanks to nan0bug00 for the change.

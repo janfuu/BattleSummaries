@@ -22,7 +22,7 @@
   "languages": [
     "en"
   ],
-  "version": "1.2.1",
+  "version": "1.2.0",
   "changelog": "Someone killed without fighting is no longer called \"an innocent\": they were \"not actively engaged in combat\", and the story decides the rest.",
   "min_skyrimnet_version": "0.25.0"
 }
