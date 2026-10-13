@@ -43,6 +43,9 @@ if (-not $Only -or $Only -eq "dll" -or $Only -eq "test") {
   if ($LASTEXITCODE -ne 0) { throw "test build failed" }
   & "$src\build\BattleSummariesTests.exe"
   if ($LASTEXITCODE -ne 0) { throw "offline tests failed" }
+  # the reference file of every phrase the mod writes, from the same table the DLL uses
+  & "$src\build\BattleSummariesTests.exe" --write-reference "$root\config\SKSE\Plugins\BattleSummaries_Text.default.ini"
+  if ($LASTEXITCODE -ne 0) { throw "could not write BattleSummaries_Text.default.ini" }
   if ($Only -ne "test") {
     cmd /c "`"$vc`" >nul 2>&1 && `"$cm`" --build $src\build --target BattleSummaries 2>&1"
     if ($LASTEXITCODE -ne 0) { throw "DLL build failed" }

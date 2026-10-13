@@ -2,6 +2,10 @@
 
 ## Next release
 
+- **Reword anything.** Every piece of text the mod writes (about 150 phrases, from "took solid wounds" to "burned by
+  fire") can now be changed. `BattleSummaries_Text.default.ini` lists them all; copy the lines you want to change into
+  your own `BattleSummaries_Text.ini` beside it. Updates never touch your file, and a line the mod cannot use falls
+  back to the built-in wording.
 - Someone killed without fighting is no longer called "an innocent": the summary says they were "not actively engaged
   in combat" and leaves the judging to the story. Thanks to nan0bug00 for the change.
 - An enemy cut down before he could draw is no longer told as someone who wasn't fighting.

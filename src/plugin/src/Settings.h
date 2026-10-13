@@ -35,6 +35,10 @@ namespace BSM::Settings
 	void                      Load();  // Data/SKSE/Plugins/BattleSummaries.ini; missing keys keep their defaults
 	void                      SetVerbose(bool a_on);
 
+	// The player's own wording: Data/SKSE/Plugins/BattleSummaries_Text.ini, read when it is new or has changed.
+	// Lines it holds replace the built-in phrases (Text.h); the log says how many were taken and names any refused.
+	void LoadText(bool a_force = false);
+
 	// A setting made on SkyrimNet's own settings page (its path there, its value as text). Empty = not set there:
 	// the ini's value stands. Main thread.
 	void Override(const std::string& a_path, const std::string& a_value);

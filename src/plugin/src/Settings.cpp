@@ -1,5 +1,7 @@
 #include "Settings.h"
 
+#include "Text.h"
+
 #include <SimpleIni.h>
 
 namespace BSM::Settings
@@ -16,6 +18,50 @@ namespace BSM::Settings
 		g_data.verbose = a_on;
 		spdlog::set_level(a_on ? spdlog::level::debug : spdlog::level::info);
 		spdlog::flush_on(a_on ? spdlog::level::debug : spdlog::level::info);
+	}
+
+	void LoadText(bool a_force)
+	{
+		static std::filesystem::file_time_type seen{};
+		static bool                            had = false;
+		const std::filesystem::path            path{ L"Data/SKSE/Plugins/BattleSummaries_Text.ini" };
+		std::error_code                        ec;
+		const bool                             exists = std::filesystem::exists(path, ec);
+		if (!exists) {
+			if (had) {
+				had = false;
+				Text::SetOverrides({});
+				SKSE::log::info("Text: BattleSummaries_Text.ini is gone; the built-in wording is back in force");
+			}
+			return;
+		}
+		const auto stamp = std::filesystem::last_write_time(path, ec);
+		if (!a_force && had && stamp == seen) return;
+		had = true;
+		seen = stamp;
+
+		CSimpleIniA ini;
+		ini.SetUnicode();
+		if (ini.LoadFile(path.c_str()) < 0) {
+			SKSE::log::warn("Text: BattleSummaries_Text.ini could not be read; the built-in wording stays in force");
+			return;
+		}
+		std::vector<std::pair<std::string, std::string>> lines;
+		CSimpleIniA::TNamesDepend                        sections;
+		ini.GetAllSections(sections);
+		for (const auto& section : sections) {  // the headings are only for finding things: a line counts under any of them
+			CSimpleIniA::TNamesDepend keys;
+			ini.GetAllKeys(section.pItem, keys);
+			for (const auto& key : keys) {
+				const char* value = ini.GetValue(section.pItem, key.pItem, "");
+				if (!value || !*value) continue;
+				std::string why;
+				if (Text::Accepts(key.pItem, value, &why)) lines.emplace_back(key.pItem, value);
+				else SKSE::log::warn("Text: the line '{}' is not used: {}", key.pItem, why);
+			}
+		}
+		const auto taken = Text::SetOverrides(lines);
+		SKSE::log::info("Text: {} of your own phrases in force (BattleSummaries_Text.ini)", taken);
 	}
 
 	void Override(const std::string& a_path, const std::string& a_value)
@@ -94,6 +140,7 @@ namespace BSM::Settings
 		d.endGraceSeconds = std::clamp(d.endGraceSeconds, 1.0f, 120.0f);
 		g_data = d;
 		SetVerbose(d.verbose);
+		LoadText(true);
 		SKSE::log::info("Settings: injuries {} ({} keywords), dismemberment {}", d.injuries, d.injuryKeywords.size(), d.dismemberment);
 		SKSE::log::info("Settings: enabled {}, near death below {:.0f}%, end grace {}s, merge gap {}s, summary for {} game hours, numbers {}, remember {}",
 			d.enabled, d.nearDeathPct * 100.0f, d.endGraceSeconds, d.mergeGapSeconds, d.summaryGameHours, d.showNumbers, d.rememberEvent);

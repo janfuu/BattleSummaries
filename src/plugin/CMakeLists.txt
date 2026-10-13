@@ -16,7 +16,7 @@ find_package(nlohmann_json CONFIG REQUIRED)
 find_path(SIMPLEINI_INCLUDE_DIRS "SimpleIni.h")
 
 # The battle model and its narrative: no game types, shared by the plugin and the offline tests.
-set(CORE_SOURCES src/Core.cpp src/Narrative.cpp)
+set(CORE_SOURCES src/Core.cpp src/Narrative.cpp src/Text.cpp)
 
 add_library(BattleSummaries SHARED ${CORE_SOURCES} src/main.cpp src/Settings.cpp src/Effects.cpp src/Tracker.cpp src/Perf.cpp src/SkyrimNet.cpp src/Papyrus.cpp)
 target_link_libraries(BattleSummaries PRIVATE CommonLibSSE::CommonLibSSE nlohmann_json::nlohmann_json)

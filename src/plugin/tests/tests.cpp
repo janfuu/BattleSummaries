@@ -4,9 +4,11 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "../src/Core.h"
 #include "../src/Narrative.h"
+#include "../src/Text.h"
 
 #include <cstdio>
 #include <cstdlib>
+#include <set>
 #include <string>
 
 using namespace BSM;
@@ -487,6 +489,52 @@ namespace
 		Check(Has(BuildMemory(b, {}), "Kaira killed 3 at once with Fireball: Bandit x2 and Bandit Chief."), "and it is remembered", BuildMemory(b, {}));
 	}
 
+	// Every phrase can be reworded by the player; nothing they type may blank a summary.
+	void TestOwnWording()
+	{
+		std::set<std::string_view> keys;
+		bool                       tidy = true;
+		for (const auto& e : Text::Defaults()) {
+			tidy = tidy && keys.insert(e.key).second && !e.text.empty() && e.text.front() != ' ' && e.text.back() != ' ' && Text::Accepts(e.key, e.text);
+		}
+		Check(tidy && keys.size() > 140, "every phrase has its own key and survives an ini file (no spaces at either end)", std::to_string(keys.size()));
+
+		std::string why;
+		Check(!Text::Accepts("no.such.phrase", "anything", &why) && why == "there is no phrase of that name", "a line for no phrase is refused", why);
+		Check(!Text::Accepts("killed.not_fighting", "{name}, an innocent, was murdered by {murderer}.", &why) && Has(why, "{murderer}"), "a placeholder the phrase lacks is refused", why);
+		Check(Text::Accepts("killed.not_fighting", "An innocent died."), "a placeholder may be left out", "");
+
+		Battle m;
+		m.Join(Info(kHero, "Kaira", Side::kPlayer, 200));
+		m.Join(Info(kBandit1, "Heimskr", Side::kOther, 75));
+		m.Find(kBandit1)->info.lawful = true;
+		m.Damage(kBandit1, kHero, 75, 0.0f, 1);
+		m.Death(kBandit1, kHero, 1);
+		m.endedAt = 2;
+		const auto before = BuildMemory(m, {});
+
+		const auto taken = Text::SetOverrides({
+			{ "killed.not_fighting", "{name}, an innocent, {killed}." },
+			{ "killed.by", "was cut down by {killer}" },
+			{ "battle.fought", "Blood was spilled{at_place}." },            // {duration} left out
+			{ "wounds.light", "{name} barely bled" },                        // refused: no {name} in that phrase
+			{ "no.such.phrase", "ignored" },
+			{ "dealt.none", "" },                                            // empty: the built-in stands
+		});
+		const auto own = BuildMemory(m, {});
+		Check(taken == 3, "the lines that can be used are taken, the rest left out", std::to_string(taken));
+		Check(Has(own, "Blood was spilled.") && Has(own, "Heimskr, an innocent, was cut down by Kaira."), "the player's wording is told", own);
+		Check(Text::Get("wounds.light") == "took only light wounds" && Text::Get("dealt.none") == "dealt no damage to anyone",
+			"a refused or empty line falls back to the built-in wording", Text::Get("wounds.light") + " / " + Text::Get("dealt.none"));
+
+		Text::SetOverrides({});
+		Check(BuildMemory(m, {}) == before, "and without the file the built-in wording is back", BuildMemory(m, {}));
+
+		const auto ref = Text::Reference();
+		Check(Has(ref, "\n[Deaths]\n") && Has(ref, "killed.not_fighting = {name}, who was not actively engaged in combat, {killed}.") && Has(ref, "fx.burned = burned by fire"),
+			"the reference file lists every phrase under its heading", ref.substr(0, 400));
+	}
+
 	void TestDuration()
 	{
 		const auto is = [](double a_s, const char* a_want) { Check(DurationText(a_s) == a_want, a_want, DurationText(a_s)); };
@@ -542,8 +590,17 @@ namespace
 	}
 }
 
-int main()
+int main(int argc, char** argv)
 {
+	// build.ps1: write the reference file that ships with the mod
+	if (argc == 3 && std::string(argv[1]) == "--write-reference") {
+		std::FILE* f = std::fopen(argv[2], "wb");
+		if (!f) return 2;
+		const auto text = Text::Reference();
+		std::fwrite(text.data(), 1, text.size(), f);
+		std::fclose(f);
+		return 0;
+	}
 	TestRescue();
 	TestNearDeathAndSummon();
 	TestOthers();
@@ -555,6 +612,7 @@ int main()
 	TestFoesSaveNobody();
 	TestFriendlyFire();
 	TestKilledAtOnce();
+	TestOwnWording();
 	TestDuration();
 	TestEdges();
 	std::printf("%d checks, %d failed\n", g_checks, g_failed);

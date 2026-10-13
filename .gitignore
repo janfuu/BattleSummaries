@@ -14,3 +14,5 @@ tools/papyrus-flags/
 snapshots/
 notes/
 build_log.txt
+# a player's own wording: never part of the mod
+config/SKSE/Plugins/BattleSummaries_Text.ini

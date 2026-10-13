@@ -6,6 +6,7 @@
 #include "Perf.h"
 #include "Settings.h"
 #include "SkyrimNet.h"
+#include "Text.h"
 
 #include <nlohmann/json.hpp>
 
@@ -168,7 +169,7 @@ namespace BSM::Tracker
 			const char* n = a_actor->GetDisplayFullName();
 			i.name = n ? n : "";
 			while (!i.name.empty() && std::isspace(static_cast<unsigned char>(i.name.back()))) i.name.pop_back();  // name mods leave a trailing space
-			if (i.name.empty()) i.name = "someone";
+			if (i.name.empty()) i.name = Text::Get("name.someone");
 			i.isPlayer = a_actor == pc;
 			i.maxHealth = MaxHealthOf(a_actor);
 			i.healthPct = HealthPct(a_actor);
@@ -204,7 +205,7 @@ namespace BSM::Tracker
 			// (Solstheim, a walled city) does
 			if (auto* ws = pc->GetWorldspace()) {
 				// (the mainland is recognised by its form, 0000003C: its name is translated in other languages)
-				if (const char* n = ws->GetFullName(); n && *n) return ws->GetFormID() == 0x3C ? std::format("the wilds of {}", n) : std::string(n);
+				if (const char* n = ws->GetFullName(); n && *n) return ws->GetFormID() == 0x3C ? Text::Fill("battle.wilds", { { "place", n } }) : std::string(n);
 			}
 			return {};
 		}
@@ -886,7 +887,10 @@ namespace BSM::Tracker
 				}
 				memories = DueMemories(now);
 			}
-			if (std::exchange(g_readSettings, false)) SkyrimNet::ReadSettings();
+			if (std::exchange(g_readSettings, false)) {
+				SkyrimNet::ReadSettings();
+				Settings::LoadText();  // the player's own wording, when their file has changed
+			}
 			for (const auto& m : memories) SkyrimNet::Remember(m);  // outside the lock: this goes through Papyrus
 			return battle;
 		}
@@ -1030,14 +1034,14 @@ namespace BSM::Tracker
 			return nullptr;
 		}
 
-		const char* AgeText(const Battle& a_b)
+		std::string AgeText(const Battle& a_b)
 		{
-			if (a_b.Ongoing()) return "now";
+			if (a_b.Ongoing()) return Text::Get("age.now");
 			const float h = GameHours() - a_b.endedGameHours;
-			if (h < 0.25f) return "moments ago";
-			if (h < 1.0f) return "a short while ago";
-			if (h < 3.0f) return "an hour or two ago";
-			return "some hours ago";
+			if (h < 0.25f) return Text::Get("age.moments");
+			if (h < 1.0f) return Text::Get("age.short");
+			if (h < 3.0f) return Text::Get("age.hour_or_two");
+			return Text::Get("age.hours");
 		}
 
 		Summary SummaryFor(RE::Actor* a_viewer, std::string& a_age)
@@ -1047,7 +1051,7 @@ namespace BSM::Tracker
 			if (!a_viewer) return r;
 			const auto        id = a_viewer->GetFormID();
 			const char*       n = a_viewer->GetDisplayFullName();
-			const std::string name = n && *n ? n : "someone";
+			const std::string name = n && *n ? n : Text::Get("name.someone");
 			const auto&       cfg = Settings::Get();
 
 			std::scoped_lock l{ g_lock };

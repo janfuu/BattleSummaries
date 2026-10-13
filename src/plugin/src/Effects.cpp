@@ -1,6 +1,7 @@
 #include "Effects.h"
 
 #include "Settings.h"
+#include "Text.h"
 
 namespace BSM::Effects
 {
@@ -37,15 +38,16 @@ namespace BSM::Effects
 			}
 		}
 
+		// the phrase's key in Text
 		const char* ResistLabel(AV a_av)
 		{
 			switch (a_av) {
-			case AV::kResistFire: return "protected against fire";
-			case AV::kResistFrost: return "protected against frost";
-			case AV::kResistShock: return "protected against shock";
-			case AV::kResistMagic: return "protected against magic";
-			case AV::kPoisonResist: return "protected against poison";
-			case AV::kResistDisease: return "protected against disease";
+			case AV::kResistFire: return "fx.resist_fire";
+			case AV::kResistFrost: return "fx.resist_frost";
+			case AV::kResistShock: return "fx.resist_shock";
+			case AV::kResistMagic: return "fx.resist_magic";
+			case AV::kPoisonResist: return "fx.resist_poison";
+			case AV::kResistDisease: return "fx.resist_disease";
 			default: return nullptr;
 			}
 		}
@@ -80,7 +82,7 @@ namespace BSM::Effects
 			std::ranges::transform(a_s, a_s.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
 			return a_s.find("injur") != std::string::npos || a_s.find("wound") != std::string::npos;
 		};
-		if (saysInjury(own) || from.empty()) return own.empty() ? std::string("an injury") : own;
+		if (saysInjury(own) || from.empty()) return own.empty() ? Text::Get("injury.unnamed") : own;
 		return from;
 	}
 
@@ -102,22 +104,22 @@ namespace BSM::Effects
 		const auto has = [&](std::string_view a_kw) { return a_effect->HasKeywordString(a_kw); };
 		const bool bad = d.flags.any(Flag::kDetrimental, Flag::kHostile);
 
-		if (RestoresHealth(a_effect)) return Kind{ "healed", false, true };
+		if (RestoresHealth(a_effect)) return Kind{ Text::Get("fx.healed"), false, true };
 
 		switch (arch) {
-		case Arch::kParalysis: return Kind{ "paralyzed", true };
-		case Arch::kDemoralize: return Kind{ "struck with magical fear", true };
-		case Arch::kFrenzy: return Kind{ "driven into a frenzy", true };
-		case Arch::kCalm: return Kind{ "magically calmed", true };
-		case Arch::kStagger: return Kind{ "staggered", true };
-		case Arch::kDisarm: return Kind{ "disarmed", true };
-		case Arch::kTurnUndead: return Kind{ "turned and driven off", true };
-		case Arch::kSoulTrap: return Kind{ "soul trapped", true };
-		case Arch::kBanish: return Kind{ "banished", true };
-		case Arch::kInvisibility: return Kind{ "turned invisible", false };
-		case Arch::kRally: return Kind{ "emboldened", false };
-		case Arch::kEtherealize: return Kind{ "made ethereal", false };
-		case Arch::kCloak: return bad && !a_selfCast ? Kind{ "caught in a damaging cloak", true } : Kind{ "wrapped in a magical cloak", false };
+		case Arch::kParalysis: return Kind{ Text::Get("fx.paralyzed"), true };
+		case Arch::kDemoralize: return Kind{ Text::Get("fx.fear"), true };
+		case Arch::kFrenzy: return Kind{ Text::Get("fx.frenzy"), true };
+		case Arch::kCalm: return Kind{ Text::Get("fx.calm"), true };
+		case Arch::kStagger: return Kind{ Text::Get("fx.staggered"), true };
+		case Arch::kDisarm: return Kind{ Text::Get("fx.disarmed"), true };
+		case Arch::kTurnUndead: return Kind{ Text::Get("fx.turned"), true };
+		case Arch::kSoulTrap: return Kind{ Text::Get("fx.soul_trapped"), true };
+		case Arch::kBanish: return Kind{ Text::Get("fx.banished"), true };
+		case Arch::kInvisibility: return Kind{ Text::Get("fx.invisible"), false };
+		case Arch::kRally: return Kind{ Text::Get("fx.emboldened"), false };
+		case Arch::kEtherealize: return Kind{ Text::Get("fx.ethereal"), false };
+		case Arch::kCloak: return bad && !a_selfCast ? Kind{ Text::Get("fx.cloak_hostile"), true } : Kind{ Text::Get("fx.cloak"), false };
 		// casting these is not something done to the target
 		case Arch::kSummonCreature:
 		case Arch::kReanimate:
@@ -132,35 +134,35 @@ namespace BSM::Effects
 
 		if (bad) {
 			const bool poison = d.resistVariable == AV::kPoisonResist || (a_source && a_source->IsPoison());
-			if (poison) return Kind{ "poisoned", true };
-			if (d.resistVariable == AV::kResistDisease) return Kind{ "infected with disease", true };
-			if (has("MagicSlow") || av == AV::kSpeedMult) return Kind{ "slowed", true };
-			if (has("MagicParalysis")) return Kind{ "paralyzed", true };
-			if (has("MagicDamageFire") || d.resistVariable == AV::kResistFire) return Kind{ "burned by fire", true };
-			if (has("MagicDamageFrost") || d.resistVariable == AV::kResistFrost) return Kind{ "frozen by frost", true };
-			if (has("MagicDamageShock") || d.resistVariable == AV::kResistShock) return Kind{ "shocked by lightning", true };
+			if (poison) return Kind{ Text::Get("fx.poisoned"), true };
+			if (d.resistVariable == AV::kResistDisease) return Kind{ Text::Get("fx.diseased"), true };
+			if (has("MagicSlow") || av == AV::kSpeedMult) return Kind{ Text::Get("fx.slowed"), true };
+			if (has("MagicParalysis")) return Kind{ Text::Get("fx.paralyzed"), true };
+			if (has("MagicDamageFire") || d.resistVariable == AV::kResistFire) return Kind{ Text::Get("fx.burned"), true };
+			if (has("MagicDamageFrost") || d.resistVariable == AV::kResistFrost) return Kind{ Text::Get("fx.frozen"), true };
+			if (has("MagicDamageShock") || d.resistVariable == AV::kResistShock) return Kind{ Text::Get("fx.shocked"), true };
 			if (ModifiesValue(arch)) {
-				if (arch == Arch::kAbsorb) return Kind{ "drained of life", true };
-				if (av == AV::kHealth) return Kind{ "hurt by harmful magic", true };
-				if (av == AV::kStamina) return Kind{ "drained of stamina", true };
-				if (av == AV::kMagicka) return Kind{ "drained of magicka", true };
-				if (av == AV::kDamageResist) return Kind{ "armor weakened", true };
+				if (arch == Arch::kAbsorb) return Kind{ Text::Get("fx.drained_life"), true };
+				if (av == AV::kHealth) return Kind{ Text::Get("fx.hurt"), true };
+				if (av == AV::kStamina) return Kind{ Text::Get("fx.drained_stamina"), true };
+				if (av == AV::kMagicka) return Kind{ Text::Get("fx.drained_magicka"), true };
+				if (av == AV::kDamageResist) return Kind{ Text::Get("fx.armor_weakened"), true };
 			}
 			// unplaced: named by the effect itself, when a spell, poison or weapon carried it
 			if (!Castable(a_source)) return std::nullopt;
-			return Kind{ std::format("afflicted with {}", name), true };
+			return Kind{ Text::Fill("fx.afflicted", { { "effect", name } }), true };
 		}
 
-		if (has("MagicWard")) return Kind{ "warded", false };
-		if (has("MagicArmorSpell") || (ModifiesValue(arch) && av == AV::kDamageResist)) return Kind{ "shielded by magical armor", false };
+		if (has("MagicWard")) return Kind{ Text::Get("fx.warded"), false };
+		if (has("MagicArmorSpell") || (ModifiesValue(arch) && av == AV::kDamageResist)) return Kind{ Text::Get("fx.armored"), false };
 		if (ModifiesValue(arch)) {
-			if (const auto* r = ResistLabel(av)) return Kind{ r, false };
-			if (av == AV::kHealth) return Kind{ "health fortified", false };
-			if (av == AV::kStamina) return Kind{ "stamina restored", false };
-			if (av == AV::kMagicka) return Kind{ "magicka restored", false };
+			if (const auto* r = ResistLabel(av)) return Kind{ Text::Get(r), false };
+			if (av == AV::kHealth) return Kind{ Text::Get("fx.health_fortified"), false };
+			if (av == AV::kStamina) return Kind{ Text::Get("fx.stamina_restored"), false };
+			if (av == AV::kMagicka) return Kind{ Text::Get("fx.magicka_restored"), false };
 		}
 		// an unplaced helpful effect: worth a line when someone else gave it, noise when it is the caster's own
 		if (a_selfCast || !Castable(a_source)) return std::nullopt;
-		return Kind{ std::format("aided with {}", name), false };
+		return Kind{ Text::Fill("fx.aided", { { "effect", name } }), false };
 	}
 }

@@ -102,6 +102,27 @@ Everything is also in `SKSE/Plugins/BattleSummaries.ini`, read at game start:
 | `bDismemberment` | true | Tell beheadings and severed limbs |
 | `[Debug] bVerboseLog` | false | One log line per damage, death, bleedout, effect and heal |
 
+## Your own wording
+
+Every piece of text the mod writes can be reworded: a darker tone, a stricter one, or simply phrases you like better.
+
+- `SKSE/Plugins/BattleSummaries_Text.default.ini` lists every phrase with its built-in wording. It is a reference:
+  each update replaces it, so do not edit it.
+- Create `SKSE/Plugins/BattleSummaries_Text.ini` next to it and copy in only the lines you want to change. That file
+  is yours; the mod never ships or overwrites it.
+- Words in `{braces}` are filled in by the mod. You may leave one out, but not use one the phrase does not have.
+- A line the mod cannot use (an unknown name, a placeholder the phrase lacks) is ignored and the built-in wording is
+  used; `BattleSummaries.log` names it.
+- Your file is read again whenever a battle begins, so a change can be tried without restarting the game.
+
+For example, to call someone killed without fighting an innocent again:
+
+```
+killed.not_fighting = {name}, an innocent, {killed}.
+```
+
+The framing around the summary, and the rule NPCs are given about it, is in the prompt file (see "How it works").
+
 ## Performance
 
 The mod measures its own cost. Over an eight-minute dungeon run on Skyrim VR with four battles of up to eleven

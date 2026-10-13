@@ -28,6 +28,8 @@ if manifest["version"] != ver:
     sys.exit(f"the layer manifest says {manifest['version']}, the DLL is {ver}: make them agree")
 
 files = [(dll, "SKSE/Plugins/BattleSummaries.dll"), (j("config", "SKSE", "Plugins", "BattleSummaries.ini"), "SKSE/Plugins/BattleSummaries.ini")]
+# every phrase with its built-in wording (the build writes it). The player's own BattleSummaries_Text.ini is never shipped.
+files.append((j("config", "SKSE", "Plugins", "BattleSummaries_Text.default.ini"), "SKSE/Plugins/BattleSummaries_Text.default.ini"))
 files += [(f, "Scripts/" + os.path.basename(f)) for f in sorted(glob.glob(j("build", "papyrus", "BattleSummaries_*.pex")))]
 files += [(f, "Source/Scripts/" + os.path.basename(f)) for f in sorted(glob.glob(j("src", "papyrus", "BattleSummaries_*.psc")))]
 base = j("config", "SKSE", "Plugins", "SkyrimNet", "external", layer)

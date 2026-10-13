@@ -31,6 +31,8 @@ for M in "${TARGETS[@]}"; do
 	mkdir -p "$M/SKSE/Plugins" "$M/Scripts" "$M/Source/Scripts"
 	cp "$R/src/plugin/build/BattleSummaries.dll"        "$M/SKSE/Plugins/BattleSummaries.dll"
 	cp "$R/config/SKSE/Plugins/BattleSummaries.ini"     "$M/SKSE/Plugins/BattleSummaries.ini"
+	# every phrase with its built-in wording; the player's own BattleSummaries_Text.ini is never touched
+	cp "$R/config/SKSE/Plugins/BattleSummaries_Text.default.ini" "$M/SKSE/Plugins/BattleSummaries_Text.default.ini"
 	cp "$R"/build/papyrus/BattleSummaries_*.pex         "$M/Scripts/"
 	cp "$R"/src/papyrus/BattleSummaries_*.psc           "$M/Source/Scripts/"
 	# SkyrimNet 0.25+ content: an EXTERNAL layer, registered by SkyrimNet at start-up (docs/modding/CONTENT_ROOTS.md).
