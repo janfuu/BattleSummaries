@@ -60,6 +60,14 @@ namespace BSM::Effects
 		return d.archetype == Arch::kValueModifier && d.primaryAV == AV::kHealth && d.flags.none(Flag::kDetrimental, Flag::kHostile, Flag::kRecover);
 	}
 
+	bool TakesHealth(const RE::EffectSetting* a_effect)
+	{
+		if (!a_effect) return false;
+		const auto& d = a_effect->data;
+		if (d.primaryAV != AV::kHealth || !ModifiesValue(d.archetype)) return false;
+		return d.archetype == Arch::kAbsorb || d.flags.any(Flag::kDetrimental);
+	}
+
 	bool IsInjury(const RE::EffectSetting* a_effect)
 	{
 		const auto& cfg = Settings::Get();
@@ -86,7 +94,8 @@ namespace BSM::Effects
 		return from;
 	}
 
-	std::optional<Kind> Classify(const RE::EffectSetting* a_effect, const RE::MagicItem* a_source, bool a_selfCast)
+	// what Classify calls it
+	static std::optional<Kind> Place(const RE::EffectSetting* a_effect, const RE::MagicItem* a_source, bool a_selfCast)
 	{
 		if (!a_effect) return std::nullopt;
 		const auto& d = a_effect->data;
@@ -142,8 +151,8 @@ namespace BSM::Effects
 			if (has("MagicDamageFrost") || d.resistVariable == AV::kResistFrost) return Kind{ Text::Get("fx.frozen"), true };
 			if (has("MagicDamageShock") || d.resistVariable == AV::kResistShock) return Kind{ Text::Get("fx.shocked"), true };
 			if (ModifiesValue(arch)) {
-				if (arch == Arch::kAbsorb) return Kind{ Text::Get("fx.drained_life"), true, false, true };
-				if (av == AV::kHealth) return Kind{ Text::Get("fx.hurt"), true, false, true };
+				if (arch == Arch::kAbsorb) return Kind{ Text::Get("fx.drained_life"), true };
+				if (av == AV::kHealth) return Kind{ Text::Get("fx.hurt"), true };
 				if (av == AV::kStamina) return Kind{ Text::Get("fx.drained_stamina"), true };
 				if (av == AV::kMagicka) return Kind{ Text::Get("fx.drained_magicka"), true };
 				if (av == AV::kDamageResist) return Kind{ Text::Get("fx.armor_weakened"), true };
@@ -164,5 +173,12 @@ namespace BSM::Effects
 		// an unplaced helpful effect: worth a line when someone else gave it, noise when it is the caster's own
 		if (a_selfCast || !Castable(a_source)) return std::nullopt;
 		return Kind{ Text::Fill("fx.aided", { { "effect", name } }), false };
+	}
+
+	std::optional<Kind> Classify(const RE::EffectSetting* a_effect, const RE::MagicItem* a_source, bool a_selfCast)
+	{
+		auto kind = Place(a_effect, a_source, a_selfCast);
+		if (kind && kind->hostile) kind->damage = TakesHealth(a_effect);
+		return kind;
 	}
 }

@@ -36,6 +36,10 @@ namespace
 		return { a_id, a_name, a_side, a_id == kHero, a_master, a_hp };
 	}
 
+	// what the tracker reads off a damage effect: whether it was doing anything (a magnitude, its conditions met), what
+	// carried it, how long it lasts
+	EffectFacts Damaging(bool a_inForce, std::uint32_t a_spell = 0, double a_lasts = 0.0) { return { a_spell, true, a_inForce, a_lasts }; }
+
 	// The fight the mod exists for: Lydia is beaten into bleedout by the chief, Kaira kills the chief and heals her.
 	Battle Rescue()
 	{
@@ -470,7 +474,7 @@ namespace
 		b.Damage(kChief, kGuard, 60, 0.8f, 1.5);                 // the guard fights the bandits...
 		b.Effect(kGuard, kHero, "burned by fire", "Fireball", true, 2);
 		b.Damage(kGuard, kHero, 50, 0.8f, 2);                     // ...and is caught in the player's fireball
-		b.Effect(kMage, kHero, Text::Get("fx.drained_life"), "", true, 2, true);
+		b.Effect(kMage, kHero, Text::Get("fx.drained_life"), "", true, 2, Damaging(true));
 		b.Damage(kMage, kHero, 40, 0.6f, 2);                      // so is the hunter, who fought nobody
 		b.Effect(kLydia, kHero, "burned by fire", "Fireball", true, 2);
 		b.Damage(kLydia, kHero, 40, 0.75f, 2);
@@ -558,38 +562,57 @@ namespace
 	}
 
 	// Seen in a player's log: something on the player pulsed an Absorb Health effect onto everyone nearby every half
-	// second, draining none of them, and each was told the player had "drained their life". Harm to health is told
-	// only when the caster's blows reached the target; what else an effect does (frost, a slow) is told as before.
-	void TestDrainWithoutABlow()
+	// second, damaging none of them, and each was told the player had "drained their life". A damage effect is told
+	// only when it took health; what does no damage (paralysis, a slow from a spell without damage) is told as before.
+	void TestHarmlessEffects()
 	{
-		Battle b;
-		b.startedAt = 0;
-		b.Join(Info(kHero, "Kaira", Side::kPlayer, 200));
-		b.Join(Info(kLydia, "Lydia", Side::kPlayer, 300));
-		b.Join(Info(kBandit1, "Bandit", Side::kEnemy, 100));
-		b.Join(Info(kMage, "Hunter", Side::kOther, 100));
-		const auto drained = Text::Get("fx.drained_life");
-		for (const double t : { 1.0, 1.5, 2.0, 2.5 }) {  // the pulse, on everyone in reach
-			for (const auto id : { kLydia, kBandit1, kMage }) b.Effect(id, kHero, drained, "", true, t, true);
-		}
-		b.Effect(kLydia, kBandit1, "frozen", "Frostbite", true, 2);  // no damage with it: still told
-		b.Effect(kLydia, kBandit1, drained, "Vampiric Drain", true, 3, true);
-		b.Damage(kLydia, kBandit1, 30, 0.9f, 3);  // the bandit's blows did reach her, after the drain took hold
-		b.Damage(kBandit1, kHero, 100, 0.0f, 4);
-		b.Death(kBandit1, kHero, 4);
-		b.endedAt = 10;
+		constexpr std::uint32_t kDrainSpell = 0xFF00A001, kFrostbite = 0xFF00A002, kParalyze = 0xFF00A003;
+		const auto drained = Text::Get("fx.drained_life"), frozen = Text::Get("fx.frozen"), slowed = Text::Get("fx.slowed"), paralyzed = Text::Get("fx.paralyzed");
+		const auto replay = [&](bool a_ignoreHarmless) {
+			Battle b;
+			b.startedAt = 0;
+			b.ignoreHarmless = a_ignoreHarmless;
+			b.Join(Info(kHero, "Kaira", Side::kPlayer, 200));
+			b.Join(Info(kLydia, "Lydia", Side::kPlayer, 300));
+			b.Join(Info(kBandit1, "Bandit", Side::kEnemy, 100));
+			b.Join(Info(kMage, "Bandit Mage", Side::kEnemy, 80));
+			b.Join(Info(kGuard, "Hunter", Side::kOther, 100));
+			for (double t = 1.0; t <= 6.0; t += 0.5) {  // the pulse, on everyone in reach, doing nothing to any of them
+				for (const auto id : { kLydia, kBandit1, kGuard }) b.Effect(id, kHero, drained, "", true, t, Damaging(false));
+			}
+			b.Damage(kBandit1, kHero, 30, 0.7f, 2.0);  // the player's sword, while the pulse was on him
+			b.Effect(kLydia, kMage, drained, "Vampiric Drain", true, 3.0, Damaging(true, kDrainSpell));
+			b.Damage(kLydia, kMage, 20, 0.9f, 3.2);  // what it took
+			b.Effect(kHero, kMage, frozen, "Frostbite", true, 4.0, Damaging(true, kFrostbite, 1.0));
+			b.Effect(kHero, kMage, slowed, "Frostbite", true, 4.0, { kFrostbite });
+			b.Damage(kHero, kMage, 15, 0.9f, 4.6);
+			b.Effect(kLydia, kBandit1, paralyzed, "Paralyze", true, 5.0, { kParalyze });  // no damage in that spell
+			b.Effect(kLydia, kMage, frozen, "Frostbite", true, 6.0, Damaging(false, kFrostbite, 1.0));  // a frostbite that did nothing...
+			b.Effect(kLydia, kMage, slowed, "Frostbite", true, 6.0, { kFrostbite });                    // ...and its slow
+			b.Damage(kBandit1, kLydia, 70, 0.0f, 7);
+			b.Death(kBandit1, kLydia, 7);
+			b.endedAt = 10;
+			return b;
+		};
 
-		Check(!b.Involved(*b.Find(kMage)), "a drain that took nothing draws nobody into the battle", "");
+		const auto b = replay(true);
+		Check(!b.Involved(*b.Find(kGuard)), "a damage effect that took nothing draws nobody into the battle", "");
 		const auto hero = SummaryText(BuildSummary(b, kHero, "Kaira", {}));
 		Check(!Has(hero, "Hunter"), "and they are not told as caught up in it", hero);
+		Check(Has(hero, "Kaira suffered: frozen by frost by Bandit Mage (Frostbite) and slowed by Bandit Mage (Frostbite)."), "a frost spell that took health: its slow goes with it", hero);
 		const auto lydia = SummaryText(BuildSummary(b, kLydia, "Lydia", {}));
-		Check(Has(lydia, "Lydia suffered: frozen by Bandit (Frostbite) and drained of life by Bandit (Vampiric Drain).") && !Has(lydia, "drained of life by Kaira"),
-			"a drain is told with a blow behind it, frost without one, and an empty drain not at all", lydia);
-		Check(!Has(lydia, "caught in"), "an empty drain is not friendly fire either", lydia);
+		Check(Has(lydia, "Lydia suffered: drained of life by Bandit Mage (Vampiric Drain) and paralyzed by Bandit (Paralyze)."), "a drain that took health is told; paralysis without damage too", lydia);
+		Check(!Has(lydia, "frozen") && !Has(lydia, "slowed") && !Has(lydia, "by Kaira") && !Has(lydia, "caught in"),
+			"a frost spell that did nothing, its slow, and an empty drain from her own side are not", lydia);
 		const auto bandit = SummaryText(BuildSummary(b, kBandit1, "Bandit", {}));
-		Check(Has(bandit, "Bandit suffered: drained of life by Kaira."), "the player's drain on someone they struck is told", bandit);
-		const auto hunter = BuildSummary(b, kMage, "Hunter", {});
+		Check(!Has(bandit, "drained"), "an empty drain on an enemy the player struck is not told", bandit);
+		const auto hunter = BuildSummary(b, kGuard, "Hunter", {});
 		Check(!hunter.participant && !Has(SummaryText(hunter), "drained"), "a bystander it reached is told nothing about it", SummaryText(hunter));
+
+		const auto all = replay(false);  // as 1.3.0: every damage effect told when it lands
+		Check(Has(SummaryText(BuildSummary(all, kBandit1, "Bandit", {})), "Bandit suffered: drained of life by Kaira."), "with the setting off, the drains are told", "");
+		Check(all.Involved(*all.Find(kGuard)) && Has(SummaryText(BuildSummary(all, kGuard, "Hunter", {})), "drained of life by Kaira"), "on bystanders too", "");
+		Check(Has(SummaryText(BuildSummary(all, kLydia, "Lydia", {})), "frozen by frost by Bandit Mage (Frostbite)"), "and the frost spell that did nothing", "");
 	}
 
 	// The first of the "significant moments": several foes killed by one fighter in the same instant.
@@ -770,7 +793,7 @@ int main(int argc, char** argv)
 	TestFoesSaveNobody();
 	TestFriendlyFire();
 	TestFriendlyFireOnBystanders();
-	TestDrainWithoutABlow();
+	TestHarmlessEffects();
 	TestKilledAtOnce();
 	TestOwnWording();
 	TestSayLessWhenInDoubt();

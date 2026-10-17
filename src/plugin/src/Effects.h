@@ -11,13 +11,17 @@ namespace BSM::Effects
 		std::string label;
 		bool        hostile{ false };
 		bool        heal{ false };  // restores health: told through the healing lines, with the amount
-		bool        drain{ false };  // harm to health itself (drained of life, hurt): told only when a blow came with it
+		bool        damage{ false };  // lowers health (TakesHealth): told only when it took some, with ignoreHarmless
 	};
 
 	// a_source: the spell, potion, poison or enchantment that carried the effect, when known.
 	[[nodiscard]] std::optional<Kind> Classify(const RE::EffectSetting* a_effect, const RE::MagicItem* a_source, bool a_selfCast);
 
 	[[nodiscard]] bool RestoresHealth(const RE::EffectSetting* a_effect);
+
+	// A damage effect: it lowers health. Absorb Health (drained of life), and any detrimental health modifier: Damage
+	// Health, a fire, frost or shock spell's damage, a poison's. Judged from the effect's data, not from what it is called.
+	[[nodiscard]] bool TakesHealth(const RE::EffectSetting* a_effect);
 
 	// An injury from an injury mod: the effect carries one of the keywords listed in the ini. Main thread only.
 	[[nodiscard]] bool IsInjury(const RE::EffectSetting* a_effect);

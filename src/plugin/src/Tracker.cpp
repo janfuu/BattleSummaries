@@ -223,6 +223,10 @@ namespace BSM::Tracker
 			std::string source;
 			const RE::MagicItem* item{ nullptr };
 			bool        found{ false };
+			// what the effect is doing: a magnitude, its conditions met, not switched off; and for how long
+			float       magnitude{ 0.0f };
+			bool        inForce{ false };
+			float       duration{ 0.0f };
 		};
 
 		class EffectFinder final : public RE::MagicTarget::ForEachActiveEffectVisitor
@@ -301,6 +305,10 @@ namespace BSM::Tracker
 				out.caster = caster;
 				out.item = ae->spell;
 				out.found = true;
+				out.magnitude = ae->magnitude;
+				out.duration = ae->duration;
+				out.inForce = ae->magnitude != 0.0f && ae->flags.none(RE::ActiveEffect::Flag::kInactive, RE::ActiveEffect::Flag::kDispelled) &&
+							  ae->conditionStatus.get() != RE::ActiveEffect::ConditionStatus::kFalse;
 			});
 			out.source = SourceName(out.item, out.caster != 0 ? out.caster : a_caster);
 			return out;
@@ -483,6 +491,7 @@ namespace BSM::Tracker
 				g_current->startedAt = a_now;
 				g_current->location = WhereNow();
 				g_current->nearDeathPct = cfg.nearDeathPct;
+				g_current->ignoreHarmless = cfg.ignoreHarmless;
 				g_live.clear();
 				g_recentHeals.clear();
 				SKSE::log::info("Battle {} began at '{}'", g_current->id, g_current->location);
@@ -751,11 +760,21 @@ namespace BSM::Tracker
 				if (kind->hostile && b == a) return;
 				JoinPair(a, b, pc);
 				if (!InBattle(a)) return;
-				SKSE::log::debug("effect: {:08X} {} by {:08X} ({}){} [effect {:08X}, event's caster {:08X}]", a_r.a, kind->label, by, on.source,
-					kind->heal ? " [heal]" : "", a_r.effect, a_r.b);
+				// A damage effect counts only for the health it took (Battle::Landed): read here whether it is doing anything at
+				// all. One no longer on the target (an instant effect, done) is left to the damage reports alone.
+				EffectFacts facts;
+				facts.spell = on.item ? on.item->GetFormID() : 0;
+				facts.damage = kind->damage;
+				facts.inForce = !on.found || on.inForce;
+				facts.lasts = on.found ? on.duration : 0.0f;
+				SKSE::log::debug("effect: {:08X} {} by {:08X} ({}){} [effect {:08X}, event's caster {:08X}{}]", a_r.a, kind->label, by, on.source,
+					kind->heal ? " [heal]" : "", a_r.effect, a_r.b,
+					!kind->damage ? std::string() :
+					!on.found     ? std::string(", damage effect no longer on the target") :
+									std::format(", damage effect, magnitude {:.1f}, {:.1f}s, {}", on.magnitude, on.duration, on.inForce ? "in force" : "doing nothing"));
 				// no caster: a potion heals its drinker; a hostile effect from nobody is a trap or a hazard
 				if (kind->heal) g_recentHeals.push_back({ a_r.a, b ? by : a_r.a, on.source, a_r.at });
-				else g_current->Effect(a_r.a, by, kind->label, on.source, kind->hostile, a_r.at, kind->drain);
+				else g_current->Effect(a_r.a, by, kind->label, on.source, kind->hostile, a_r.at, facts);
 				break;
 			}
 			}

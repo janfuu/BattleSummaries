@@ -10,10 +10,15 @@
 - Standing by while others fight no longer gets you blamed for their magic: an effect a script or perk applies in your
   name is credited to whoever the effect itself names, or to nobody when you hadn't fought, drawn a weapon or readied a
   spell. (Shouts and powers still count as yours.)
-- "Drained of life" (and other harm to health) is only told when the caster actually hurt that person. Seen in a log:
-  a pulsing Absorb Health effect from the player, applied to everyone nearby every half second, that damaged none of
-  them, and every one of them was told the player had drained their life. Effects like frost, slows or fear are told
-  as before.
+- A damage effect that did no damage is no longer told. Seen in a log: a pulsing Absorb Health effect from the
+  player, applied to everyone nearby every half second, that damaged none of them, and every one of them was told the
+  player had drained their life. Now "drained of life", "burned", "frozen", "shocked", "poisoned" and "hurt" are told
+  only when that effect took health from that person (and a spell's slow goes with its frost). Paralysis, fear, calm
+  and slows from spells that do no damage are told as before.
+
+**New setting**
+- "Ignore effects that did no damage" on SkyrimNet's settings page (`bIgnoreHarmlessEffects` in the ini), on by
+  default. Switch it off and every damage effect is told when it lands, as in 1.3.0.
 
 ## 1.3.0
 

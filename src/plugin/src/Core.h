@@ -41,10 +41,25 @@ namespace BSM
 		bool        hostile{ false };
 		int         count{ 0 };
 		double      lastAt{ -1.0 };  // when it last took hold; -1 = not known
-		// Harm to health itself (drained of life, hurt): nothing to tell unless the caster's blows reached the target.
-		// Seen in play: something on the player pulsed an Absorb Health effect onto everyone nearby every half second,
-		// draining none of them, and each was told the player had drained their life.
-		bool drainsHealth{ false };
+		std::uint32_t spell{ 0 };    // what carried it (spell, potion, enchantment), by form; 0 = not known
+		// A damage effect: it lowers health (drained of life, burned, frozen, shocked, poisoned, hurt). Seen in play:
+		// something on the player pulsed an Absorb Health effect onto everyone nearby every half second, damaging none
+		// of them, and each was told the player had drained their life. So one is told only when it took health.
+		bool damage{ false };
+		struct Span
+		{
+			double from, to;
+		};
+		std::vector<Span> inForce;  // a damage effect's times on the target while it did something, with a little slack
+	};
+
+	// What the tracker could read about one application of an effect, beyond its name.
+	struct EffectFacts
+	{
+		std::uint32_t spell{ 0 };
+		bool          damage{ false };
+		bool          inForce{ true };  // the effect on the target has a magnitude and its conditions hold (or it is gone: not known)
+		double        lasts{ 0.0 };     // its duration in seconds; 0 = instant
 	};
 
 	// A lasting injury an injury mod put on a participant ("Leg Injury", "Major Injury").
@@ -65,6 +80,12 @@ namespace BSM
 		float healingDone{ 0.0f };
 
 		std::map<ActorId, float> damageFrom;  // attacker -> damage; 0 = no attacker (falls, traps, lingering effects)
+		struct Blow
+		{
+			ActorId by;  // as in damageFrom
+			double  at;
+		};
+		std::vector<Blow> blows;  // every loss of health, when it came: what a damage effect took is read from these
 
 		struct Heal
 		{
@@ -123,6 +144,8 @@ namespace BSM
 		float       endedGameHours{ 0.0f };
 		std::string location;
 		float       nearDeathPct{ 0.15f };
+		// A damage effect that took no health is left out: not told, and no sign that anyone fought (Landed).
+		bool        ignoreHarmless{ true };
 
 		std::vector<Participant> participants;  // in the order they joined
 
@@ -139,9 +162,10 @@ namespace BSM
 		void Sample(ActorId a_id, float a_healthPct, double a_now);
 		void Heal(ActorId a_target, ActorId a_healer, float a_amount, const std::string& a_source, double a_now);
 		void Effect(ActorId a_target, ActorId a_by, const std::string& a_label, const std::string& a_source, bool a_hostile, double a_now = -1.0,
-			bool a_drainsHealth = false);
-		// The effect did something to a_target worth telling: always, except harm to health from someone whose blows
-		// never reached them in this battle (judged when told: the damage can come after the effect).
+			const EffectFacts& a_facts = {});
+		// The effect is worth telling. With ignoreHarmless, a damage effect only when it took health from a_target: it was
+		// in force (a magnitude, its conditions met) and a_target lost health to its caster while it was. The other effects
+		// of its spell (a frost spell's slow) go with it. Judged when told: the damage can come after the effect.
 		[[nodiscard]] bool Landed(const Participant& a_target, const EffectNote& a_e) const;
 		// the spell (or poison, or enchantment) whose harmful magic a_by last put on a_target within a_within seconds
 		// before a_now; empty when there was none
