@@ -13,8 +13,9 @@ namespace BSM
 		bool showNumbers{ false };  // add raw damage / healing points; off by default, since models tend to recite figures
 		int  maxOthers{ 6 };
 		int  maxEffects{ 6 };
-		// Friendly fire (harm from someone on the same side) is told as an accident, or left out of the summary
-		// altogether. A death by friendly fire is always told.
+		// Friendly fire (harm from someone on the same side, or from the player's side to a bystander caught in the
+		// crossfire during a fight) is told as an accident, or left out of the summary altogether. A death by friendly fire
+		// is always told.
 		bool ignoreFriendlyFire{ false };
 	};
 

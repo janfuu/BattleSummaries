@@ -92,7 +92,7 @@ Everything is also in `SKSE/Plugins/BattleSummaries.ini`, read at game start:
 | `fWitnessRange` | 3500 | Bystanders this close when a battle ends know what happened in it |
 | `[Summary] fSummaryGameHours` | 6 | How long after a battle its summary is still given to dialogue |
 | `bShowNumbers` | false | Add raw damage and healing points to the summary |
-| `bIgnoreFriendlyFire` | false | Harm from one's own side: false tells it as an accident, true leaves it out |
+| `bIgnoreFriendlyFire` | false | Harm from one's own side, or to a bystander caught in the crossfire during a fight: false tells it as an accident, true leaves it out |
 | `iMaxCompanionLines` | 6 | Most companions listed one by one |
 | `iMaxEffectsPerList` | 6 | Most magic effects listed per fighter |
 | `[Memory] bRememberBattles` | true | Register a remembered SkyrimNet event per battle worth remembering |

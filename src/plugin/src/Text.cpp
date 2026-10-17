@@ -125,6 +125,8 @@ namespace BSM::Text
 			{ "Effects", "effect.own", "own {source}", "a spell they cast on themself: \"(own Stoneflesh)\"" },
 
 			{ "FriendlyFire", "friendly.line", "{name} was caught in their own side's attacks, by accident (friendly fire, not an attack on them): {what}.", "" },
+			{ "FriendlyFire", "friendly.crossfire_line", "{name} was caught in the crossfire, by accident (not an attack on them): {what}.",
+				"a bystander who fought nobody, struck by the player's side during a fight" },
 			{ "FriendlyFire", "friendly.damage", "took part of their damage from {names}", "" },
 
 			// ---------------------------------------------------------------- kills and moments

@@ -142,8 +142,8 @@ namespace BSM::Effects
 			if (has("MagicDamageFrost") || d.resistVariable == AV::kResistFrost) return Kind{ Text::Get("fx.frozen"), true };
 			if (has("MagicDamageShock") || d.resistVariable == AV::kResistShock) return Kind{ Text::Get("fx.shocked"), true };
 			if (ModifiesValue(arch)) {
-				if (arch == Arch::kAbsorb) return Kind{ Text::Get("fx.drained_life"), true };
-				if (av == AV::kHealth) return Kind{ Text::Get("fx.hurt"), true };
+				if (arch == Arch::kAbsorb) return Kind{ Text::Get("fx.drained_life"), true, false, true };
+				if (av == AV::kHealth) return Kind{ Text::Get("fx.hurt"), true, false, true };
 				if (av == AV::kStamina) return Kind{ Text::Get("fx.drained_stamina"), true };
 				if (av == AV::kMagicka) return Kind{ Text::Get("fx.drained_magicka"), true };
 				if (av == AV::kDamageResist) return Kind{ Text::Get("fx.armor_weakened"), true };

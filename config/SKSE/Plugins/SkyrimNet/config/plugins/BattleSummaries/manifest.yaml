@@ -10,7 +10,7 @@ schema:
     - name: "Ignore friendly fire"
       path: "summary.ignore_friendly_fire"
       type: "bool"
-      description: "Friendly fire is harm from someone on the same side, such as a follower caught in your fireball. Off: it is told as an accident. On: it is left out of the summaries, so followers stop bringing it up. A death by friendly fire is always told."
+      description: "Friendly fire is harm from someone on the same side, such as a follower caught in your fireball, or to a bystander caught in the crossfire during a fight. Off: it is told as an accident. On: it is left out of the summaries, so followers stop bringing it up. A death by friendly fire is always told."
       defaultValue: false
       category: "Summary"
 

@@ -142,7 +142,7 @@ namespace BSM
 		return best ? best->source : std::string();
 	}
 
-	void Battle::Effect(ActorId a_target, ActorId a_by, const std::string& a_label, const std::string& a_source, bool a_hostile, double a_now)
+	void Battle::Effect(ActorId a_target, ActorId a_by, const std::string& a_label, const std::string& a_source, bool a_hostile, double a_now, bool a_drainsHealth)
 	{
 		auto* t = Find(a_target);
 		if (!t || a_label.empty()) return;
@@ -153,10 +153,16 @@ namespace BSM
 				return;
 			}
 		}
-		t->effects.push_back({ a_label, a_source, a_by, a_hostile, 1, a_now });
-		if (a_hostile && a_by != a_target) {
+		t->effects.push_back({ a_label, a_source, a_by, a_hostile, 1, a_now, a_drainsHealth });
+		// a drain alone is no sign of a fight: if it took anything, the blow did (Damage) and marks them then
+		if (a_hostile && !a_drainsHealth && a_by != a_target) {
 			if (auto* by = Find(a_by)) MarkFought(*Find(a_target), *by);  // Find again: push_back may have moved t
 		}
+	}
+
+	bool Battle::Landed(const Participant& a_target, const EffectNote& a_e) const
+	{
+		return !a_e.drainsHealth || a_target.damageFrom.contains(a_e.by == a_target.info.id ? 0 : a_e.by);
 	}
 
 	void Battle::Injury(ActorId a_id, const std::string& a_name, bool a_carried, double a_now)
@@ -195,7 +201,7 @@ namespace BSM
 		if (a_p.damageTaken <= 0.0f && !a_p.dead) return false;  // nobody touched them
 		for (const auto& q : participants) {
 			for (const auto& e : q.effects) {
-				if (e.hostile && e.by == a_p.info.id && q.info.id != a_p.info.id) return false;
+				if (e.hostile && e.by == a_p.info.id && q.info.id != a_p.info.id && Landed(q, e)) return false;
 			}
 		}
 		return true;
@@ -253,18 +259,27 @@ namespace BSM
 		}
 		if (toPlayerSide > toEnemies) return Side::kEnemy;
 		if (toEnemies > 0.0f) return Side::kPlayer;
-		// did no damage to either: judge by who went for them
+		// Did no damage to either: one the player's enemies went for is with the player's side. One only the player's side
+		// went for is the one they fought, unless the party was fighting real enemies here: then it was crossfire (a
+		// fireball's edge, a stray arrow), and someone who never turned hostile to the player (Join would have made them
+		// an enemy) and never struck the party stays a bystander.
+		bool byPlayerSide = false;
 		for (const auto& [attacker, dmg] : a_p.damageFrom) {
 			const auto* q = Find(attacker);
-			if (q && q->info.side == Side::kPlayer) return Side::kEnemy;
 			if (q && q->info.side == Side::kEnemy) return Side::kPlayer;
+			if (q && q->info.side == Side::kPlayer) byPlayerSide = true;
 		}
-		return Side::kOther;
+		return byPlayerSide && !HasEnemies() ? Side::kEnemy : Side::kOther;
 	}
 
 	bool Battle::Involved(const Participant& a_p) const
 	{
 		return a_p.info.side == Side::kPlayer || a_p.engaged || a_p.involved;
+	}
+
+	bool Battle::HasEnemies() const
+	{
+		return std::ranges::any_of(participants, [&](const Participant& p) { return p.info.side == Side::kEnemy && Involved(p); });
 	}
 
 	float Battle::SideDamageDealt(Side a_side) const

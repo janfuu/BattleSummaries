@@ -11,6 +11,7 @@ namespace BSM::Effects
 		std::string label;
 		bool        hostile{ false };
 		bool        heal{ false };  // restores health: told through the healing lines, with the amount
+		bool        drain{ false };  // harm to health itself (drained of life, hurt): told only when a blow came with it
 	};
 
 	// a_source: the spell, potion, poison or enchantment that carried the effect, when known.

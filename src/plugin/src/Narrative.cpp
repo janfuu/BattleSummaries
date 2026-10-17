@@ -87,11 +87,22 @@ namespace BSM
 			return out;
 		}
 
-		// someone else, on the same side: what they did to a_p was friendly fire
+		// Caught in the crossfire of a fight with real enemies: on neither side, never hostile to the player (Join would
+		// have made them an enemy) and struck nobody. With no enemies about, whoever the party went for was no accident
+		// (a townsman attacked on his own is told as attacked).
+		bool Bystander(const Battle& a_b, const Participant& a_p)
+		{
+			return a_p.info.side == Side::kOther && a_p.damageDealt <= 0.0f && a_b.HasEnemies() && a_b.EffectiveSide(a_p) == Side::kOther;
+		}
+
+		// someone else, on the same side: what they did to a_p was friendly fire. So is what the player's side did to a
+		// bystander (a townsman at the edge of a fireball aimed at bandits): the same accident, told or left out the same way.
 		bool OwnSide(const Battle& a_b, const Participant& a_p, ActorId a_other)
 		{
 			const auto* q = a_b.Find(a_other);
-			return q && q->info.id != a_p.info.id && a_b.EffectiveSide(*q) == a_b.EffectiveSide(a_p);
+			if (!q || q->info.id == a_p.info.id) return false;
+			const Side theirs = a_b.EffectiveSide(*q);
+			return theirs == a_b.EffectiveSide(a_p) || (theirs == Side::kPlayer && Bystander(a_b, a_p));
 		}
 
 		// the damage a participant did to the other side: what they did to their own does not make them a fighter
@@ -298,7 +309,7 @@ namespace BSM
 			std::vector<std::string> items;
 			int                      more = 0;
 			for (const auto& e : a_p.effects) {
-				if (e.hostile != a_hostile) continue;
+				if (e.hostile != a_hostile || !a_b.Landed(a_p, e)) continue;
 				if (e.hostile && OwnSide(a_b, a_p, e.by)) continue;  // friendly fire: told apart (FriendlyFire), or not at all
 				// the same thing from several attackers of one name (three wolves) is told once
 				auto phrase = EffectPhrase(a_b, a_p, e);
@@ -354,7 +365,7 @@ namespace BSM
 		{
 			std::vector<std::string> items;
 			for (const auto& e : a_p.effects) {
-				if (!e.hostile || !OwnSide(a_b, a_p, e.by) || static_cast<int>(items.size()) >= a_max) continue;
+				if (!e.hostile || !a_b.Landed(a_p, e) || !OwnSide(a_b, a_p, e.by) || static_cast<int>(items.size()) >= a_max) continue;
 				auto phrase = EffectPhrase(a_b, a_p, e);
 				if (std::ranges::find(items, phrase) == items.end()) items.push_back(std::move(phrase));
 			}
@@ -469,7 +480,8 @@ namespace BSM
 				std::string          own;
 				if (FriendlyDamage(a_b, a_p, &by) >= 0.1f * a_p.info.maxHealth && !by.empty()) own = F("friendly.damage", { { "names", JoinList(Names(a_b, by)) } });
 				if (const auto magic = FriendlyFire(a_b, a_p, a_opt.maxEffects); !magic.empty()) own += (own.empty() ? "" : "; ") + magic;
-				if (!own.empty()) out.push_back(F("friendly.line", { { "name", n }, { "what", own } }));
+				// a bystander was on nobody's side: not "their own side's attacks"
+				if (!own.empty()) out.push_back(F(Bystander(a_b, a_p) ? "friendly.crossfire_line" : "friendly.line", { { "name", n }, { "what", own } }));
 			}
 			if (const auto good = Effects(a_b, a_p, false, a_opt.maxEffects); !good.empty()) out.push_back(F("effects.helped", { { "name", n }, { "effects", good } }));
 
