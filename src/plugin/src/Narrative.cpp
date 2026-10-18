@@ -30,11 +30,35 @@ namespace BSM
 			return out;
 		}
 
+		// Several fighters of one name are told apart by the order they joined: "the first Troll", "the second Troll". The
+		// same one keeps its number in every line and every NPC's account, so a reader can follow who did what. Lists keep
+		// the name alone ("Troll x2"); a unique name is never numbered.
+		std::string Numbered(const Battle& a_b, const Participant& a_p)
+		{
+			int nth = 0, of = 0;
+			for (const auto& q : a_b.participants) {
+				if (q.info.name != a_p.info.name || !a_b.Involved(q)) continue;
+				++of;
+				if (&q == &a_p) nth = of;
+			}
+			if (of < 2 || nth == 0) return a_p.info.name;
+			if (nth <= 10) return F("name.nth", { { "ordinal", T("ordinal." + std::to_string(nth)) }, { "name", a_p.info.name } });
+			return F("name.numbered", { { "name", a_p.info.name }, { "count", std::to_string(nth) } });
+		}
+
 		std::string NameOf(const Battle& a_b, ActorId a_id)
 		{
 			if (a_id == 0) return T("name.nobody");
 			const auto* p = a_b.Find(a_id);
-			return p && !p->info.name.empty() ? p->info.name : T("name.someone");
+			if (!p || p->info.name.empty()) return T("name.someone");
+			return Numbered(a_b, *p);
+		}
+
+		// a line begins with a capital, whatever name or phrase it opens with ("the second Troll, who ...")
+		std::string Cap(std::string a_line)
+		{
+			if (!a_line.empty() && a_line[0] >= 'a' && a_line[0] <= 'z') a_line[0] = static_cast<char>(a_line[0] - 'a' + 'A');
+			return a_line;
 		}
 
 		std::string CreditName(const Battle& a_b, ActorId a_id);
@@ -217,15 +241,18 @@ namespace BSM
 			for (const auto id : assailants) {
 				const auto* a = a_b.Find(id);
 				if (!a || !a->dead || a->diedAt < a_p.criticalAt || a_b.EffectiveSide(*a) == mine) continue;
+				// the one whose blows did it "had struck down" them; another who only did a large part of the damage had wounded them
+				const bool downedThem = id == a_p.broughtLowBy;
+				const auto assailant = NameOf(a_b, a->info.id);
 				if (a->killer == a_p.info.id) {
-					r.deeds.push_back(F("rescue.recovered", { { "name", a_p.info.name }, { "assailant", a->info.name }, { "what", what } }));
+					r.deeds.push_back(F(downedThem ? "rescue.recovered" : "rescue.recovered_wounded", { { "name", a_p.info.name }, { "assailant", assailant }, { "what", what } }));
 				} else if (a->killer != 0) {
-					r.deeds.push_back(F("rescue.assailant_killed",
-						{ { "assailant", a->info.name }, { "what", what }, { "name", a_p.info.name }, { "killer", CreditName(a_b, a->killer) } }));
+					r.deeds.push_back(F(downedThem ? "rescue.assailant_killed" : "rescue.assailant_wounded",
+						{ { "assailant", assailant }, { "what", what }, { "name", a_p.info.name }, { "killer", CreditName(a_b, a->killer) } }));
 					// a foe who happened to kill the assailant (monsters turning on each other) saved nobody
 					const auto* k = a_b.Find(a->killer);
 					if (!k || a_b.EffectiveSide(*k) == Opposing(mine)) continue;
-					r.brief.push_back(F("rescue.brief_killed", { { "killer", NameOf(a_b, a->killer) }, { "assailant", a->info.name } }));
+					r.brief.push_back(F("rescue.brief_killed", { { "killer", NameOf(a_b, a->killer) }, { "assailant", assailant } }));
 					addSavior(k->info.master != 0 && a_b.Find(k->info.master) ? k->info.master : a->killer);
 				}
 			}
@@ -326,7 +353,9 @@ namespace BSM
 		{
 			std::string s = a_e.label;
 			if (a_e.by != 0 && a_e.by != a_p.info.id) {
-				s += " " + F("effect.by", { { "name", NameOf(a_b, a_e.by) } });
+				// by name alone: a list of what was done to them, where three wolves doing the same are told once
+				const auto* by = a_b.Find(a_e.by);
+				s += " " + F("effect.by", { { "name", by && !by->info.name.empty() ? by->info.name : NameOf(a_b, a_e.by) } });
 				if (!a_e.source.empty()) s += " (" + a_e.source + ")";
 			} else if (!a_e.source.empty()) {
 				s += " (" + (a_e.by == 0 ? a_e.source : F("effect.own", { { "source", a_e.source } })) + ")";  // by nobody: a trap, a hazard
@@ -549,7 +578,7 @@ namespace BSM
 				if (std::ranges::find(r.saviors, a_p.info.id) != r.saviors.end()) {
 					std::string deeds;
 					for (const auto& d : r.deeds) deeds += " " + d;
-					out.push_back(F("rescue.saved_other", { { "name", n }, { "other", q.info.name }, { "deeds", deeds } }));
+					out.push_back(F("rescue.saved_other", { { "name", n }, { "other", NameOf(a_b, q.info.id) }, { "deeds", deeds } }));
 				}
 			}
 			return out;
@@ -574,7 +603,7 @@ namespace BSM
 			if (EnemyKills(a_b, a_p, foes, &dispatched, nullptr, nullptr, true) > 0) bits.push_back(F("other.dispatched", { { "victims", Grouped(dispatched) } }));
 			std::string facts;
 			for (std::size_t i = 0; i < bits.size(); ++i) facts += (i ? "; " : "") + bits[i];
-			return F("other.line", { { "name", a_p.info.name }, { "facts", facts } });
+			return F("other.line", { { "name", NameOf(a_b, a_p.info.id) }, { "facts", facts } });
 		}
 
 		// nobody on this side fell, went down, came near death or took real wounds
@@ -607,11 +636,11 @@ namespace BSM
 				// killed by their own side: said outright, accident or not
 				const auto* k = a_b.Find(p->killer);
 				const bool  ownSide = k && k->info.id != p->info.id && a_b.EffectiveSide(*k) == Side::kPlayer;
-				out.push_back(F("killed.line", { { "name", p->info.name }, { "killed", KilledBy(a_b, p->killer) }, { "own_side", ownSide ? ", " + T("killed.own_side") : std::string() } }));
+				out.push_back(F("killed.line", { { "name", NameOf(a_b, p->info.id) }, { "killed", KilledBy(a_b, p->killer) }, { "own_side", ownSide ? ", " + T("killed.own_side") : std::string() } }));
 			}
 			for (const auto* p : others) {
 				if (a_b.omitBystanders || !p->dead || !a_b.Innocent(*p)) continue;
-				out.push_back(F("killed.not_fighting", { { "name", p->info.name }, { "killed", KilledBy(a_b, p->killer) } }));
+				out.push_back(F("killed.not_fighting", { { "name", NameOf(a_b, p->info.id) }, { "killed", KilledBy(a_b, p->killer) } }));
 			}
 			for (auto& m : KilledAtOnce(a_b)) out.push_back(std::move(m));
 			for (auto& m : Maimings(a_b)) out.push_back(std::move(m));
@@ -627,6 +656,7 @@ namespace BSM
 		r.ongoing = a_b.Ongoing();
 		r.name = a_viewerName;
 		r.general = General(a_b);
+		for (auto& l : r.general) l = Cap(std::move(l));
 
 		const auto* me = a_b.Find(a_viewer);
 		if (me && !a_b.Involved(*me)) me = nullptr;  // in the game's combat state, but never fought: a witness
@@ -634,6 +664,7 @@ namespace BSM
 		if (me) {
 			if (r.name.empty()) r.name = me->info.name;
 			r.personal = Personal(a_b, *me, a_opt);
+			for (auto& l : r.personal) l = Cap(std::move(l));
 		}
 		// their companions: the viewer's own side, or the player's side for a witness
 		const Side side = me && a_b.EffectiveSide(*me) == Side::kEnemy ? Side::kEnemy : Side::kPlayer;
@@ -645,7 +676,7 @@ namespace BSM
 		for (const auto* p : OnSide(a_b, side)) {
 			if (p->info.id == a_viewer) continue;
 			if (static_cast<int>(r.others.size()) >= a_opt.maxOthers) break;
-			r.others.push_back(OtherLine(a_b, *p, a_opt));
+			r.others.push_back(Cap(OtherLine(a_b, *p, a_opt)));
 		}
 		return r;
 	}
@@ -656,7 +687,7 @@ namespace BSM
 		const auto  add = [&](const std::string& a_line) {
 			if (a_line.empty()) return;
 			if (!s.empty()) s += ' ';
-			s += a_line;
+			s += Cap(a_line);
 		};
 		for (const auto& l : General(a_b)) add(l);
 		for (const auto* p : OnSide(a_b, Side::kPlayer)) {

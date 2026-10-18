@@ -26,6 +26,10 @@
   whoever did it: "Summoned creatures dispatched: Lydia 1 (Flame Atronach)."
 - Follower Death and Injury Chance's injuries are recognised: "a minor injury", "a serious injury", "a lasting injury".
 
+- Several enemies of one name are told apart: "the first Troll", "the second Troll", the same in every line, so a
+  follower can tell which one struck her down. Only the one whose blows did it "struck her down"; another that hurt
+  her badly "had also wounded" her.
+
 **New setting**
 - "Mention bystanders who were killed" on SkyrimNet's settings page (`bMentionBystanders` in the ini), off by
   default.

@@ -134,8 +134,8 @@ namespace
 		b.endedAt = 30;
 
 		const auto hero = SummaryText(BuildSummary(b, kHero, "Kaira", {}));
-		Check(Has(hero, "Kaira was brought to the very edge of death by Wolf"), "near death without bleedout", hero);
-		Check(Has(hero, "Wolf, who had nearly killed Kaira, was then killed by Flame Atronach (commanded by Kaira)."), "the summon's kill, with its master", hero);
+		Check(Has(hero, "Kaira was brought to the very edge of death by the first Wolf"), "near death without bleedout", hero);
+		Check(Has(hero, "The first Wolf, who had nearly killed Kaira, was then killed by Flame Atronach (commanded by Kaira)."), "the summon's kill, with its master", hero);
 		Check(!Has(hero, "saved Kaira's life"), "your own summon's kill is not someone else's rescue", hero);
 		Check(Has(hero, "Kaira healed themself with Potion of Healing"), "a potion is a self heal", hero);
 		Check(Has(hero, "1 of the 2 enemies were killed; the rest fled, yielded or broke off."), "partial outcome", hero);
@@ -835,6 +835,34 @@ namespace
 			"told to each who did", kaira);
 	}
 
+	// Seen in play: two Trolls, one that struck a follower down and one that had wounded her, read as one Troll killed twice.
+	void TestSameNames()
+	{
+		constexpr ActorId kTroll1 = 0xFF000931, kTroll2 = 0xFF000932;
+		Battle b;
+		b.startedAt = 0;
+		b.Join(Info(kHero, "Kaira", Side::kPlayer, 200));
+		b.Join(Info(kLydia, "Lydia", Side::kPlayer, 300));
+		b.Join(Info(kTroll1, "Troll", Side::kEnemy, 300));
+		b.Join(Info(kTroll2, "Troll", Side::kEnemy, 300));
+		b.Damage(kLydia, kTroll2, 150, 0.5f, 1);
+		b.Damage(kLydia, kTroll1, 140, 0.03f, 2);
+		b.Down(kLydia, 2);
+		b.Damage(kTroll1, kHero, 300, 0.0f, 4);
+		b.Death(kTroll1, kHero, 4);
+		b.Up(kLydia);
+		b.Damage(kTroll2, kLydia, 300, 0.0f, 8);
+		b.Death(kTroll2, kLydia, 8);
+		b.endedAt = 10;
+		const auto lydia = SummaryText(BuildSummary(b, kLydia, "Lydia", {}));
+		Check(Has(lydia, "Lydia was struck down by the first Troll") && Has(lydia, "The first Troll, who had struck down Lydia, was then killed by Kaira.") &&
+				  Has(lydia, "Lydia recovered enough to kill the second Troll, who had also wounded Lydia badly."),
+			"same-named fighters are numbered, and only the one that did it struck her down", lydia);
+		Check(Has(lydia, "Kaira and Lydia fought against Troll x2."), "lists keep the name alone", lydia);
+		const auto hero = SummaryText(BuildSummary(b, kHero, "Kaira", {}));
+		Check(Has(hero, "Lydia: ") && !Has(hero, "- the "), "every line starts with a capital", hero);
+	}
+
 	void TestDuration()
 	{
 		const auto is = [](double a_s, const char* a_want) { Check(DurationText(a_s) == a_want, a_want, DurationText(a_s)); };
@@ -919,6 +947,7 @@ int main(int argc, char** argv)
 	TestNonCombatantsLeftOut();
 	TestSummons();
 	TestEnemySummonsDispatched();
+	TestSameNames();
 	TestDuration();
 	TestEdges();
 	std::printf("%d checks, %d failed\n", g_checks, g_failed);
