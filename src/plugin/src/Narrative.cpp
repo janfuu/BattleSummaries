@@ -81,7 +81,11 @@ namespace BSM
 		{
 			std::vector<const Participant*> out;
 			for (const auto& p : a_b.participants) {
-				if (a_b.Involved(p) && a_b.EffectiveSide(p) == a_side) out.push_back(&p);
+				if (!a_b.Involved(p) || a_b.EffectiveSide(p) != a_side) continue;
+				// a summon on the player's side is its master's doing, not a fighter of its own: its kills are told with the
+				// master's, and its end (a dismissal as often as a death) is never a loss
+				if (a_side == Side::kPlayer && p.info.summon) continue;
+				out.push_back(&p);
 			}
 			std::ranges::stable_partition(out, [](const Participant* p) { return p->info.isPlayer; });  // the player leads the list
 			return out;
@@ -262,19 +266,33 @@ namespace BSM
 		// enemy-of-a_side kills per killer, most first: "Kaira 3 (Bandit x2, Bandit Chief), Lydia 1 (Bandit)"
 		std::string KillTally(const Battle& a_b, Side a_victims)
 		{
-			std::vector<std::pair<ActorId, std::vector<const Participant*>>> tally;
+			struct Entry
+			{
+				ActorId                         killer;
+				std::vector<const Participant*> victims;
+				std::vector<const Participant*> summons;  // the summons that made some of these kills
+			};
+			std::vector<Entry> tally;
 			for (const auto* v : OnSide(a_b, a_victims)) {
 				if (!v->dead) continue;
-				const auto it = std::ranges::find_if(tally, [&](const auto& t) { return t.first == v->killer; });
-				if (it == tally.end()) tally.push_back({ v->killer, { v } });
-				else it->second.push_back(v);
+				const auto* k = a_b.Find(v->killer);
+				const bool  bySummon = k && k->info.summon && k->info.master != 0 && a_b.Find(k->info.master);
+				const auto  credited = bySummon ? k->info.master : v->killer;
+				auto        it = std::ranges::find_if(tally, [&](const Entry& t) { return t.killer == credited; });
+				if (it == tally.end()) it = tally.insert(tally.end(), { credited, {}, {} });
+				it->victims.push_back(v);
+				if (bySummon && std::ranges::none_of(it->summons, [&](const Participant* q) { return q->info.name == k->info.name; })) it->summons.push_back(k);
 			}
-			std::ranges::stable_sort(tally, [](const auto& a, const auto& b) { return a.second.size() > b.second.size(); });
+			std::ranges::stable_sort(tally, [](const Entry& a, const Entry& b) { return a.victims.size() > b.victims.size(); });
 			std::vector<std::string> items;
-			for (const auto& [killer, victims] : tally) {
-				// the victims by name only while the list stays short
-				items.push_back((killer == 0 ? T("tally.unknown") : CreditName(a_b, killer)) + " " + N(victims.size()) +
-								(victims.size() <= 3 ? " (" + Grouped(victims) + ")" : std::string()));
+			for (const auto& [killer, victims, summons] : tally) {
+				// the victims by name only while the list stays short; a summon's share as "through Scrap"
+				std::vector<std::string> notes;
+				if (victims.size() <= 3) notes.push_back(Grouped(victims));
+				if (!summons.empty()) notes.push_back(F("tally.through", { { "summons", Grouped(summons) } }));
+				std::string inner;
+				for (const auto& n : notes) inner += (inner.empty() ? "" : ", ") + n;
+				items.push_back((killer == 0 ? T("tally.unknown") : CreditName(a_b, killer)) + " " + N(victims.size()) + (inner.empty() ? std::string() : " (" + inner + ")"));
 			}
 			std::string out;
 			for (const auto& i : items) out += (out.empty() ? "" : "; ") + i;
@@ -417,14 +435,26 @@ namespace BSM
 			return out;
 		}
 
-		int EnemyKills(const Battle& a_b, const Participant& a_p, Side a_foes, std::vector<const Participant*>* a_out = nullptr)
+		// the participant's own kills of the other side, and their summons' (a_bySummons counts those, a_summons names them)
+		int EnemyKills(const Battle& a_b, const Participant& a_p, Side a_foes, std::vector<const Participant*>* a_out = nullptr, int* a_bySummons = nullptr,
+			std::vector<const Participant*>* a_summons = nullptr)
 		{
-			int n = 0;
-			for (const auto id : a_p.kills) {
-				const auto* v = a_b.Find(id);
-				if (v && a_b.EffectiveSide(*v) == a_foes) {
+			int        n = 0;
+			const auto count = [&](const Participant& a_killer, bool a_summon) {
+				for (const auto id : a_killer.kills) {
+					const auto* v = a_b.Find(id);
+					if (!v || !a_b.Involved(*v) || a_b.EffectiveSide(*v) != a_foes) continue;
 					++n;
 					if (a_out) a_out->push_back(v);
+					if (!a_summon) continue;
+					if (a_bySummons) ++*a_bySummons;
+					if (a_summons && std::ranges::none_of(*a_summons, [&](const Participant* q) { return q->info.name == a_killer.info.name; })) a_summons->push_back(&a_killer);
+				}
+			};
+			count(a_p, false);
+			if (!a_p.info.summon) {
+				for (const auto& q : a_b.participants) {
+					if (q.info.summon && q.info.master == a_p.info.id) count(q, true);
 				}
 			}
 			return n;
@@ -485,11 +515,13 @@ namespace BSM
 			}
 			if (const auto good = Effects(a_b, a_p, false, a_opt.maxEffects); !good.empty()) out.push_back(F("effects.helped", { { "name", n }, { "effects", good } }));
 
-			std::vector<const Participant*> victims;
-			const int                       mine = EnemyKills(a_b, a_p, foes, &victims);
+			std::vector<const Participant*> victims, summons;
+			int                             bySummons = 0;
+			const int                       mine = EnemyKills(a_b, a_p, foes, &victims, &bySummons, &summons);
 			const int                       all = a_b.Dead(foes);
 			if (mine > 0) {
 				out.push_back(F("kills.mine", { { "name", n }, { "count", N(mine) }, { "total", N(all) }, { "victims", mine <= 3 ? ": " + Grouped(victims) : std::string() } }));
+				if (bySummons > 0) out.push_back(F("kills.through", { { "count", N(bySummons) }, { "summons", Grouped(summons) } }));
 			}
 			else if (all > 0) out.push_back(F("kills.none", { { "name", n }, { "total", N(all) } }));
 
@@ -558,7 +590,7 @@ namespace BSM
 				out.push_back(F("killed.line", { { "name", p->info.name }, { "killed", KilledBy(a_b, p->killer) }, { "own_side", ownSide ? ", " + T("killed.own_side") : std::string() } }));
 			}
 			for (const auto* p : others) {
-				if (!p->dead || !a_b.Innocent(*p)) continue;
+				if (a_b.omitBystanders || !p->dead || !a_b.Innocent(*p)) continue;
 				out.push_back(F("killed.not_fighting", { { "name", p->info.name }, { "killed", KilledBy(a_b, p->killer) } }));
 			}
 			for (auto& m : KilledAtOnce(a_b)) out.push_back(std::move(m));
@@ -658,7 +690,7 @@ namespace BSM
 	bool Significant(const Battle& a_b, int a_minEnemies, double a_minSeconds)
 	{
 		for (const auto& p : a_b.participants) {
-			if (p.dead && a_b.Innocent(p)) return true;  // an innocent died
+			if (!a_b.omitBystanders && p.dead && a_b.Innocent(p)) return true;  // someone was killed without fighting
 		}
 		if (a_b.Count(Side::kPlayer) == 0 || a_b.Count(Side::kEnemy) == 0) return false;  // nothing the player's side fought
 		for (const auto* p : OnSide(a_b, Side::kPlayer)) {

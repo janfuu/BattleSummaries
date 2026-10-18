@@ -716,6 +716,92 @@ namespace
 		Check(Has(told, "Kaira suffered: hurt by a harmful effect by Caged Wolf and burned by fire by Caged Wolf (Flames)."), "the same thing from same-named attackers is told once, and nothing is guessed", told);
 	}
 
+	// A player's report: any line about someone killed without fighting set their followers (and other mods tracking
+	// such things) against them. Left out by default; enemies killed unaware still count.
+	void TestNonCombatantsLeftOut()
+	{
+		constexpr ActorId kDeer = 0xFF000901, kVigilant = 0xFF000902;
+		const auto fight = [&](bool a_omit) {
+			Battle b;
+			b.omitBystanders = a_omit;
+			b.startedAt = 0;
+			b.Join(Info(kHero, "Kaira", Side::kPlayer, 200));
+			b.Join(Info(kLydia, "Lydia", Side::kPlayer, 300));
+			b.Join(Info(kBandit1, "Bandit", Side::kEnemy, 100));
+			b.Join(Info(kBandit2, "Heimskr", Side::kOther, 75));
+			b.Find(kBandit2)->info.lawful = true;
+			b.Join(Info(kDeer, "Deer", Side::kOther, 40));
+			b.Join(Info(kVigilant, "Vigilant of Stendarr", Side::kOther, 150));
+			b.Find(kVigilant)->info.lawful = true;
+			b.Find(kVigilant)->info.wouldFight = true;  // his order hunts vampires: an enemy, asleep or not
+			b.Damage(kLydia, kBandit1, 30, 0.9f, 1);
+			b.Damage(kBandit1, kLydia, 100, 0.0f, 2);
+			b.Death(kBandit1, kLydia, 2);
+			b.Damage(kBandit2, kHero, 75, 0.0f, 3);  // a townsman cut down in the fight
+			b.Death(kBandit2, kHero, 3);
+			b.Damage(kDeer, kHero, 40, 0.0f, 4);
+			b.Death(kDeer, kHero, 4);
+			b.Damage(kVigilant, kHero, 150, 0.0f, 5);  // a sneak attack: he never drew
+			b.Death(kVigilant, kHero, 5);
+			b.endedAt = 10;
+			return b;
+		};
+		const auto left = fight(true);
+		const auto told = SummaryText(BuildSummary(left, kLydia, "Lydia", {}));
+		Check(!Has(told, "Heimskr") && !Has(told, "Deer") && !Has(told, "caught up"), "non-combatants are left out altogether", told);
+		Check(Has(told, "Kaira and Lydia fought against Bandit and Vigilant of Stendarr.") && Has(told, "All 2 enemies were killed."),
+			"an enemy killed unaware still counts", told);
+		Check(Has(told, "Who killed the enemies: Lydia 1 (Bandit); Kaira 1 (Vigilant of Stendarr)."), "and is credited", told);
+		Check(!Has(BuildMemory(left, {}), "Heimskr"), "and nothing of them is remembered", BuildMemory(left, {}));
+
+		const auto mentioned = SummaryText(BuildSummary(fight(false), kLydia, "Lydia", {}));
+		Check(Has(mentioned, "Heimskr, who was not actively engaged in combat, was killed by Kaira."), "with the setting on, the old line", mentioned);
+		Check(!Has(mentioned, "Vigilant of Stendarr, who was not"), "and an enemy killed unaware is never one of them", mentioned);
+
+		Battle only;  // a townsman's murder and nothing else: no battle to tell, with them left out
+		only.omitBystanders = true;
+		only.Join(Info(kHero, "Kaira", Side::kPlayer, 200));
+		only.Join(Info(kBandit2, "Heimskr", Side::kOther, 75));
+		only.Find(kBandit2)->info.lawful = true;
+		only.Damage(kBandit2, kHero, 75, 0.0f, 1);
+		only.Death(kBandit2, kHero, 1);
+		only.endedAt = 2;
+		Check(only.Count(Side::kEnemy) == 0 && !Significant(only, 3, 30.0), "a murder alone is no battle to remember", BuildMemory(only, {}));
+	}
+
+	// Reported by players: a companion's mechanical spider, re-summoned all through a long fight, was told as killed 18
+	// times; followers mourned a conjured skeleton.
+	void TestSummons()
+	{
+		constexpr ActorId kRemiel = 0xFF000911, kScrap1 = 0xFF000912, kScrap2 = 0xFF000913, kScrap3 = 0xFF000914, kWolf1 = 0xFF000915, kWolf2 = 0xFF000916;
+		Battle b;
+		b.omitBystanders = true;
+		b.startedAt = 0;
+		b.Join(Info(kHero, "Kaira", Side::kPlayer, 200));
+		b.Join(Info(kRemiel, "Remiel", Side::kPlayer, 250));
+		for (const auto id : { kScrap1, kScrap2, kScrap3 }) {
+			b.Join(Info(id, "Scrap", Side::kPlayer, 120, kRemiel));
+			b.Find(id)->info.summon = true;
+		}
+		b.Join(Info(kWolf1, "Wolf", Side::kEnemy, 60));
+		b.Join(Info(kWolf2, "Wolf", Side::kEnemy, 60));
+		for (const auto id : { kWolf1, kWolf2 }) b.Find(id)->info.wouldFight = true;  // wolves attack on sight
+		b.Damage(kWolf1, kScrap1, 60, 0.0f, 1);
+		b.Death(kWolf1, kScrap1, 1);
+		b.Damage(kScrap1, kWolf2, 120, 0.0f, 2);
+		b.Death(kScrap1, kWolf2, 2);
+		b.Death(kScrap2, 0, 5);  // dismissed: no blow, no killer
+		b.Damage(kWolf2, kScrap3, 60, 0.0f, 6);
+		b.Death(kWolf2, kScrap3, 6);
+		b.endedAt = 10;
+		const auto remiel = SummaryText(BuildSummary(b, kRemiel, "Remiel", {}));
+		Check(!Has(remiel, "Scrap was killed") && !Has(remiel, "Scrap:") && Has(remiel, "Kaira and Remiel fought against Wolf x2."),
+			"a summon is not a fighter of its own, and its end is no death", remiel);
+		Check(Has(remiel, "Who killed the enemies: Remiel 2 (Wolf x2, through Scrap)."), "its kills are its master's, with its name", remiel);
+		Check(Has(remiel, "Remiel killed 2 of the 2 who died on the other side: Wolf x2.") && Has(remiel, "2 of them through Scrap."), "told to the master too", remiel);
+		Check(!Has(BuildMemory(b, {}), "Scrap was"), "and nothing is remembered of its ends", BuildMemory(b, {}));
+	}
+
 	void TestDuration()
 	{
 		const auto is = [](double a_s, const char* a_want) { Check(DurationText(a_s) == a_want, a_want, DurationText(a_s)); };
@@ -797,6 +883,8 @@ int main(int argc, char** argv)
 	TestKilledAtOnce();
 	TestOwnWording();
 	TestSayLessWhenInDoubt();
+	TestNonCombatantsLeftOut();
+	TestSummons();
 	TestDuration();
 	TestEdges();
 	std::printf("%d checks, %d failed\n", g_checks, g_failed);

@@ -51,6 +51,7 @@ namespace BSM::Text
 			{ "Outcome", "outcome.some", "{dead} of the {total} {foes} were killed; the rest fled, yielded or broke off.", "" },
 			{ "Outcome", "tally.line", "Who killed the enemies: {tally}.", "{tally} reads \"Kaira 3 (Bandit x2 and Bandit Chief); Lydia 1 (Bandit)\"" },
 			{ "Outcome", "tally.unknown", "unknown causes", "" },
+			{ "Outcome", "tally.through", "through {summons}", "kills a summoned creature made, credited to whoever summoned it" },
 
 			// ---------------------------------------------------------------- deaths
 			{ "Deaths", "killed.by", "was killed by {killer}", "" },
@@ -117,6 +118,8 @@ namespace BSM::Text
 			{ "Injuries", "injury.memory", "{name} came out of it injured: {injuries}.", "for the remembered paragraph" },
 			{ "Injuries", "injury.dealt_by", "{injury} (dealt by {name})", "" },
 			{ "Injuries", "injury.unnamed", "an injury", "an injury effect with no name of its own" },
+			{ "Injuries", "injury.serious", "a serious injury", "an injury mod's injury listed by its spell (sInjurySpells)" },
+			{ "Injuries", "injury.lasting", "a lasting injury", "the same, for one marked as lasting" },
 
 			{ "Effects", "effects.suffered", "{name} suffered: {effects}.", "{effects} reads \"burned by fire by Bandit Mage (Flames)\"" },
 			{ "Effects", "effects.helped", "{name} was helped by: {effects}.", "" },
@@ -131,6 +134,7 @@ namespace BSM::Text
 
 			// ---------------------------------------------------------------- kills and moments
 			{ "Kills", "kills.mine", "{name} killed {count} of the {total} who died on the other side{victims}.", "{victims} is empty or a colon and the names" },
+			{ "Kills", "kills.through", "{count} of them through {summons}.", "the part of those kills their summoned creatures made" },
 			{ "Kills", "kills.none", "{name} killed none of the {total} who died on the other side.", "" },
 
 			{ "Moments", "moment.at_once", "{killer} killed {count} at once{with}: {victims}.", "{with} is empty or a space and moment.with" },

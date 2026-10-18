@@ -21,6 +21,13 @@ schema:
       defaultValue: true
       category: "Summary"
 
+    - name: "Mention bystanders who were killed"
+      path: "summary.mention_bystanders"
+      type: "bool"
+      description: "Someone killed in a battle without being a fighter (a townsman caught in it) is left out of the summaries by default, so followers don't read it as the player murdering people. On: they are told as not actively engaged in combat. Anyone who would fight you on sight counts as an enemy either way, even when killed before they noticed you."
+      defaultValue: false
+      category: "Summary"
+
     - name: "Show damage numbers"
       path: "summary.show_numbers"
       type: "bool"

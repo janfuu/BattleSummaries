@@ -20,6 +20,42 @@ namespace BSM::Settings
 		spdlog::flush_on(a_on ? spdlog::level::debug : spdlog::level::info);
 	}
 
+	namespace
+	{
+		std::map<std::uint32_t, int> g_injurySpells;
+
+		void ResolveInjurySpells(const std::vector<std::string>& a_list)
+		{
+			g_injurySpells.clear();
+			auto* dh = RE::TESDataHandler::GetSingleton();
+			if (!dh) return;
+			for (const auto& entry : a_list) {
+				std::string spec = entry, tag;
+				if (const auto eq = spec.find('='); eq != std::string::npos) tag = spec.substr(eq + 1), spec = spec.substr(0, eq);
+				const auto bar = spec.find('|');
+				if (bar == std::string::npos) continue;
+				const auto     plugin = spec.substr(0, bar);
+				std::uint32_t  local = 0;
+				try {
+					local = static_cast<std::uint32_t>(std::stoul(spec.substr(bar + 1), nullptr, 0));
+				} catch (...) {
+					SKSE::log::warn("Settings: sInjurySpells entry '{}' is not Plugin.esp|0xFormID", entry);
+					continue;
+				}
+				if (!dh->LookupModByName(plugin)) continue;  // that mod is not in this load order: nothing to say
+				if (auto* spell = dh->LookupForm<RE::SpellItem>(local, plugin)) g_injurySpells[spell->GetFormID()] = tag == "lasting" ? 2 : 1;
+				else SKSE::log::warn("Settings: sInjurySpells: no spell {:#x} in {}", local, plugin);
+			}
+			if (!g_injurySpells.empty()) SKSE::log::info("Settings: {} injury spells from other mods recognised", g_injurySpells.size());
+		}
+	}
+
+	int InjurySpell(std::uint32_t a_formId)
+	{
+		const auto it = g_injurySpells.find(a_formId);
+		return it != g_injurySpells.end() ? it->second : 0;
+	}
+
 	void LoadText(bool a_force)
 	{
 		static std::filesystem::file_time_type seen{};
@@ -76,6 +112,7 @@ namespace BSM::Settings
 		};
 		if (a_path == "summary.ignore_friendly_fire") set(g_data.ignoreFriendlyFire);
 		else if (a_path == "summary.ignore_harmless_effects") set(g_data.ignoreHarmless);
+		else if (a_path == "summary.mention_bystanders") set(g_data.mentionBystanders);
 		else if (a_path == "summary.show_numbers") set(g_data.showNumbers);
 		else if (a_path == "memory.remember_battles") set(g_data.rememberEvent);
 		else if (a_path == "mods.injuries") set(g_data.injuries);
@@ -135,6 +172,20 @@ namespace BSM::Settings
 				flush();
 			}
 			d.dismemberment = ini.GetBoolValue("OtherMods", "bDismemberment", d.dismemberment);
+			if (const char* list = ini.GetValue("OtherMods", "sInjurySpells", nullptr)) {
+				d.injurySpells.clear();
+				std::string item;
+				const auto  flush = [&] {
+					if (!item.empty()) d.injurySpells.push_back(item);
+					item.clear();
+				};
+				for (const char* c = list; *c; ++c) {
+					if (*c == ',' || std::isspace(static_cast<unsigned char>(*c))) flush();
+					else item += *c;
+				}
+				flush();
+			}
+			d.mentionBystanders = ini.GetBoolValue("Summary", "bMentionBystanders", d.mentionBystanders);
 
 			d.verbose = ini.GetBoolValue("Debug", "bVerboseLog", d.verbose);
 		}
@@ -142,6 +193,7 @@ namespace BSM::Settings
 		d.endGraceSeconds = std::clamp(d.endGraceSeconds, 1.0f, 120.0f);
 		g_data = d;
 		SetVerbose(d.verbose);
+		ResolveInjurySpells(d.injurySpells);
 		LoadText(true);
 		SKSE::log::info("Settings: injuries {} ({} keywords), dismemberment {}", d.injuries, d.injuryKeywords.size(), d.dismemberment);
 		SKSE::log::info("Settings: enabled {}, near death below {:.0f}%, end grace {}s, merge gap {}s, summary for {} game hours, numbers {}, remember {}",

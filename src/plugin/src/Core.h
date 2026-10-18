@@ -30,6 +30,12 @@ namespace BSM
 		float       maxHealth{ 1.0f };
 		float       healthPct{ 1.0f };  // their health share when they joined
 		bool        lawful{ false };    // belongs to a hold's law (a citizen, a guard): killing them is murder, unlike a bandit or a beast
+		// Would fight the player on sight, noticed or not: their factions count the player an enemy, or they attack anyone.
+		// A bandit killed in his sleep was still an enemy.
+		bool        wouldFight{ false };
+		// A summoned or raised creature (a conjured atronach, a companion's mechanical spider): not a fighter of its own on
+		// the player's side, and its end is no death. Its master is in `master` when the game names one.
+		bool        summon{ false };
 	};
 
 	// One kind of magic applied to a participant by one actor: "burned by fire" by 00012345 with "Flames", 4 times.
@@ -146,6 +152,9 @@ namespace BSM
 		float       nearDeathPct{ 0.15f };
 		// A damage effect that took no health is left out: not told, and no sign that anyone fought (Landed).
 		bool        ignoreHarmless{ true };
+		// Non-combatants (NonCombatant) are left out: not listed, not counted, not told. Off: the one killed is told as not
+		// actively engaged in combat (Innocent).
+		bool        omitBystanders{ false };
 
 		std::vector<Participant> participants;  // in the order they joined
 
@@ -175,6 +184,10 @@ namespace BSM
 		// the dead participant's body lost a limb (a_beheaded: the head)
 		void Dismember(ActorId a_id, bool a_beheaded);
 		void Armed(ActorId a_id);
+		[[nodiscard]] bool Fought(const Participant& a_p) const;  // did anything hostile in this battle
+		// Harmed or killed in it without being a fighter: not on the player's side, not someone who would fight the player,
+		// and did nothing hostile. Left out of the battle altogether with omitBystanders.
+		[[nodiscard]] bool NonCombatant(const Participant& a_p) const;
 		void CameToFight(ActorId a_id);
 		void Down(ActorId a_id, double a_now);
 		void Up(ActorId a_id);

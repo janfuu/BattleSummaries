@@ -70,7 +70,8 @@ None of these is required; each is picked up when present.
   [Wildcat](https://www.nexusmods.com/skyrimspecialedition/mods/1368). An injury a fighter picks up during the battle
   is told by its name, with whose blows did it when one landed just before; one they already had is told as brought
   into the fight. Another injury mod works too if its injury effects carry a keyword: add that keyword's editor id to
-  `sInjuryKeywords` in the ini.
+  `sInjuryKeywords` in the ini. Follower Death and Injury Chance marks its injuries with spells instead; those are recognised too
+  (`sInjurySpells`).
 - **Dismemberment** - [Dismembering Framework](https://www.nexusmods.com/skyrimspecialedition/mods/126203) for severed
   limbs, Next-Gen Decapitations for heads, and the game's own beheadings. Told with the kill: who beheaded whom, who severed a limb.
 
@@ -94,12 +95,14 @@ Everything is also in `SKSE/Plugins/BattleSummaries.ini`, read at game start:
 | `bShowNumbers` | false | Add raw damage and healing points to the summary |
 | `bIgnoreFriendlyFire` | false | Harm from one's own side, or to a bystander caught in the crossfire during a fight: false tells it as an accident, true leaves it out |
 | `bIgnoreHarmlessEffects` | true | Damage effects (drained of life, burned, frozen, shocked, poisoned, hurt) are told only when they took health: true leaves out one that did no damage, false tells every damage effect when it lands |
+| `bMentionBystanders` | false | Someone harmed or killed without being a fighter: false leaves them out, true tells the one killed as not engaged in combat |
 | `iMaxCompanionLines` | 6 | Most companions listed one by one |
 | `iMaxEffectsPerList` | 6 | Most magic effects listed per fighter |
 | `[Memory] bRememberBattles` | true | Register a remembered SkyrimNet event per battle worth remembering |
 | `iMinEnemies` / `fMinSeconds` | 3 / 30 | What makes a battle worth remembering when nobody was in danger |
 | `[OtherMods] bInjuries` | true | Tell injuries from injury mods |
 | `sInjuryKeywords` | Blade and Blunt's, Wildcat's | Effects carrying one of these keywords (editor ids) are injuries |
+| `sInjurySpells` | Follower Death and Injury Chance's | Injuries marked by a spell (Plugin.esp\|0xFormID, `=lasting` for a lasting one) |
 | `bDismemberment` | true | Tell beheadings and severed limbs |
 | `[Debug] bVerboseLog` | false | One log line per damage, death, bleedout, effect and heal |
 

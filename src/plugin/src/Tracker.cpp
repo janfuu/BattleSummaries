@@ -178,6 +178,18 @@ namespace BSM::Tracker
 			else i.side = Side::kOther;
 			// under a hold's law: citizens and guards have a crime faction, bandits and beasts have none
 			i.lawful = i.side != Side::kPlayer && a_actor->GetCrimeFaction() != nullptr;
+			// Would fight the player on sight, whether or not they had noticed them: read from their factions and nature,
+			// which a blow does not change (the combat state it starts does, so it is no guide here).
+			if (i.side != Side::kPlayer && pc) {
+				const bool enemy = a_actor->GetFactionReaction(pc) == RE::FIGHT_REACTION::kEnemy;
+				const bool anyone = a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kAggression) >= 2.0f;
+				i.wouldFight = enemy || anyone;
+			}
+			// summoned or raised: commanded by someone, marked summoned by the game, or a creature made to be summoned
+			i.summon = a_actor->IsCommandedActor() || a_actor->IsSummoned();
+			if (!i.summon) {
+				if (const auto* base = a_actor->GetActorBase(); base && base->IsSummonable()) i.summon = true;
+			}
 			return i;
 		}
 
@@ -362,15 +374,20 @@ namespace BSM::Tracker
 		void ScanInjuries(RE::Actor* a_actor, bool a_joining, double a_now)
 		{
 			const auto& cfg = Settings::Get();
-			if (!g_current || !a_actor || !cfg.injuries || cfg.injuryKeywords.empty()) return;
+			if (!g_current || !a_actor || !cfg.injuries) return;
 			const auto id = a_actor->GetFormID();
 			auto&      live = g_live[id];
 			ForEachEffect(a_actor, [&](RE::ActiveEffect* ae) {
 				if (ae->flags.any(RE::ActiveEffect::Flag::kInactive, RE::ActiveEffect::Flag::kDispelled)) return;
 				const auto* base = ae->GetBaseObject();
-				if (!Effects::IsInjury(base) || !live.injuriesSeen.insert(base->GetFormID()).second) return;
+				if (!base) return;
+				// an injury mod's injury spell (Follower Death Chance: abilities with hidden effects, no keyword), or an
+				// effect carrying an injury keyword
+				const int  listed = ae->spell ? Settings::InjurySpell(ae->spell->GetFormID()) : 0;
+				if (listed == 0 && !Effects::IsInjury(base)) return;
+				if (!live.injuriesSeen.insert(listed ? ae->spell->GetFormID() : base->GetFormID()).second) return;
 				const bool carried = a_joining && ae->elapsedSeconds > 2.0f;
-				const auto name = Effects::InjuryName(base, ae->spell);
+				const auto name = listed ? Text::Get(listed == 2 ? "injury.lasting" : "injury.serious") : Effects::InjuryName(base, ae->spell);
 				g_current->Injury(id, name, carried, a_now);
 				SKSE::log::info("Battle {}: {:08X} {} {}", g_current->id, id, carried ? "came into it with" : "was injured:", name);
 			});
@@ -492,6 +509,7 @@ namespace BSM::Tracker
 				g_current->location = WhereNow();
 				g_current->nearDeathPct = cfg.nearDeathPct;
 				g_current->ignoreHarmless = cfg.ignoreHarmless;
+				g_current->omitBystanders = !cfg.mentionBystanders;
 				g_live.clear();
 				g_recentHeals.clear();
 				SKSE::log::info("Battle {} began at '{}'", g_current->id, g_current->location);
@@ -513,7 +531,9 @@ namespace BSM::Tracker
 				live.lastHealth = HealthOf(a_actor);
 				live.damageSince = 0.0f;
 				live.pendingLoss = 0.0f;
-				SKSE::log::debug("Battle {}: {} ({:08X}) joined, side {}", g_current->id, p.info.name, p.info.id, static_cast<int>(p.info.side));
+				SKSE::log::debug("Battle {}: {} ({:08X}) joined, side {}{}{}{}", g_current->id, p.info.name, p.info.id, static_cast<int>(p.info.side),
+					p.info.wouldFight ? ", would fight the player" : "", p.info.lawful ? ", lawful" : "",
+					p.info.summon ? std::format(", summoned (master {:08X})", p.info.master) : std::string());
 				ScanInjuries(a_actor, true, Now());
 				auto* joined = g_current->Find(a_actor->GetFormID());
 				if (joined) SampleIntent(a_actor, *joined);
@@ -529,7 +549,7 @@ namespace BSM::Tracker
 			// an alarm where nothing happened (combat state with no blow struck and nobody dead) is not a battle
 			const bool blows = std::ranges::any_of(b.participants, [](const Participant& p) { return p.damageTaken > 0.0f || p.dead; });
 			// (with no enemies it is still a battle when an innocent was cut down)
-			const bool murder = std::ranges::any_of(b.participants, [&](const Participant& p) { return p.dead && b.Innocent(p); });
+			const bool murder = !b.omitBystanders && std::ranges::any_of(b.participants, [&](const Participant& p) { return p.dead && b.Innocent(p); });
 			if (b.participants.size() < 2 || !blows || (b.Count(Side::kEnemy) == 0 && !murder)) {
 				SKSE::log::info("Battle {} came to nothing ({} participants); forgotten", b.id, b.participants.size());
 				g_stale = true;

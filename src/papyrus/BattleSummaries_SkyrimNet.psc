@@ -18,7 +18,7 @@ EndFunction
 ; the ini's value stands.
 Function ReadSettings() Global
 	String c = "Plugin_BattleSummaries"
-	String[] paths = new String[7]
+	String[] paths = new String[8]
 	paths[0] = "summary.ignore_friendly_fire"
 	paths[1] = "summary.show_numbers"
 	paths[2] = "summary.game_hours"
@@ -26,6 +26,7 @@ Function ReadSettings() Global
 	paths[4] = "mods.injuries"
 	paths[5] = "mods.dismemberment"
 	paths[6] = "summary.ignore_harmless_effects"
+	paths[7] = "summary.mention_bystanders"
 	Int i = 0
 	While i < paths.Length
 		BattleSummaries_Native.ApplySetting(paths[i], SkyrimNetApi.GetConfigString(c, paths[i], ""))

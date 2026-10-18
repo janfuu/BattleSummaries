@@ -66,6 +66,8 @@ namespace BSM
 			if (a_info.maxHealth > 0.0f) p->info.maxHealth = a_info.maxHealth;
 			if (a_info.master != 0) p->info.master = a_info.master;
 			if (a_info.lawful) p->info.lawful = true;
+			if (a_info.wouldFight) p->info.wouldFight = true;
+			if (a_info.summon) p->info.summon = true;
 			// a follower stays a follower through a stray friendly hit; anyone else who turns hostile is an enemy from then on
 			if (p->info.side == Side::kOther || a_info.side == Side::kPlayer) p->info.side = a_info.side;
 			return *p;
@@ -122,7 +124,13 @@ namespace BSM
 		}
 		t->damageTaken += a_amount;
 		t->damageFrom[a_attacker == a_target ? 0 : a_attacker] += a_amount;
-		t->blows.push_back({ a_attacker == a_target ? 0 : a_attacker, a_now });
+		{
+			// a spell held on someone reports every frame (about 800 a minute seen for Flames): one blow per attacker per
+			// quarter second is enough for TookHealth, and the oldest go past a limit
+			const ActorId by = a_attacker == a_target ? 0 : a_attacker;
+			if (t->blows.empty() || t->blows.back().by != by || a_now - t->blows.back().at >= 0.25) t->blows.push_back({ by, a_now });
+			if (t->blows.size() > 1024) t->blows.erase(t->blows.begin(), t->blows.begin() + 256);
+		}
 		if (a_attacker != 0 && a_attacker != a_target) {
 			t->lastAttacker = a_attacker;
 			t->lastAttackedAt = a_now;
@@ -242,9 +250,27 @@ namespace BSM
 		if (auto* p = Find(a_id)) p->cameToFight = true;
 	}
 
+	bool Battle::Fought(const Participant& a_p) const
+	{
+		if (a_p.armed || a_p.cameToFight || a_p.damageDealt > 0.0f || !a_p.kills.empty()) return true;
+		for (const auto& q : participants) {
+			for (const auto& e : q.effects) {
+				if (e.hostile && e.by == a_p.info.id && q.info.id != a_p.info.id && Landed(q, e)) return true;
+			}
+		}
+		return false;
+	}
+
+	bool Battle::NonCombatant(const Participant& a_p) const
+	{
+		if (a_p.info.side == Side::kPlayer || a_p.info.wouldFight) return false;
+		if (a_p.damageTaken <= 0.0f && !a_p.dead) return false;  // nobody touched them
+		return !Fought(a_p);
+	}
+
 	bool Battle::Innocent(const Participant& a_p) const
 	{
-		if (a_p.info.side == Side::kPlayer || !a_p.info.lawful || a_p.armed || a_p.cameToFight || a_p.damageDealt > 0.0f || !a_p.kills.empty()) return false;
+		if (a_p.info.side == Side::kPlayer || !a_p.info.lawful || a_p.info.wouldFight || a_p.armed || a_p.cameToFight || a_p.damageDealt > 0.0f || !a_p.kills.empty()) return false;
 		if (a_p.damageTaken <= 0.0f && !a_p.dead) return false;  // nobody touched them
 		for (const auto& q : participants) {
 			for (const auto& e : q.effects) {
@@ -297,6 +323,7 @@ namespace BSM
 	{
 		if (Innocent(a_p)) return Side::kOther;
 		if (a_p.info.side != Side::kOther) return a_p.info.side;
+		if (a_p.info.wouldFight) return Side::kEnemy;  // would have fought the player: killed unaware, still an enemy
 		float toPlayerSide = 0.0f, toEnemies = 0.0f;
 		for (const auto& q : participants) {
 			const auto it = q.damageFrom.find(a_p.info.id);
@@ -321,6 +348,7 @@ namespace BSM
 
 	bool Battle::Involved(const Participant& a_p) const
 	{
+		if (omitBystanders && NonCombatant(a_p)) return false;  // the player's doing to bystanders is no part of the story
 		return a_p.info.side == Side::kPlayer || a_p.engaged || a_p.involved;
 	}
 

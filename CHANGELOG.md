@@ -16,6 +16,15 @@
   only when that effect took health from that person (and a spell's slow goes with its frost). Paralysis, fear, calm
   and slows from spells that do no damage are told as before.
 
+- Bystanders are left out. Someone harmed or killed in a battle without being a fighter (a townsman caught in it, a
+  deer) is no longer mentioned at all, so followers stop reading it as you murdering people. Anyone who would fight you
+  on sight still counts as an enemy, even killed before they noticed you: stealth archers keep their credit.
+  "Mention bystanders who were killed" on SkyrimNet's settings page brings them back.
+- Summons are their master's: a conjured skeleton or a companion's mechanical spider is no longer listed as a fighter,
+  and its end is never told as a death (one long fight told "Scrap was killed" 18 times). Its kills are credited to
+  whoever summoned it: "Remiel 2 (Wolf x2, through Scrap)".
+- Follower Death and Injury Chance's injuries are recognised ("a serious injury", "a lasting injury").
+
 **New setting**
 - "Ignore effects that did no damage" on SkyrimNet's settings page (`bIgnoreHarmlessEffects` in the ini), on by
   default. Switch it off and every damage effect is told when it lands, as in 1.3.0.
