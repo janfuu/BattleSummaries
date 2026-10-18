@@ -253,6 +253,9 @@ namespace BSM
 	bool Battle::Fought(const Participant& a_p) const
 	{
 		if (a_p.armed || a_p.cameToFight || a_p.damageDealt > 0.0f || !a_p.kills.empty()) return true;
+		for (const auto& q : participants) {  // a summoner fights through what they summoned
+			if (q.info.summon && q.info.master == a_p.info.id && (q.damageDealt > 0.0f || !q.kills.empty())) return true;
+		}
 		for (const auto& q : participants) {
 			for (const auto& e : q.effects) {
 				if (e.hostile && e.by == a_p.info.id && q.info.id != a_p.info.id && Landed(q, e)) return true;

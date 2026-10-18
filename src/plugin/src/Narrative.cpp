@@ -264,7 +264,8 @@ namespace BSM
 		}
 
 		// enemy-of-a_side kills per killer, most first: "Kaira 3 (Bandit x2, Bandit Chief), Lydia 1 (Bandit)"
-		std::string KillTally(const Battle& a_b, Side a_victims)
+		// a_summons: the summoned creatures among them (told as dispatched), not the rest
+		std::string KillTally(const Battle& a_b, Side a_victims, bool a_summons = false)
 		{
 			struct Entry
 			{
@@ -274,7 +275,8 @@ namespace BSM
 			};
 			std::vector<Entry> tally;
 			for (const auto* v : OnSide(a_b, a_victims)) {
-				if (!v->dead) continue;
+				if (!v->dead || v->info.summon != a_summons) continue;
+				if (a_summons && v->killer == 0) continue;  // dismissed or expired: nobody's doing
 				const auto* k = a_b.Find(v->killer);
 				const bool  bySummon = k && k->info.summon && k->info.master != 0 && a_b.Find(k->info.master);
 				const auto  credited = bySummon ? k->info.master : v->killer;
@@ -299,9 +301,19 @@ namespace BSM
 			return out;
 		}
 
+		// the foes proper: their summoned creatures are told as dispatched, apart
+		int FoesProper(const Battle& a_b, Side a_foes, bool a_deadOnly)
+		{
+			int n = 0;
+			for (const auto* p : OnSide(a_b, a_foes)) {
+				if (!p->info.summon && (!a_deadOnly || p->dead)) ++n;
+			}
+			return n;
+		}
+
 		std::string Outcome(const Battle& a_b, Side a_foes)
 		{
-			const int n = a_b.Count(a_foes), dead = a_b.Dead(a_foes);
+			const int n = FoesProper(a_b, a_foes, false), dead = FoesProper(a_b, a_foes, true);
 			if (n == 0) return {};
 			const std::initializer_list<Text::Arg> args{ { "dead", N(dead) }, { "total", N(n) }, { "foes", T(a_foes == Side::kEnemy ? "outcome.word_enemies" : "outcome.word_opponents") } };
 			if (a_b.Ongoing()) return F("outcome.so_far", args);
@@ -407,7 +419,7 @@ namespace BSM
 				std::vector<const Participant*> dead;
 				for (const auto id : k.kills) {
 					const auto* v = a_b.Find(id);
-					if (v && v->dead && v->diedAt >= 0.0 && a_b.Involved(*v) && a_b.EffectiveSide(*v) == foes) dead.push_back(v);
+					if (v && v->dead && !v->info.summon && v->diedAt >= 0.0 && a_b.Involved(*v) && a_b.EffectiveSide(*v) == foes) dead.push_back(v);
 				}
 				std::ranges::stable_sort(dead, [](const Participant* a, const Participant* b) { return a->diedAt < b->diedAt; });
 				for (std::size_t i = 0; i < dead.size();) {
@@ -437,13 +449,13 @@ namespace BSM
 
 		// the participant's own kills of the other side, and their summons' (a_bySummons counts those, a_summons names them)
 		int EnemyKills(const Battle& a_b, const Participant& a_p, Side a_foes, std::vector<const Participant*>* a_out = nullptr, int* a_bySummons = nullptr,
-			std::vector<const Participant*>* a_summons = nullptr)
+			std::vector<const Participant*>* a_summons = nullptr, bool a_summonedVictims = false)
 		{
 			int        n = 0;
 			const auto count = [&](const Participant& a_killer, bool a_summon) {
 				for (const auto id : a_killer.kills) {
 					const auto* v = a_b.Find(id);
-					if (!v || !a_b.Involved(*v) || a_b.EffectiveSide(*v) != a_foes) continue;
+					if (!v || !a_b.Involved(*v) || a_b.EffectiveSide(*v) != a_foes || v->info.summon != a_summonedVictims) continue;
 					++n;
 					if (a_out) a_out->push_back(v);
 					if (!a_summon) continue;
@@ -518,12 +530,17 @@ namespace BSM
 			std::vector<const Participant*> victims, summons;
 			int                             bySummons = 0;
 			const int                       mine = EnemyKills(a_b, a_p, foes, &victims, &bySummons, &summons);
-			const int                       all = a_b.Dead(foes);
+			const int                       all = FoesProper(a_b, foes, true);
 			if (mine > 0) {
 				out.push_back(F("kills.mine", { { "name", n }, { "count", N(mine) }, { "total", N(all) }, { "victims", mine <= 3 ? ": " + Grouped(victims) : std::string() } }));
 				if (bySummons > 0) out.push_back(F("kills.through", { { "count", N(bySummons) }, { "summons", Grouped(summons) } }));
 			}
 			else if (all > 0) out.push_back(F("kills.none", { { "name", n }, { "total", N(all) } }));
+
+			{
+				std::vector<const Participant*> dispatched;
+				if (EnemyKills(a_b, a_p, foes, &dispatched, nullptr, nullptr, true) > 0) out.push_back(F("kills.dispatched", { { "name", n }, { "victims", Grouped(dispatched) } }));
+			}
 
 			// the lives this participant saved
 			for (const auto& q : a_b.participants) {
@@ -553,6 +570,8 @@ namespace BSM
 			if (const auto hurt = Injuries(a_b, a_p, false, false); !hurt.empty() && !a_p.dead) bits.push_back(F("other.injured", { { "injuries", hurt } }));
 			const int kills = EnemyKills(a_b, a_p, foes);
 			bits.push_back(kills == 0 ? T("other.kills_none") : F("other.kills", { { "count", N(kills) } }));
+			std::vector<const Participant*> dispatched;
+			if (EnemyKills(a_b, a_p, foes, &dispatched, nullptr, nullptr, true) > 0) bits.push_back(F("other.dispatched", { { "victims", Grouped(dispatched) } }));
 			std::string facts;
 			for (std::size_t i = 0; i < bits.size(); ++i) facts += (i ? "; " : "") + bits[i];
 			return F("other.line", { { "name", a_p.info.name }, { "facts", facts } });
@@ -582,6 +601,7 @@ namespace BSM
 
 			if (auto o = Outcome(a_b, Side::kEnemy); !o.empty()) out.push_back(std::move(o));
 			if (const auto t = KillTally(a_b, Side::kEnemy); !t.empty()) out.push_back(F("tally.line", { { "tally", t } }));
+			if (const auto t = KillTally(a_b, Side::kEnemy, true); !t.empty()) out.push_back(F("summons.dispatched", { { "tally", t } }));
 			for (const auto* p : party) {
 				if (!p->dead) continue;
 				// killed by their own side: said outright, accident or not

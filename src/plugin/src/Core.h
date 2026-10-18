@@ -151,7 +151,7 @@ namespace BSM
 		std::string location;
 		float       nearDeathPct{ 0.15f };
 		// A damage effect that took no health is left out: not told, and no sign that anyone fought (Landed).
-		bool        ignoreHarmless{ true };
+		bool        ignoreHarmless{ true };  // always on in game; the offline tests also run without it
 		// Non-combatants (NonCombatant) are left out: not listed, not counted, not told. Off: the one killed is told as not
 		// actively engaged in combat (Innocent).
 		bool        omitBystanders{ false };

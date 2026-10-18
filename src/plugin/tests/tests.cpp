@@ -802,6 +802,39 @@ namespace
 		Check(!Has(BuildMemory(b, {}), "Scrap was"), "and nothing is remembered of its ends", BuildMemory(b, {}));
 	}
 
+	// The enemy's summons are no enemies of their own, but putting an end to one is still the fighter's doing.
+	void TestEnemySummonsDispatched()
+	{
+		constexpr ActorId kNecro = 0xFF000921, kAtro1 = 0xFF000922, kAtro2 = 0xFF000923, kAtro3 = 0xFF000924;
+		Battle b;
+		b.omitBystanders = true;
+		b.startedAt = 0;
+		b.Join(Info(kHero, "Kaira", Side::kPlayer, 200));
+		b.Join(Info(kLydia, "Lydia", Side::kPlayer, 300));
+		b.Join(Info(kNecro, "Necromancer", Side::kEnemy, 150));
+		for (const auto id : { kAtro1, kAtro2, kAtro3 }) {
+			b.Join(Info(id, "Flame Atronach", Side::kEnemy, 100, kNecro));
+			b.Find(id)->info.summon = true;
+			b.Find(id)->info.wouldFight = true;
+		}
+		b.Damage(kLydia, kAtro1, 40, 0.86f, 1);
+		b.Damage(kAtro1, kLydia, 100, 0.0f, 2);
+		b.Death(kAtro1, kLydia, 2);
+		b.Damage(kAtro2, kHero, 100, 0.0f, 3);
+		b.Death(kAtro2, kHero, 3);
+		b.Death(kAtro3, 0, 4);  // its summoner fell: it went with him, nobody's doing
+		b.Damage(kNecro, kHero, 150, 0.0f, 4);
+		b.Death(kNecro, kHero, 4);
+		b.endedAt = 8;
+		const auto told = SummaryText(BuildSummary(b, kLydia, "Lydia", {}));
+		Check(Has(told, "The one enemy was killed.") && Has(told, "Who killed the enemies: Kaira 1 (Necromancer)."), "the enemy proper, apart from its summons", told);
+		Check(Has(told, "Summoned creatures dispatched: Lydia 1 (Flame Atronach); Kaira 1 (Flame Atronach)."), "who dispatched them", told);
+		const auto kaira = SummaryText(BuildSummary(b, kHero, "Kaira", {}));
+		Check(Has(told, "Lydia also dispatched Flame Atronach.") && Has(kaira, "Kaira killed 1 of the 1 who died on the other side: Necromancer.") &&
+				  Has(kaira, "Kaira also dispatched Flame Atronach."),
+			"told to each who did", kaira);
+	}
+
 	void TestDuration()
 	{
 		const auto is = [](double a_s, const char* a_want) { Check(DurationText(a_s) == a_want, a_want, DurationText(a_s)); };
@@ -885,6 +918,7 @@ int main(int argc, char** argv)
 	TestSayLessWhenInDoubt();
 	TestNonCombatantsLeftOut();
 	TestSummons();
+	TestEnemySummonsDispatched();
 	TestDuration();
 	TestEdges();
 	std::printf("%d checks, %d failed\n", g_checks, g_failed);

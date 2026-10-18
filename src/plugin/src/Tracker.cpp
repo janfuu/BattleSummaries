@@ -381,13 +381,13 @@ namespace BSM::Tracker
 				if (ae->flags.any(RE::ActiveEffect::Flag::kInactive, RE::ActiveEffect::Flag::kDispelled)) return;
 				const auto* base = ae->GetBaseObject();
 				if (!base) return;
-				// an injury mod's injury spell (Follower Death Chance: abilities with hidden effects, no keyword), or an
-				// effect carrying an injury keyword
-				const int  listed = ae->spell ? Settings::InjurySpell(ae->spell->GetFormID()) : 0;
+				// an injury listed by what carries it (Follower Death Chance: a potion, its bandages' enchantment, an
+				// ability; no keyword), or an effect carrying an injury keyword
+				const int  listed = ae->spell ? Settings::InjurySource(ae->spell->GetFormID()) : 0;
 				if (listed == 0 && !Effects::IsInjury(base)) return;
 				if (!live.injuriesSeen.insert(listed ? ae->spell->GetFormID() : base->GetFormID()).second) return;
 				const bool carried = a_joining && ae->elapsedSeconds > 2.0f;
-				const auto name = listed ? Text::Get(listed == 2 ? "injury.lasting" : "injury.serious") : Effects::InjuryName(base, ae->spell);
+				const auto name = listed ? Text::Get(listed == 1 ? "injury.minor" : listed == 3 ? "injury.lasting" : "injury.serious") : Effects::InjuryName(base, ae->spell);
 				g_current->Injury(id, name, carried, a_now);
 				SKSE::log::info("Battle {}: {:08X} {} {}", g_current->id, id, carried ? "came into it with" : "was injured:", name);
 			});
@@ -508,7 +508,6 @@ namespace BSM::Tracker
 				g_current->startedAt = a_now;
 				g_current->location = WhereNow();
 				g_current->nearDeathPct = cfg.nearDeathPct;
-				g_current->ignoreHarmless = cfg.ignoreHarmless;
 				g_current->omitBystanders = !cfg.mentionBystanders;
 				g_live.clear();
 				g_recentHeals.clear();

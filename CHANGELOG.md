@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## Next release
 
 **Bug Fixes**
 - "Ignore friendly fire" now covers crossfire during a fight, not just followers. A townsman caught at the edge of the
@@ -22,12 +22,13 @@
   "Mention bystanders who were killed" on SkyrimNet's settings page brings them back.
 - Summons are their master's: a conjured skeleton or a companion's mechanical spider is no longer listed as a fighter,
   and its end is never told as a death (one long fight told "Scrap was killed" 18 times). Its kills are credited to
-  whoever summoned it: "Remiel 2 (Wolf x2, through Scrap)".
-- Follower Death and Injury Chance's injuries are recognised ("a serious injury", "a lasting injury").
+  whoever summoned it: "Remiel 2 (Wolf x2, through Scrap)". The enemy's summons are told as dispatched, with credit to
+  whoever did it: "Summoned creatures dispatched: Lydia 1 (Flame Atronach)."
+- Follower Death and Injury Chance's injuries are recognised: "a minor injury", "a serious injury", "a lasting injury".
 
 **New setting**
-- "Ignore effects that did no damage" on SkyrimNet's settings page (`bIgnoreHarmlessEffects` in the ini), on by
-  default. Switch it off and every damage effect is told when it lands, as in 1.3.0.
+- "Mention bystanders who were killed" on SkyrimNet's settings page (`bMentionBystanders` in the ini), off by
+  default.
 
 ## 1.3.0
 

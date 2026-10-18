@@ -16,7 +16,6 @@ namespace BSM::Settings
 		float witnessRange{ 3500.0f };  // bystanders this close at the end know what happened
 		bool  showNumbers{ false };
 		bool  ignoreFriendlyFire{ false };  // false: harm from one's own side is told as an accident; true: left out
-		bool  ignoreHarmless{ true };       // a damage effect that took no health is left out (an aura pulsing over everyone)
 		int   maxOthers{ 6 };
 		int   maxEffects{ 6 };
 
@@ -28,9 +27,10 @@ namespace BSM::Settings
 		bool                     injuries{ true };       // tell injuries from injury mods
 		std::vector<std::string> injuryKeywords{ "MAG_MagicInjurySpell", "WCT_Injury_Keyword" };  // Blade and Blunt, Wildcat
 		bool                     dismemberment{ true };  // tell beheadings and severed limbs
-		// injuries an injury mod marks with a spell rather than a keyword: "Plugin.esp|0xFormID", "=lasting" for a lasting one
-		std::vector<std::string> injurySpells{ "FollowerDeathChance.esp|0x80A", "FollowerDeathChance.esp|0x814", "FollowerDeathChance.esp|0x815",
-			"FollowerDeathChance.esp|0x816", "FollowerDeathChance.esp|0x817", "FollowerDeathChance.esp|0x818", "FollowerDeathChance.esp|0x821=lasting" };
+		// injuries an injury mod marks by what carries them (a spell, potion or enchantment) rather than a keyword:
+		// "Plugin.esp|0xFormID", with "=minor" or "=lasting" (a serious injury otherwise). Follower Death and Injury Chance's:
+		// its short-term injury potion, its bandages' enchantment, its permanent injury.
+		std::vector<std::string> injurySources{ "FollowerDeathChance.esp|0x800=minor", "FollowerDeathChance.esp|0x80E", "FollowerDeathChance.esp|0x821=lasting" };
 		bool                     mentionBystanders{ false };  // tell those killed without fighting; off: leave them out
 
 		bool verbose{ false };
@@ -44,9 +44,9 @@ namespace BSM::Settings
 	// Lines it holds replace the built-in phrases (Text.h); the log says how many were taken and names any refused.
 	void LoadText(bool a_force = false);
 
-	// sInjurySpells resolved to the spells in this load order: 0 = not an injury, 1 = an injury, 2 = a lasting one.
+	// sInjurySources resolved in this load order: 0 = not an injury, 1 = minor, 2 = serious, 3 = lasting.
 	// Main thread, after the game data has loaded.
-	[[nodiscard]] int InjurySpell(std::uint32_t a_formId);
+	[[nodiscard]] int InjurySource(std::uint32_t a_formId);
 
 	// A setting made on SkyrimNet's own settings page (its path there, its value as text). Empty = not set there:
 	// the ini's value stands. Main thread.

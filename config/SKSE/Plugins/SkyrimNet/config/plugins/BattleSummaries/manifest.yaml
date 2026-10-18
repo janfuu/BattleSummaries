@@ -14,13 +14,6 @@ schema:
       defaultValue: false
       category: "Summary"
 
-    - name: "Ignore effects that did no damage"
-      path: "summary.ignore_harmless_effects"
-      type: "bool"
-      description: "Damage effects (drained of life, burned, frozen, shocked, poisoned, hurt) are told only when they took health from the person. On: one that did no damage, such as a mod's aura pulsing over everyone nearby, is left out. Off: every damage effect is told when it lands. Paralysis, fear, calm and slows are always told."
-      defaultValue: true
-      category: "Summary"
-
     - name: "Mention bystanders who were killed"
       path: "summary.mention_bystanders"
       type: "bool"
