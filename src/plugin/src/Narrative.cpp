@@ -245,10 +245,10 @@ namespace BSM
 				const bool downedThem = id == a_p.broughtLowBy;
 				const auto assailant = NameOf(a_b, a->info.id);
 				if (a->killer == a_p.info.id) {
-					r.deeds.push_back(F(downedThem ? "rescue.recovered" : "rescue.recovered_wounded", { { "name", a_p.info.name }, { "assailant", assailant }, { "what", what } }));
+					r.deeds.push_back(Cap(F(downedThem ? "rescue.recovered" : "rescue.recovered_wounded", { { "name", a_p.info.name }, { "assailant", assailant }, { "what", what } })));
 				} else if (a->killer != 0) {
-					r.deeds.push_back(F(downedThem ? "rescue.assailant_killed" : "rescue.assailant_wounded",
-						{ { "assailant", assailant }, { "what", what }, { "name", a_p.info.name }, { "killer", CreditName(a_b, a->killer) } }));
+					r.deeds.push_back(Cap(F(downedThem ? "rescue.assailant_killed" : "rescue.assailant_wounded",
+						{ { "assailant", assailant }, { "what", what }, { "name", a_p.info.name }, { "killer", CreditName(a_b, a->killer) } })));
 					// a foe who happened to kill the assailant (monsters turning on each other) saved nobody
 					const auto* k = a_b.Find(a->killer);
 					if (!k || a_b.EffectiveSide(*k) == Opposing(mine)) continue;
@@ -258,12 +258,12 @@ namespace BSM
 			}
 			for (const auto& [healer, h] : a_p.healFrom) {
 				if (healer == 0 || healer == a_p.info.id || h.whileCritical < 0.15f * a_p.info.maxHealth) continue;
-				r.deeds.push_back(F("rescue.healed_while",
+				r.deeds.push_back(Cap(F("rescue.healed_while",
 					{ { "name", a_p.info.name },
 						{ "state", T(a_p.downs > 0 ? "rescue.state_down" : "rescue.state_deaths_door") },
 						{ "healer", NameOf(a_b, healer) },
 						{ "with", h.source.empty() ? std::string() : " " + F("heal.with", { { "source", h.source } }) },
-						{ "restoring", HealAmount(a_p, h.whileCritical, a_opt) } }));
+						{ "restoring", HealAmount(a_p, h.whileCritical, a_opt) } })));
 				r.brief.push_back(F("rescue.brief_healed", { { "healer", NameOf(a_b, healer) }, { "name", a_p.info.name } }));
 				addSavior(healer);
 			}

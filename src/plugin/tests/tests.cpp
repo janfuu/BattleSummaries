@@ -869,6 +869,7 @@ namespace
 		Check(Has(lydia, "Kaira and Lydia fought against Troll x2."), "lists keep the name alone", lydia);
 		const auto hero = SummaryText(BuildSummary(b, kHero, "Kaira", {}));
 		Check(Has(hero, "Lydia: ") && !Has(hero, "- the "), "every line starts with a capital", hero);
+		Check(Has(hero, "Kaira saved Lydia's life. The first Troll, who had struck down Lydia, was then killed by Kaira."), "and every sentence within one", hero);
 	}
 
 	void TestDuration()
