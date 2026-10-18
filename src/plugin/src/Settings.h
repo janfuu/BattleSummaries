@@ -16,6 +16,7 @@ namespace BSM::Settings
 		float witnessRange{ 3500.0f };  // bystanders this close at the end know what happened
 		bool  showNumbers{ false };
 		bool  ignoreFriendlyFire{ false };  // false: harm from one's own side is told as an accident; true: left out
+		bool  ignoreHarmless{ true };       // a damage effect that took no health is left out (an aura pulsing over everyone)
 		int   maxOthers{ 6 };
 		int   maxEffects{ 6 };
 

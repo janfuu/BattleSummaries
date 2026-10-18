@@ -223,6 +223,10 @@ namespace BSM::Tracker
 			std::string source;
 			const RE::MagicItem* item{ nullptr };
 			bool        found{ false };
+			// what the effect is doing: a magnitude, its conditions met, not switched off; and for how long
+			float       magnitude{ 0.0f };
+			bool        inForce{ false };
+			float       duration{ 0.0f };
 		};
 
 		class EffectFinder final : public RE::MagicTarget::ForEachActiveEffectVisitor
@@ -282,19 +286,29 @@ namespace BSM::Tracker
 			}
 		}
 
+		// The effect event's caster is not always the one the effect itself names: a script or a perk can apply an effect
+		// with the player as its source. The effect on the target is the engine's own record, so it is read first: the
+		// one from a_caster when there is one, else the newest of that kind.
 		OnTarget FindOnTarget(RE::Actor* a_target, const RE::EffectSetting* a_effect, ActorId a_caster)
 		{
 			OnTarget out;
 			float    youngest = 1e9f;
+			bool     named = false;  // out is a_caster's own
 			ForEachEffect(a_target, [&](RE::ActiveEffect* ae) {
 				if (ae->GetBaseObject() != a_effect) return;
 				const auto caster = CasterOf(ae);
-				if (a_caster != 0 && caster != 0 && caster != a_caster) return;
-				if (ae->elapsedSeconds >= youngest) return;
+				const bool theirs = a_caster != 0 && caster == a_caster;
+				if (named && !theirs) return;
+				if (named == theirs && ae->elapsedSeconds >= youngest) return;
+				named = theirs;
 				youngest = ae->elapsedSeconds;
 				out.caster = caster;
 				out.item = ae->spell;
 				out.found = true;
+				out.magnitude = ae->magnitude;
+				out.duration = ae->duration;
+				out.inForce = ae->magnitude != 0.0f && ae->flags.none(RE::ActiveEffect::Flag::kInactive, RE::ActiveEffect::Flag::kDispelled) &&
+							  ae->conditionStatus.get() != RE::ActiveEffect::ConditionStatus::kFalse;
 			});
 			out.source = SourceName(out.item, out.caster != 0 ? out.caster : a_caster);
 			return out;
@@ -477,6 +491,7 @@ namespace BSM::Tracker
 				g_current->startedAt = a_now;
 				g_current->location = WhereNow();
 				g_current->nearDeathPct = cfg.nearDeathPct;
+				g_current->ignoreHarmless = cfg.ignoreHarmless;
 				g_live.clear();
 				g_recentHeals.clear();
 				SKSE::log::info("Battle {} began at '{}'", g_current->id, g_current->location);
@@ -591,6 +606,20 @@ namespace BSM::Tracker
 		bool PlayerSideInvolved(RE::Actor* a_a, RE::Actor* a_b, RE::Actor* a_pc)
 		{
 			return (a_a && Near(a_a) && OnPlayerSide(a_a, a_pc)) || (a_b && Near(a_b) && OnPlayerSide(a_b, a_pc));
+		}
+
+		// Could an effect that names the player be the player's doing? Yes once they have fought in this battle (struck
+		// or been struck, killed, cast something harmful), while a weapon or a spell is readied, or when it came from a
+		// shout or a power, which need neither. A player who only stood watching casts nothing: what names them then is
+		// a script's or a perk's (reported by a player: "drained of life by" them while they did nothing).
+		bool PlayerCouldHaveDoneIt(RE::PlayerCharacter* a_pc, const RE::MagicItem* a_item)
+		{
+			if (const auto* p = g_current->Find(a_pc->GetFormID()); p && (p->engaged || p->damageDealt > 0.0f)) return true;
+			if (a_pc->AsActorState()->IsWeaponDrawn()) return true;
+			if (!a_item) return false;
+			using Type = RE::MagicSystem::SpellType;
+			const auto type = a_item->GetSpellType();
+			return type == Type::kPower || type == Type::kLesserPower || type == Type::kVoicePower;
 		}
 
 		// The actor a damage report's raw source value points at, found by comparing it with the actors that exist: the
@@ -713,17 +742,39 @@ namespace BSM::Tracker
 				auto* effect = RE::TESForm::LookupByID<RE::EffectSetting>(a_r.effect);
 				if (!effect) return;
 				if (Effects::IsInjury(effect)) return;  // told as an injury (ScanInjuries), not as magic someone cast
-				const auto on = FindOnTarget(a, effect, a_r.b);
+				auto on = FindOnTarget(a, effect, a_r.b);
+				// whose it is: the caster the effect on the target names, else the event's; the player only when it can be
+				// the player's doing, else nobody's (and then what carried it is nobody's to name either)
+				ActorId by = on.caster != 0 ? on.caster : a_r.b;
+				if (by == pc->GetFormID() && a != pc && !PlayerCouldHaveDoneIt(pc, on.item)) {
+					by = 0;
+					on.source.clear();
+				}
+				if (by != a_r.b) {
+					b = Lookup(by);
+					if (b && b != a && b->IsDead()) return;
+				}
 				const auto kind = Effects::Classify(effect, on.item, b == a);
 				if (!kind) return;
 				// harm someone does to themself is their own spell's price or another mod's bookkeeping, not the battle's
 				if (kind->hostile && b == a) return;
 				JoinPair(a, b, pc);
 				if (!InBattle(a)) return;
-				SKSE::log::debug("effect: {:08X} {} by {:08X} ({}){}", a_r.a, kind->label, a_r.b, on.source, kind->heal ? " [heal]" : "");
+				// A damage effect counts only for the health it took (Battle::Landed): read here whether it is doing anything at
+				// all. One no longer on the target (an instant effect, done) is left to the damage reports alone.
+				EffectFacts facts;
+				facts.spell = on.item ? on.item->GetFormID() : 0;
+				facts.damage = kind->damage;
+				facts.inForce = !on.found || on.inForce;
+				facts.lasts = on.found ? on.duration : 0.0f;
+				SKSE::log::debug("effect: {:08X} {} by {:08X} ({}){} [effect {:08X}, event's caster {:08X}{}]", a_r.a, kind->label, by, on.source,
+					kind->heal ? " [heal]" : "", a_r.effect, a_r.b,
+					!kind->damage ? std::string() :
+					!on.found     ? std::string(", damage effect no longer on the target") :
+									std::format(", damage effect, magnitude {:.1f}, {:.1f}s, {}", on.magnitude, on.duration, on.inForce ? "in force" : "doing nothing"));
 				// no caster: a potion heals its drinker; a hostile effect from nobody is a trap or a hazard
-				if (kind->heal) g_recentHeals.push_back({ a_r.a, b ? a_r.b : a_r.a, on.source, a_r.at });
-				else g_current->Effect(a_r.a, a_r.b, kind->label, on.source, kind->hostile, a_r.at);
+				if (kind->heal) g_recentHeals.push_back({ a_r.a, b ? by : a_r.a, on.source, a_r.at });
+				else g_current->Effect(a_r.a, by, kind->label, on.source, kind->hostile, a_r.at, facts);
 				break;
 			}
 			}

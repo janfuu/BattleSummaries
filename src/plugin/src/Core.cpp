@@ -10,6 +10,21 @@ namespace BSM
 		constexpr double kAttackerMemory = 8.0;
 		// a death this soon after a blow is that blow's doing
 		constexpr double kFinalBlow = 3.0;
+		// a damage effect's health loss may be reported this much before it took hold or after it ran out (an instant
+		// effect's damage lands a frame or two after the effect does; the reports are stamped as they are queued)
+		constexpr double kEffectSlack = 0.5;
+
+		// a_target lost health to a_e's caster while a_e was in force
+		bool TookHealth(const Participant& a_target, const EffectNote& a_e)
+		{
+			const ActorId from = a_e.by == a_target.info.id ? 0 : a_e.by;  // self-harm is kept as nobody's (Damage)
+			for (const auto& s : a_e.inForce) {
+				for (const auto& b : a_target.blows) {
+					if (b.by == from && b.at >= s.from && b.at <= s.to) return true;
+				}
+			}
+			return false;
+		}
 
 		ActorId TopDamager(const Participant& a_p)
 		{
@@ -107,6 +122,7 @@ namespace BSM
 		}
 		t->damageTaken += a_amount;
 		t->damageFrom[a_attacker == a_target ? 0 : a_attacker] += a_amount;
+		t->blows.push_back({ a_attacker == a_target ? 0 : a_attacker, a_now });
 		if (a_attacker != 0 && a_attacker != a_target) {
 			t->lastAttacker = a_attacker;
 			t->lastAttackedAt = a_now;
@@ -142,21 +158,58 @@ namespace BSM
 		return best ? best->source : std::string();
 	}
 
-	void Battle::Effect(ActorId a_target, ActorId a_by, const std::string& a_label, const std::string& a_source, bool a_hostile, double a_now)
+	void Battle::Effect(ActorId a_target, ActorId a_by, const std::string& a_label, const std::string& a_source, bool a_hostile, double a_now,
+		const EffectFacts& a_facts)
 	{
 		auto* t = Find(a_target);
 		if (!t || a_label.empty()) return;
+		EffectNote* note = nullptr;
 		for (auto& e : t->effects) {
-			if (e.label == a_label && e.by == a_by && e.source == a_source) {
-				e.lastAt = a_now;
-				++e.count;
-				return;
+			if (e.label == a_label && e.by == a_by && e.source == a_source && e.spell == a_facts.spell) {
+				note = &e;
+				break;
 			}
 		}
-		t->effects.push_back({ a_label, a_source, a_by, a_hostile, 1, a_now });
-		if (a_hostile && a_by != a_target) {
+		const bool first = note == nullptr;
+		if (first) {
+			note = &t->effects.emplace_back();
+			note->label = a_label;
+			note->source = a_source;
+			note->by = a_by;
+			note->hostile = a_hostile;
+			note->spell = a_facts.spell;
+			note->damage = a_facts.damage;
+		}
+		note->lastAt = a_now;
+		++note->count;
+		// while a damage effect is in force, what its target loses to its caster is what it took (TookHealth); a pulse
+		// every half second makes one span
+		if (a_facts.damage && a_facts.inForce) {
+			constexpr double kForever = 1e18;
+			const EffectNote::Span s = a_now < 0.0 ? EffectNote::Span{ -kForever, kForever } : EffectNote::Span{ a_now - kEffectSlack, a_now + std::max(a_facts.lasts, 0.0) + kEffectSlack };
+			if (!note->inForce.empty() && s.from <= note->inForce.back().to) note->inForce.back().to = std::max(note->inForce.back().to, s.to);
+			else note->inForce.push_back(s);
+		}
+		if (!first) return;
+		// a damage effect is no sign of a fight until it takes health, and the blow that does marks them (Damage)
+		if (a_hostile && a_by != a_target && !(ignoreHarmless && a_facts.damage)) {
 			if (auto* by = Find(a_by)) MarkFought(*Find(a_target), *by);  // Find again: push_back may have moved t
 		}
+	}
+
+	bool Battle::Landed(const Participant& a_target, const EffectNote& a_e) const
+	{
+		if (!ignoreHarmless || !a_e.hostile) return true;
+		if (a_e.damage) return TookHealth(a_target, a_e);
+		if (a_e.spell == 0) return true;
+		// the spell's other effects go with its damage: told when one of its damage effects took health
+		bool carriesDamage = false;
+		for (const auto& d : a_target.effects) {
+			if (!d.damage || d.by != a_e.by || d.spell != a_e.spell) continue;
+			if (TookHealth(a_target, d)) return true;
+			carriesDamage = true;
+		}
+		return !carriesDamage;
 	}
 
 	void Battle::Injury(ActorId a_id, const std::string& a_name, bool a_carried, double a_now)
@@ -195,7 +248,7 @@ namespace BSM
 		if (a_p.damageTaken <= 0.0f && !a_p.dead) return false;  // nobody touched them
 		for (const auto& q : participants) {
 			for (const auto& e : q.effects) {
-				if (e.hostile && e.by == a_p.info.id && q.info.id != a_p.info.id) return false;
+				if (e.hostile && e.by == a_p.info.id && q.info.id != a_p.info.id && Landed(q, e)) return false;
 			}
 		}
 		return true;
@@ -253,18 +306,27 @@ namespace BSM
 		}
 		if (toPlayerSide > toEnemies) return Side::kEnemy;
 		if (toEnemies > 0.0f) return Side::kPlayer;
-		// did no damage to either: judge by who went for them
+		// Did no damage to either: one the player's enemies went for is with the player's side. One only the player's side
+		// went for is the one they fought, unless the party was fighting real enemies here: then it was crossfire (a
+		// fireball's edge, a stray arrow), and someone who never turned hostile to the player (Join would have made them
+		// an enemy) and never struck the party stays a bystander.
+		bool byPlayerSide = false;
 		for (const auto& [attacker, dmg] : a_p.damageFrom) {
 			const auto* q = Find(attacker);
-			if (q && q->info.side == Side::kPlayer) return Side::kEnemy;
 			if (q && q->info.side == Side::kEnemy) return Side::kPlayer;
+			if (q && q->info.side == Side::kPlayer) byPlayerSide = true;
 		}
-		return Side::kOther;
+		return byPlayerSide && !HasEnemies() ? Side::kEnemy : Side::kOther;
 	}
 
 	bool Battle::Involved(const Participant& a_p) const
 	{
 		return a_p.info.side == Side::kPlayer || a_p.engaged || a_p.involved;
+	}
+
+	bool Battle::HasEnemies() const
+	{
+		return std::ranges::any_of(participants, [&](const Participant& p) { return p.info.side == Side::kEnemy && Involved(p); });
 	}
 
 	float Battle::SideDamageDealt(Side a_side) const

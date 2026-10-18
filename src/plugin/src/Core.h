@@ -41,6 +41,25 @@ namespace BSM
 		bool        hostile{ false };
 		int         count{ 0 };
 		double      lastAt{ -1.0 };  // when it last took hold; -1 = not known
+		std::uint32_t spell{ 0 };    // what carried it (spell, potion, enchantment), by form; 0 = not known
+		// A damage effect: it lowers health (drained of life, burned, frozen, shocked, poisoned, hurt). Seen in play:
+		// something on the player pulsed an Absorb Health effect onto everyone nearby every half second, damaging none
+		// of them, and each was told the player had drained their life. So one is told only when it took health.
+		bool damage{ false };
+		struct Span
+		{
+			double from, to;
+		};
+		std::vector<Span> inForce;  // a damage effect's times on the target while it did something, with a little slack
+	};
+
+	// What the tracker could read about one application of an effect, beyond its name.
+	struct EffectFacts
+	{
+		std::uint32_t spell{ 0 };
+		bool          damage{ false };
+		bool          inForce{ true };  // the effect on the target has a magnitude and its conditions hold (or it is gone: not known)
+		double        lasts{ 0.0 };     // its duration in seconds; 0 = instant
 	};
 
 	// A lasting injury an injury mod put on a participant ("Leg Injury", "Major Injury").
@@ -61,6 +80,12 @@ namespace BSM
 		float healingDone{ 0.0f };
 
 		std::map<ActorId, float> damageFrom;  // attacker -> damage; 0 = no attacker (falls, traps, lingering effects)
+		struct Blow
+		{
+			ActorId by;  // as in damageFrom
+			double  at;
+		};
+		std::vector<Blow> blows;  // every loss of health, when it came: what a damage effect took is read from these
 
 		struct Heal
 		{
@@ -119,6 +144,8 @@ namespace BSM
 		float       endedGameHours{ 0.0f };
 		std::string location;
 		float       nearDeathPct{ 0.15f };
+		// A damage effect that took no health is left out: not told, and no sign that anyone fought (Landed).
+		bool        ignoreHarmless{ true };
 
 		std::vector<Participant> participants;  // in the order they joined
 
@@ -134,7 +161,12 @@ namespace BSM
 		void Damage(ActorId a_target, ActorId a_attacker, float a_amount, float a_healthPctAfter, double a_now);
 		void Sample(ActorId a_id, float a_healthPct, double a_now);
 		void Heal(ActorId a_target, ActorId a_healer, float a_amount, const std::string& a_source, double a_now);
-		void Effect(ActorId a_target, ActorId a_by, const std::string& a_label, const std::string& a_source, bool a_hostile, double a_now = -1.0);
+		void Effect(ActorId a_target, ActorId a_by, const std::string& a_label, const std::string& a_source, bool a_hostile, double a_now = -1.0,
+			const EffectFacts& a_facts = {});
+		// The effect is worth telling. With ignoreHarmless, a damage effect only when it took health from a_target: it was
+		// in force (a magnitude, its conditions met) and a_target lost health to its caster while it was. The other effects
+		// of its spell (a frost spell's slow) go with it. Judged when told: the damage can come after the effect.
+		[[nodiscard]] bool Landed(const Participant& a_target, const EffectNote& a_e) const;
 		// the spell (or poison, or enchantment) whose harmful magic a_by last put on a_target within a_within seconds
 		// before a_now; empty when there was none
 		[[nodiscard]] std::string RecentSpell(ActorId a_target, ActorId a_by, double a_now, double a_within) const;
@@ -149,12 +181,18 @@ namespace BSM
 		void Death(ActorId a_victim, ActorId a_killer, double a_now);
 
 		// The side used for telling the story: an "other" who fought the player's side counts as an enemy, one who only
-		// fought the player's enemies counts with the player's side.
+		// fought the player's enemies (or was only attacked by them) counts with the player's side. One who fought nobody
+		// and was struck only by the player's side is an enemy, unless the party was fighting real enemies (HasEnemies):
+		// then they were caught in the crossfire, and stay an "other": a bystander.
 		[[nodiscard]] Side EffectiveSide(const Participant& a_p) const;
 
 		// Took part in this battle. The player's side always counts; anyone else must have fought the player's side, or
 		// fought someone who did (a deer that only bolted is not an enemy, and neither is a crab a wolf killed nearby).
 		[[nodiscard]] bool Involved(const Participant& a_p) const;
+
+		// Someone in it who turned hostile to the player (as the game saw them, not as the story tells them) took part:
+		// the party had real enemies to fight here, not only whoever it went for.
+		[[nodiscard]] bool HasEnemies() const;
 
 		// A lawful person who was attacked without fighting: never raised a weapon, never came at anyone, struck nobody,
 		// cast nothing harmful. (Told as "not actively engaged in combat": whether they were innocent is for the story.)

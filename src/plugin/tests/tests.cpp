@@ -36,6 +36,10 @@ namespace
 		return { a_id, a_name, a_side, a_id == kHero, a_master, a_hp };
 	}
 
+	// what the tracker reads off a damage effect: whether it was doing anything (a magnitude, its conditions met), what
+	// carried it, how long it lasts
+	EffectFacts Damaging(bool a_inForce, std::uint32_t a_spell = 0, double a_lasts = 0.0) { return { a_spell, true, a_inForce, a_lasts }; }
+
 	// The fight the mod exists for: Lydia is beaten into bleedout by the chief, Kaira kills the chief and heals her.
 	Battle Rescue()
 	{
@@ -452,6 +456,165 @@ namespace
 		Check(!Has(BuildMemory(b, quiet), "Kaira (by accident"), "and left out of what is remembered", BuildMemory(b, quiet));
 	}
 
+	// Reported by a player: "Ignore friendly fire" worked for followers but not for anyone else, and a bystander caught
+	// in the crossfire of a fight with bandits was told as one of the enemies.
+	void TestFriendlyFireOnBystanders()
+	{
+		Battle b;
+		b.startedAt = 0;
+		b.Join(Info(kHero, "Kaira", Side::kPlayer, 200));
+		b.Join(Info(kLydia, "Lydia", Side::kPlayer, 300));
+		b.Join(Info(kBandit1, "Bandit", Side::kEnemy, 100));
+		b.Join(Info(kChief, "Bandit Chief", Side::kEnemy, 300));
+		b.Join(Info(kGuard, "Whiterun Guard", Side::kOther, 250));
+		b.Join(Info(kMage, "Hunter", Side::kOther, 100));        // stood by: no hold's law, never fought
+		b.Join(Info(kAtronach, "Heimskr", Side::kOther, 75));
+		b.Find(kGuard)->info.lawful = b.Find(kAtronach)->info.lawful = true;
+		b.Damage(kLydia, kBandit1, 30, 0.9f, 1);
+		b.Damage(kChief, kGuard, 60, 0.8f, 1.5);                 // the guard fights the bandits...
+		b.Effect(kGuard, kHero, "burned by fire", "Fireball", true, 2);
+		b.Damage(kGuard, kHero, 50, 0.8f, 2);                     // ...and is caught in the player's fireball
+		b.Effect(kMage, kHero, Text::Get("fx.drained_life"), "", true, 2, Damaging(true));
+		b.Damage(kMage, kHero, 40, 0.6f, 2);                      // so is the hunter, who fought nobody
+		b.Effect(kLydia, kHero, "burned by fire", "Fireball", true, 2);
+		b.Damage(kLydia, kHero, 40, 0.75f, 2);
+		b.Effect(kBandit1, kHero, "burned by fire", "Fireball", true, 2);
+		b.Damage(kBandit1, kHero, 100, 0.0f, 2);
+		b.Death(kBandit1, kHero, 2);
+		b.Damage(kAtronach, kHero, 75, 0.0f, 2.2);
+		b.Death(kAtronach, kHero, 2.2);
+		b.Damage(kChief, kLydia, 300, 0.0f, 6);
+		b.Death(kChief, kLydia, 6);
+		b.endedAt = 10;
+
+		Check(b.EffectiveSide(*b.Find(kMage)) == Side::kOther, "a bystander struck only by the player's side is not an enemy", "");
+		Check(b.EffectiveSide(*b.Find(kGuard)) == Side::kPlayer, "a guard who fought the bandits is on the player's side", "");
+		const auto hero = SummaryText(BuildSummary(b, kHero, "Kaira", {}));
+		Check(Has(hero, "Kaira, Lydia and Whiterun Guard fought against Bandit and Bandit Chief.") && Has(hero, "Also caught up in it: Hunter and Heimskr."),
+			"the bystanders are caught up in it, not enemies", hero);
+
+		NarrativeOptions quiet;
+		quiet.ignoreFriendlyFire = true;
+		const auto hunterTold = SummaryText(BuildSummary(b, kMage, "Hunter", {}));
+		Check(Has(hunterTold, "Hunter was caught in the crossfire, by accident (not an attack on them): took part of their damage from Kaira; drained of life by Kaira.")
+				&& !Has(hunterTold, "own side") && !Has(hunterTold, "Hunter suffered"),
+			"a bystander hit by the player's side: told as an accident", hunterTold);
+		const auto hunterHidden = SummaryText(BuildSummary(b, kMage, "Hunter", quiet));
+		Check(!Has(hunterHidden, "from Kaira") && !Has(hunterHidden, "drained") && !Has(hunterHidden, "friendly fire") && Has(hunterHidden, "Hunter took no damage worth the name"),
+			"a bystander hit by the player's side: left out", hunterHidden);
+
+		const auto bandit = SummaryText(BuildSummary(b, kBandit1, "Bandit", quiet));
+		Check(Has(bandit, "Bandit suffered: burned by fire by Kaira (Fireball).") && Has(bandit, "Bandit was killed by Kaira."), "what the player did to an enemy is still told", bandit);
+
+		const auto guardTold = SummaryText(BuildSummary(b, kGuard, "Whiterun Guard", {}));
+		Check(Has(guardTold, "Whiterun Guard was caught in their own side's attacks, by accident (friendly fire, not an attack on them): took part of their damage from Kaira; burned by fire by Kaira (Fireball)."),
+			"a guard who fought beside the party: friendly fire, as before", guardTold);
+		const auto guardHidden = SummaryText(BuildSummary(b, kGuard, "Whiterun Guard", quiet));
+		Check(!Has(guardHidden, "Fireball") && !Has(guardHidden, "from Kaira"), "and left out as before", guardHidden);
+
+		const auto lydiaTold = SummaryText(BuildSummary(b, kLydia, "Lydia", {}));
+		const auto lydiaHidden = SummaryText(BuildSummary(b, kLydia, "Lydia", quiet));
+		Check(Has(lydiaTold, "Lydia was caught in their own side's attacks") && !Has(lydiaHidden, "Fireball"), "a follower: unchanged", lydiaTold + lydiaHidden);
+
+		// a death by friendly fire is always told
+		Check(Has(SummaryText(BuildSummary(b, kAtronach, "Heimskr", quiet)), "Heimskr was killed by Kaira.")
+				&& Has(BuildMemory(b, quiet), "Heimskr, who was not actively engaged in combat, was killed by Kaira."),
+			"a bystander's death is told, the option or not", BuildMemory(b, quiet));
+
+		// one only the player's enemies went for is still counted with the player's side
+		Battle c;
+		c.Join(Info(kHero, "Kaira", Side::kPlayer, 200));
+		c.Join(Info(kBandit1, "Bandit", Side::kEnemy, 100));
+		c.Join(Info(kMage, "Hunter", Side::kOther, 100));
+		c.Damage(kHero, kBandit1, 10, 0.95f, 1);
+		c.Damage(kMage, kBandit1, 30, 0.7f, 2);
+		Check(c.EffectiveSide(*c.Find(kMage)) == Side::kPlayer, "struck by the player's enemies: with the player's side", "");
+
+		// with no enemies about, whoever the party went for is no bystander: a deer hunt is still a fight with the deer...
+		Battle d;
+		d.Join(Info(kHero, "Kaira", Side::kPlayer, 200));
+		d.Join(Info(0x846F6, "Deer", Side::kOther, 50));
+		d.Damage(0x846F6, kHero, 50, 0.0f, 1);
+		d.Death(0x846F6, kHero, 1);
+		d.endedAt = 5;
+		const auto hunt = SummaryText(BuildSummary(d, kHero, "Kaira", quiet));
+		Check(d.EffectiveSide(*d.Find(0x846F6)) == Side::kEnemy && d.Count(Side::kEnemy) == 1 && Has(hunt, "Kaira fought against Deer.") && Has(hunt, "Who killed the enemies: Kaira 1 (Deer)."),
+			"a deer hunt is a battle with the deer, as before", hunt);
+
+		// ...and a townsman attacked on his own is told as attacked, the option or not
+		Battle t;
+		t.Join(Info(kHero, "Kaira", Side::kPlayer, 200));
+		t.Join(Info(kAtronach, "Heimskr", Side::kOther, 75));
+		t.Join(Info(kMage, "Farmhand", Side::kOther, 80));
+		t.Find(kAtronach)->info.lawful = true;
+		t.Effect(kAtronach, kHero, "burned by fire", "Flames", true, 1);
+		t.Damage(kAtronach, kHero, 40, 0.45f, 1);
+		t.Damage(kMage, kHero, 30, 0.6f, 2);  // no hold's law
+		t.endedAt = 5;
+		Check(t.EffectiveSide(*t.Find(kMage)) == Side::kEnemy, "someone else attacked on their own is the one the player fought, as before", "");
+		for (const bool ignore : { false, true }) {
+			NarrativeOptions o;
+			o.ignoreFriendlyFire = ignore;
+			const auto assault = SummaryText(BuildSummary(t, kAtronach, "Heimskr", o));
+			Check(Has(assault, "Heimskr suffered: burned by fire by Kaira (Flames).") && !Has(assault, "by accident") && !Has(assault, "crossfire") && Has(assault, "took solid wounds"),
+				"a lone assault on a townsman is told as an attack", assault);
+		}
+	}
+
+	// Seen in a player's log: something on the player pulsed an Absorb Health effect onto everyone nearby every half
+	// second, damaging none of them, and each was told the player had "drained their life". A damage effect is told
+	// only when it took health; what does no damage (paralysis, a slow from a spell without damage) is told as before.
+	void TestHarmlessEffects()
+	{
+		constexpr std::uint32_t kDrainSpell = 0xFF00A001, kFrostbite = 0xFF00A002, kParalyze = 0xFF00A003;
+		const auto drained = Text::Get("fx.drained_life"), frozen = Text::Get("fx.frozen"), slowed = Text::Get("fx.slowed"), paralyzed = Text::Get("fx.paralyzed");
+		const auto replay = [&](bool a_ignoreHarmless) {
+			Battle b;
+			b.startedAt = 0;
+			b.ignoreHarmless = a_ignoreHarmless;
+			b.Join(Info(kHero, "Kaira", Side::kPlayer, 200));
+			b.Join(Info(kLydia, "Lydia", Side::kPlayer, 300));
+			b.Join(Info(kBandit1, "Bandit", Side::kEnemy, 100));
+			b.Join(Info(kMage, "Bandit Mage", Side::kEnemy, 80));
+			b.Join(Info(kGuard, "Hunter", Side::kOther, 100));
+			for (double t = 1.0; t <= 6.0; t += 0.5) {  // the pulse, on everyone in reach, doing nothing to any of them
+				for (const auto id : { kLydia, kBandit1, kGuard }) b.Effect(id, kHero, drained, "", true, t, Damaging(false));
+			}
+			b.Damage(kBandit1, kHero, 30, 0.7f, 2.0);  // the player's sword, while the pulse was on him
+			b.Effect(kLydia, kMage, drained, "Vampiric Drain", true, 3.0, Damaging(true, kDrainSpell));
+			b.Damage(kLydia, kMage, 20, 0.9f, 3.2);  // what it took
+			b.Effect(kHero, kMage, frozen, "Frostbite", true, 4.0, Damaging(true, kFrostbite, 1.0));
+			b.Effect(kHero, kMage, slowed, "Frostbite", true, 4.0, { kFrostbite });
+			b.Damage(kHero, kMage, 15, 0.9f, 4.6);
+			b.Effect(kLydia, kBandit1, paralyzed, "Paralyze", true, 5.0, { kParalyze });  // no damage in that spell
+			b.Effect(kLydia, kMage, frozen, "Frostbite", true, 6.0, Damaging(false, kFrostbite, 1.0));  // a frostbite that did nothing...
+			b.Effect(kLydia, kMage, slowed, "Frostbite", true, 6.0, { kFrostbite });                    // ...and its slow
+			b.Damage(kBandit1, kLydia, 70, 0.0f, 7);
+			b.Death(kBandit1, kLydia, 7);
+			b.endedAt = 10;
+			return b;
+		};
+
+		const auto b = replay(true);
+		Check(!b.Involved(*b.Find(kGuard)), "a damage effect that took nothing draws nobody into the battle", "");
+		const auto hero = SummaryText(BuildSummary(b, kHero, "Kaira", {}));
+		Check(!Has(hero, "Hunter"), "and they are not told as caught up in it", hero);
+		Check(Has(hero, "Kaira suffered: frozen by frost by Bandit Mage (Frostbite) and slowed by Bandit Mage (Frostbite)."), "a frost spell that took health: its slow goes with it", hero);
+		const auto lydia = SummaryText(BuildSummary(b, kLydia, "Lydia", {}));
+		Check(Has(lydia, "Lydia suffered: drained of life by Bandit Mage (Vampiric Drain) and paralyzed by Bandit (Paralyze)."), "a drain that took health is told; paralysis without damage too", lydia);
+		Check(!Has(lydia, "frozen") && !Has(lydia, "slowed") && !Has(lydia, "by Kaira") && !Has(lydia, "caught in"),
+			"a frost spell that did nothing, its slow, and an empty drain from her own side are not", lydia);
+		const auto bandit = SummaryText(BuildSummary(b, kBandit1, "Bandit", {}));
+		Check(!Has(bandit, "drained"), "an empty drain on an enemy the player struck is not told", bandit);
+		const auto hunter = BuildSummary(b, kGuard, "Hunter", {});
+		Check(!hunter.participant && !Has(SummaryText(hunter), "drained"), "a bystander it reached is told nothing about it", SummaryText(hunter));
+
+		const auto all = replay(false);  // as 1.3.0: every damage effect told when it lands
+		Check(Has(SummaryText(BuildSummary(all, kBandit1, "Bandit", {})), "Bandit suffered: drained of life by Kaira."), "with the setting off, the drains are told", "");
+		Check(all.Involved(*all.Find(kGuard)) && Has(SummaryText(BuildSummary(all, kGuard, "Hunter", {})), "drained of life by Kaira"), "on bystanders too", "");
+		Check(Has(SummaryText(BuildSummary(all, kLydia, "Lydia", {})), "frozen by frost by Bandit Mage (Frostbite)"), "and the frost spell that did nothing", "");
+	}
+
 	// The first of the "significant moments": several foes killed by one fighter in the same instant.
 	void TestKilledAtOnce()
 	{
@@ -629,6 +792,8 @@ int main(int argc, char** argv)
 	TestInnocentsAndAllies();
 	TestFoesSaveNobody();
 	TestFriendlyFire();
+	TestFriendlyFireOnBystanders();
+	TestHarmlessEffects();
 	TestKilledAtOnce();
 	TestOwnWording();
 	TestSayLessWhenInDoubt();
