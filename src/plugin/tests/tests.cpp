@@ -822,7 +822,8 @@ namespace
 		b.Death(kAtro1, kLydia, 2);
 		b.Damage(kAtro2, kHero, 100, 0.0f, 3);
 		b.Death(kAtro2, kHero, 3);
-		b.Death(kAtro3, 0, 4);  // its summoner fell: it went with him, nobody's doing
+		b.Damage(kAtro3, kHero, 30, 0.7f, 3.8);  // struck once, then it vanished with its summoner: still nobody's doing
+		b.Death(kAtro3, 0, 4);
 		b.Damage(kNecro, kHero, 150, 0.0f, 4);
 		b.Death(kNecro, kHero, 4);
 		b.endedAt = 8;

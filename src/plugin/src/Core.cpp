@@ -304,7 +304,11 @@ namespace BSM
 		// The game's own death report names the player as the killer for many kills their followers make (seen in play:
 		// a player who only healed was credited with every kill). Whoever dealt the blow the victim died of is the
 		// killer; the game's word is used only when no blow was seen just before the death (a kill move, a script).
-		if (v->lastAttacker != 0 && a_now - v->lastAttackedAt <= kFinalBlow) a_killer = v->lastAttacker;
+		// A summoned creature that ends with health left and no killer named was dismissed, not killed: its summoner fell
+		// or its time ran out (seen in play: an atronach struck once, to 68%, vanished the moment its conjurer died, and
+		// was credited to the one who had struck it). Nobody gets that one.
+		if (v->info.summon && a_killer == 0 && v->healthPct > 0.01f) a_killer = 0;
+		else if (v->lastAttacker != 0 && a_now - v->lastAttackedAt <= kFinalBlow) a_killer = v->lastAttacker;
 		else if (a_killer == 0 || a_killer == a_victim) a_killer = RecentAttacker(*v, a_now);
 		else if (!v->damageFrom.contains(a_killer)) {
 			// ...and not even then when the one it names never struck the victim while others did: that is how a follower
