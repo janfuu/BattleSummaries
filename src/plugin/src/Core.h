@@ -34,7 +34,8 @@ namespace BSM
 		// A bandit killed in his sleep was still an enemy.
 		bool        wouldFight{ false };
 		// A summoned or raised creature (a conjured atronach, a companion's mechanical spider): not a fighter of its own on
-		// the player's side, and its end is no death. Its master is in `master` when the game names one.
+		// the player's side, and its end is no death. Its master is in `master` when the game names one. Decided when it first
+		// joins: a corpse a necromancer raises later keeps its first death as the kill it was.
 		bool        summon{ false };
 	};
 

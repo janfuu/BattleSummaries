@@ -299,6 +299,7 @@ namespace BSM
 				ActorId                         killer;
 				std::vector<const Participant*> victims;
 				std::vector<const Participant*> summons;  // the summons that made some of these kills
+				int                             bySummons{ 0 };
 			};
 			std::vector<Entry> tally;
 			for (const auto* v : OnSide(a_b, a_victims)) {
@@ -308,17 +309,18 @@ namespace BSM
 				const bool  bySummon = k && k->info.summon && k->info.master != 0 && a_b.Find(k->info.master);
 				const auto  credited = bySummon ? k->info.master : v->killer;
 				auto        it = std::ranges::find_if(tally, [&](const Entry& t) { return t.killer == credited; });
-				if (it == tally.end()) it = tally.insert(tally.end(), { credited, {}, {} });
+				if (it == tally.end()) it = tally.insert(tally.end(), { credited, {}, {}, 0 });
 				it->victims.push_back(v);
+				if (bySummon) ++it->bySummons;
 				if (bySummon && std::ranges::none_of(it->summons, [&](const Participant* q) { return q->info.name == k->info.name; })) it->summons.push_back(k);
 			}
 			std::ranges::stable_sort(tally, [](const Entry& a, const Entry& b) { return a.victims.size() > b.victims.size(); });
 			std::vector<std::string> items;
-			for (const auto& [killer, victims, summons] : tally) {
+			for (const auto& [killer, victims, summons, bySummons] : tally) {
 				// the victims by name only while the list stays short; a summon's share as "through Scrap"
 				std::vector<std::string> notes;
 				if (victims.size() <= 3) notes.push_back(Grouped(victims));
-				if (!summons.empty()) notes.push_back(F("tally.through", { { "summons", Grouped(summons) } }));
+				if (!summons.empty()) notes.push_back(F("tally.through", { { "count", N(bySummons) }, { "summons", Grouped(summons) } }));
 				std::string inner;
 				for (const auto& n : notes) inner += (inner.empty() ? "" : ", ") + n;
 				items.push_back((killer == 0 ? T("tally.unknown") : CreditName(a_b, killer)) + " " + N(victims.size()) + (inner.empty() ? std::string() : " (" + inner + ")"));

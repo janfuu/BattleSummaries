@@ -181,9 +181,13 @@ namespace BSM::Tracker
 			// Would fight the player on sight, whether or not they had noticed them: read from their factions and nature,
 			// which a blow does not change (the combat state it starts does, so it is no guide here).
 			if (i.side != Side::kPlayer && pc) {
-				const bool enemy = a_actor->GetFactionReaction(pc) == RE::FIGHT_REACTION::kEnemy;
-				const bool anyone = a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kAggression) >= 2.0f;
-				i.wouldFight = enemy || anyone;
+				const bool  enemy = a_actor->GetFactionReaction(pc) == RE::FIGHT_REACTION::kEnemy;
+				const float aggression = a_actor->AsActorValueOwner()->GetActorValue(RE::ActorValue::kAggression);
+				// a wolf's factions do not count the player an enemy, yet it attacks on sight (seen in play): one of no hold,
+				// hostile to the player and set to attack counts too. A townsman struck in a brawl turns hostile as well, but
+				// has a crime faction; a farmer or a deer has aggression 0.
+				const bool  beast = !i.lawful && aggression >= 1.0f && a_actor->IsHostileToActor(pc);
+				i.wouldFight = enemy || aggression >= 2.0f || beast;
 			}
 			// summoned or raised: commanded by someone, marked summoned by the game, or a creature made to be summoned
 			i.summon = a_actor->IsCommandedActor() || a_actor->IsSummoned();

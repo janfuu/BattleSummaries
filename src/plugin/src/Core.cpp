@@ -67,7 +67,6 @@ namespace BSM
 			if (a_info.master != 0) p->info.master = a_info.master;
 			if (a_info.lawful) p->info.lawful = true;
 			if (a_info.wouldFight) p->info.wouldFight = true;
-			if (a_info.summon) p->info.summon = true;
 			// a follower stays a follower through a stray friendly hit; anyone else who turns hostile is an enemy from then on
 			if (p->info.side == Side::kOther || a_info.side == Side::kPlayer) p->info.side = a_info.side;
 			return *p;

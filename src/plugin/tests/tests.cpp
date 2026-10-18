@@ -794,10 +794,17 @@ namespace
 		b.Damage(kWolf2, kScrap3, 60, 0.0f, 6);
 		b.Death(kWolf2, kScrap3, 6);
 		b.endedAt = 10;
+		// a corpse raised after it died is no summon: its first death stays a kill
+		b.Join(Info(kWolf1, "Wolf", Side::kEnemy, 60, 0xFF000999));
+		b.Find(kWolf1)->info.summon = false;
+		ActorInfo raised = Info(kWolf1, "Wolf", Side::kEnemy, 60, 0xFF000999);
+		raised.summon = true;
+		b.Join(raised);
+		Check(!b.Find(kWolf1)->info.summon, "a summon is decided when it first joins", "");
 		const auto remiel = SummaryText(BuildSummary(b, kRemiel, "Remiel", {}));
 		Check(!Has(remiel, "Scrap was killed") && !Has(remiel, "Scrap:") && Has(remiel, "Kaira and Remiel fought against Wolf x2."),
 			"a summon is not a fighter of its own, and its end is no death", remiel);
-		Check(Has(remiel, "Who killed the enemies: Remiel 2 (Wolf x2, through Scrap)."), "its kills are its master's, with its name", remiel);
+		Check(Has(remiel, "Who killed the enemies: Remiel 2 (Wolf x2, 2 through Scrap)."), "its kills are its master's, with its name", remiel);
 		Check(Has(remiel, "Remiel killed 2 of the 2 who died on the other side: Wolf x2.") && Has(remiel, "2 of them through Scrap."), "told to the master too", remiel);
 		Check(!Has(BuildMemory(b, {}), "Scrap was"), "and nothing is remembered of its ends", BuildMemory(b, {}));
 	}

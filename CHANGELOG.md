@@ -22,7 +22,7 @@
   "Mention bystanders who were killed" on SkyrimNet's settings page brings them back.
 - Summons are their master's: a conjured skeleton or a companion's mechanical spider is no longer listed as a fighter,
   and its end is never told as a death (one long fight told "Scrap was killed" 18 times). Its kills are credited to
-  whoever summoned it: "Remiel 2 (Wolf x2, through Scrap)". The enemy's summons are told as dispatched, with credit to
+  whoever summoned it: "Remiel 2 (Wolf x2, 2 through Scrap)". The enemy's summons are told as dispatched, with credit to
   whoever did it: "Summoned creatures dispatched: Lydia 1 (Flame Atronach)."
 - Follower Death and Injury Chance's injuries are recognised: "a minor injury", "a serious injury", "a lasting injury".
 

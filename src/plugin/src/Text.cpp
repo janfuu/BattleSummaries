@@ -64,7 +64,7 @@ namespace BSM::Text
 			{ "Outcome", "tally.line", "Who killed the enemies: {tally}.", "{tally} reads \"Kaira 3 (Bandit x2 and Bandit Chief); Lydia 1 (Bandit)\"" },
 			{ "Outcome", "tally.unknown", "unknown causes", "" },
 			{ "Outcome", "summons.dispatched", "Summoned creatures dispatched: {tally}.", "the enemy's summoned or raised creatures, by who put an end to them" },
-			{ "Outcome", "tally.through", "through {summons}", "kills a summoned creature made, credited to whoever summoned it" },
+			{ "Outcome", "tally.through", "{count} through {summons}", "kills a summoned creature made, credited to whoever summoned it" },
 
 			// ---------------------------------------------------------------- deaths
 			{ "Deaths", "killed.by", "was killed by {killer}", "" },
