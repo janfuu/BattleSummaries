@@ -1,38 +1,30 @@
 # Changelog
 
-## Next release
+## 1.4.0
+
+**Bystanders stay out of it**
+- Someone caught in a fight without fighting (a farmer, a passing townsman) is no longer mentioned at all, so your
+  followers stop deciding you're a murderer. Want them back? "Mention bystanders who were killed" on SkyrimNet's
+  settings page.
+- Enemies killed before they noticed you still count. Stealth archers keep their credit.
+
+**Summons**
+- Your summons and your followers' (Scrap, a conjured skeleton, a spectral wolf, a raised corpse) are no longer
+  fighters of their own, and nobody mourns them. Their kills are their master's: "Remiel 2 (Wolf x2, 2 through Scrap)".
+- The enemy's summons are told as dispatched, with credit: "Summoned creatures dispatched: Lydia 1 (Flame Atronach)".
+  One that vanished with its master counts for nobody.
+
+**Telling them apart**
+- Several enemies with the same name are numbered: "the first Troll", "the second Troll", so it's clear which one
+  struck your follower down.
+
+**Injuries**
+- Follower Death and Injury Chance is supported: a minor, a serious or a lasting injury.
 
 **Bug Fixes**
-- "Ignore friendly fire" now covers crossfire during a fight, not just followers. A townsman caught at the edge of the
-  fireball you aimed at bandits is no longer counted as an enemy: he's told he was caught in the crossfire, by
-  accident, or nothing at all when the option is on. Attack someone when there's nobody else to fight and it's still
-  told as an attack. (A death is always told.)
-- Standing by while others fight no longer gets you blamed for their magic: an effect a script or perk applies in your
-  name is credited to whoever the effect itself names, or to nobody when you hadn't fought, drawn a weapon or readied a
-  spell. (Shouts and powers still count as yours.)
-- A damage effect that did no damage is no longer told. Seen in a log: a pulsing Absorb Health effect from the
-  player, applied to everyone nearby every half second, that damaged none of them, and every one of them was told the
-  player had drained their life. Now "drained of life", "burned", "frozen", "shocked", "poisoned" and "hurt" are told
-  only when that effect took health from that person (and a spell's slow goes with its frost). Paralysis, fear, calm
-  and slows from spells that do no damage are told as before.
-
-- Bystanders are left out. Someone harmed or killed in a battle without being a fighter (a townsman caught in it, a
-  deer) is no longer mentioned at all, so followers stop reading it as you murdering people. Anyone who would fight you
-  on sight still counts as an enemy, even killed before they noticed you: stealth archers keep their credit.
-  "Mention bystanders who were killed" on SkyrimNet's settings page brings them back.
-- Summons are their master's: a conjured skeleton or a companion's mechanical spider is no longer listed as a fighter,
-  and its end is never told as a death (one long fight told "Scrap was killed" 18 times). Its kills are credited to
-  whoever summoned it: "Remiel 2 (Wolf x2, 2 through Scrap)". The enemy's summons are told as dispatched, with credit to
-  whoever did it: "Summoned creatures dispatched: Lydia 1 (Flame Atronach)."
-- Follower Death and Injury Chance's injuries are recognised: "a minor injury", "a serious injury", "a lasting injury".
-
-- Several enemies of one name are told apart: "the first Troll", "the second Troll", the same in every line, so a
-  follower can tell which one struck her down. Only the one whose blows did it "struck her down"; another that hurt
-  her badly "had also wounded" her.
-
-**New setting**
-- "Mention bystanders who were killed" on SkyrimNet's settings page (`bMentionBystanders` in the ini), off by
-  default.
+- "Ignore friendly fire" now also covers bystanders caught in the crossfire. Thanks to Zol for the change.
+- Effects that did no damage (an aura pulsing over everyone nearby) are no longer blamed on anyone. Thanks to Zol.
+- Two creatures that the game gave the same ID to are no longer mixed up.
 
 ## 1.3.0
 
