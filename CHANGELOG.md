@@ -2,24 +2,13 @@
 
 ## 1.4.0
 
-**Bystanders stay out of it**
-- Someone caught in a fight without fighting (a farmer, a passing townsman) is no longer mentioned at all, so your
-  followers stop deciding you're a murderer. Want them back? "Mention bystanders who were killed" on SkyrimNet's
-  settings page.
-- Enemies killed before they noticed you still count. Stealth archers keep their credit.
-
-**Summons**
-- Your summons and your followers' (Scrap, a conjured skeleton, a spectral wolf, a raised corpse) are no longer
-  fighters of their own, and nobody mourns them. Their kills are their master's: "Remiel 2 (Wolf x2, 2 through Scrap)".
-- The enemy's summons are told as dispatched, with credit: "Summoned creatures dispatched: Lydia 1 (Flame Atronach)".
-  One that vanished with its master counts for nobody.
-
-**Telling them apart**
-- Several enemies with the same name are numbered: "the first Troll", "the second Troll", so it's clear which one
-  struck your follower down.
-
-**Injuries**
-- Follower Death and Injury Chance is supported: a minor, a serious or a lasting injury.
+**Improvements**
+- Someone caught in a fight without fighting (a farmer, a passing townsman) is no longer mentioned at all, so your followers stop deciding you're a murderer. Want them back? "Mention bystanders who were killed" on SkyrimNet's settings page.
+- Enemies killed before they noticed you still count. Stealth archers rejoice!
+- Your summons and your followers' (Scrap, a conjured skeleton, a spectral wolf, a raised corpse) are no longer fighters of their own, and nobody mourns them. Their kills are their master's: "Remiel 3 (Wolf x3, 2 through Scrap)".
+- The enemy's summons are told as dispatched, with credit: "Summoned creatures dispatched: Lydia 1 (Flame Atronach)". Any that disappear with their master's death count for nobody.
+- Several enemies with the same name are numbered: "the first Troll", "the second Troll", so it's clear which one struck your follower down.
+- Follower Death and Injury Chance is now officially supported: a minor, a serious or a lasting injury.
 
 **Bug Fixes**
 - "Ignore friendly fire" now also covers bystanders caught in the crossfire. Thanks to Zol for the change.
