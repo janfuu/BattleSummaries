@@ -161,11 +161,11 @@ namespace BSM::Tracker
 			return false;
 		}
 
-		ActorInfo InfoOf(RE::Actor* a_actor)
+		ActorInfo InfoOf(RE::Actor* a_actor, ActorId a_key = 0)
 		{
 			auto*     pc = RE::PlayerCharacter::GetSingleton();
 			ActorInfo i;
-			i.id = a_actor->GetFormID();
+			i.id = a_key ? a_key : a_actor->GetFormID();
 			const char* n = a_actor->GetDisplayFullName();
 			i.name = n ? n : "";
 			while (!i.name.empty() && std::isspace(static_cast<unsigned char>(i.name.back()))) i.name.pop_back();  // name mods leave a trailing space
@@ -198,6 +198,19 @@ namespace BSM::Tracker
 		}
 
 		RE::Actor* Lookup(ActorId a_id) { return a_id ? RE::TESForm::LookupByID<RE::Actor>(a_id) : nullptr; }
+
+		// The game reuses the IDs of references it creates and frees: a dismissed summon's ID goes to the next summon (seen
+		// in play: a flame atronach took the ID of the player's dead spectral wolf, and its death was lost as the wolf's).
+		// When an ID whose fighter is dead in this battle turns up on a living actor, that actor is a new fighter, kept
+		// under a key of its own; a raised corpse likewise. Key() maps a game ID to the fighter it means now.
+		std::unordered_map<RE::FormID, ActorId> g_alias;
+		ActorId                                 g_nextKey{ 0xFFFFFE00 };  // counting down; FakeRescue uses 0xFFFFFF01-02
+
+		ActorId Key(RE::FormID a_id)
+		{
+			const auto it = g_alias.find(a_id);
+			return it != g_alias.end() ? it->second : a_id;
+		}
 
 		bool Near(RE::Actor* a_actor)
 		{
@@ -379,7 +392,7 @@ namespace BSM::Tracker
 		{
 			const auto& cfg = Settings::Get();
 			if (!g_current || !a_actor || !cfg.injuries) return;
-			const auto id = a_actor->GetFormID();
+			const auto id = Key(a_actor->GetFormID());
 			auto&      live = g_live[id];
 			ForEachEffect(a_actor, [&](RE::ActiveEffect* ae) {
 				if (ae->flags.any(RE::ActiveEffect::Flag::kInactive, RE::ActiveEffect::Flag::kDispelled)) return;
@@ -444,7 +457,7 @@ namespace BSM::Tracker
 		void RecordLimb(ActorId a_id, bool a_head)
 		{
 			const auto apply = [&](Battle& a_b) {
-				auto* p = a_b.Find(a_id);
+				auto* p = a_b.Find(Key(a_id));
 				if (!p || !p->dead) return false;
 				if (!p->dismembered || (a_head && !p->beheaded)) SKSE::log::info("Battle {}: {} ({:08X}) {}", a_b.id, p->info.name, a_id, a_head ? "was beheaded" : "lost a limb");
 				a_b.Dismember(a_id, a_head);
@@ -515,6 +528,7 @@ namespace BSM::Tracker
 				g_current->omitBystanders = !cfg.mentionBystanders;
 				g_live.clear();
 				g_recentHeals.clear();
+				g_alias.clear();
 				SKSE::log::info("Battle {} began at '{}'", g_current->id, g_current->location);
 				g_readSettings = true;
 			}
@@ -526,8 +540,15 @@ namespace BSM::Tracker
 		Participant* Join(RE::Actor* a_actor)
 		{
 			if (!g_current || !a_actor) return nullptr;
-			const bool known = g_current->Find(a_actor->GetFormID()) != nullptr;
-			auto&      p = g_current->Join(InfoOf(a_actor));
+			const auto fid = a_actor->GetFormID();
+			ActorId    key = Key(fid);
+			if (const auto* was = g_current->Find(key); was && was->dead && !a_actor->IsDead()) {
+				key = g_nextKey--;  // a living actor under a dead fighter's ID: someone new
+				g_alias[fid] = key;
+				SKSE::log::debug("Battle {}: {:08X} is a new fighter under the ID of {} (dead): kept as {:08X}", g_current->id, fid, was->info.name, key);
+			}
+			const bool known = g_current->Find(key) != nullptr;
+			auto&      p = g_current->Join(InfoOf(a_actor, key));
 			auto&      live = g_live[p.info.id];
 			if (!known) {
 				live.handle = a_actor->CreateRefHandle();
@@ -538,7 +559,7 @@ namespace BSM::Tracker
 					p.info.wouldFight ? ", would fight the player" : "", p.info.lawful ? ", lawful" : "",
 					p.info.summon ? std::format(", summoned (master {:08X})", p.info.master) : std::string());
 				ScanInjuries(a_actor, true, Now());
-				auto* joined = g_current->Find(a_actor->GetFormID());
+				auto* joined = g_current->Find(key);
 				if (joined) SampleIntent(a_actor, *joined);
 				return joined;
 			}
@@ -599,7 +620,7 @@ namespace BSM::Tracker
 		}
 
 		// ---- working through the reports (caller holds g_lock, main thread) ----
-		bool InBattle(RE::Actor* a_actor) { return g_current && a_actor && g_current->Find(a_actor->GetFormID()) != nullptr; }
+		bool InBattle(RE::Actor* a_actor) { return g_current && a_actor && g_current->Find(Key(a_actor->GetFormID())) != nullptr; }
 
 		// A newcomer belongs to the battle when they are on the player's side, or the one they are fighting is on the
 		// player's side or has fought the player's side in this battle. Bystanders' quarrels with each other (a hunter and
@@ -613,7 +634,7 @@ namespace BSM::Tracker
 			if (!g_current) return false;
 			// ...and only when that one has itself fought the player's side: otherwise every predator near a fight drags
 			// in its prey, and their prey's attackers, until the whole valley is "the battle" (seen on a creature-heavy list)
-			const auto* p = g_current->Find(a_other->GetFormID());
+			const auto* p = g_current->Find(Key(a_other->GetFormID()));
 			return p && p->engaged;
 		}
 
@@ -637,7 +658,7 @@ namespace BSM::Tracker
 		// a script's or a perk's (reported by a player: "drained of life by" them while they did nothing).
 		bool PlayerCouldHaveDoneIt(RE::PlayerCharacter* a_pc, const RE::MagicItem* a_item)
 		{
-			if (const auto* p = g_current->Find(a_pc->GetFormID()); p && (p->engaged || p->damageDealt > 0.0f)) return true;
+			if (const auto* p = g_current->Find(Key(a_pc->GetFormID())); p && (p->engaged || p->damageDealt > 0.0f)) return true;
 			if (a_pc->AsActorState()->IsWeaponDrawn()) return true;
 			if (!a_item) return false;
 			using Type = RE::MagicSystem::SpellType;
@@ -674,7 +695,7 @@ namespace BSM::Tracker
 		void Handle(const Report& a_r)
 		{
 			if (a_r.type == Report::Type::kLimb) {
-				RecordLimb(a_r.a, a_r.amount > 1.5f);
+				RecordLimb(Key(a_r.a), a_r.amount > 1.5f);
 				return;
 			}
 			auto* pc = RE::PlayerCharacter::GetSingleton();
@@ -697,7 +718,7 @@ namespace BSM::Tracker
 					Begin(a_r.at);
 				}
 				JoinPair(a, b, pc);
-				if (auto* p = g_current->Find(a_r.a); p && p->damageTaken <= 0.0f && !p->dead) g_live[a_r.a].enteredUnstruck = true;
+				if (auto* p = g_current->Find(Key(a_r.a)); p && p->damageTaken <= 0.0f && !p->dead) g_live[p->info.id].enteredUnstruck = true;
 				break;
 
 			case Report::Type::kDamage: {
@@ -708,8 +729,8 @@ namespace BSM::Tracker
 				}
 				JoinPair(a, b, pc);
 				if (!InBattle(a)) return;
-				g_current->Damage(a_r.a, attacker, a_r.amount, a_r.pct, a_r.at);
-				g_live[a_r.a].damageSince += a_r.amount;
+				g_current->Damage(Key(a_r.a), Key(attacker), a_r.amount, a_r.pct, a_r.at);
+				g_live[Key(a_r.a)].damageSince += a_r.amount;
 				g_quiet = 0.0;
 				g_lastBlow = a_r.at;
 				SKSE::log::debug("damage: {:08X} took {:.1f} from {:08X}, health now {:.0f}%", a_r.a, a_r.amount, attacker, a_r.pct * 100.0f);
@@ -725,18 +746,19 @@ namespace BSM::Tracker
 				if (!InBattle(a)) return;
 				// Cut down within moments of turning on the party, before two looks could confirm it: go by their nature. One
 				// the game has set to attack on sight came to fight; a townsman who had only just been startled did not.
-				if (auto* v = g_current->Find(a_r.a); v && !v->dead && !v->cameToFight && v->info.side != Side::kPlayer) {
-					const auto& live = g_live[a_r.a];
+				if (auto* v = g_current->Find(Key(a_r.a)); v && !v->dead && !v->cameToFight && v->info.side != Side::kPlayer) {
+					const auto& live = g_live[v->info.id];
 					if ((live.enteredUnstruck || live.fightSamples > 0) && a->AsActorValueOwner()->GetActorValue(RE::ActorValue::kAggression) >= 1.0f) {
 						MarkCameToFight(*v, "entered combat unstruck, aggressive by nature");
 					}
 				}
-				g_current->Death(a_r.a, a_r.b, a_r.at);
+				g_current->Death(Key(a_r.a), Key(a_r.b), a_r.at);
 				// with what: the spell the killer's harmful magic came from just before, else the weapon in the killer's hand
-				if (auto* v = g_current->Find(a_r.a); v && v->dead && v->killer != 0 && v->killedWith.empty()) {
-					v->killedWith = g_current->RecentSpell(a_r.a, v->killer, a_r.at, 1.5);
+				if (auto* v = g_current->Find(Key(a_r.a)); v && v->dead && v->killer != 0 && v->killedWith.empty()) {
+					v->killedWith = g_current->RecentSpell(v->info.id, v->killer, a_r.at, 1.5);
 					if (v->killedWith.empty()) {
-						if (auto* k = Lookup(v->killer)) {
+						const auto lk = g_live.find(v->killer);
+						if (auto* k = lk != g_live.end() ? lk->second.handle.get().get() : Lookup(v->killer)) {
 							if (auto* held = k->GetEquippedObject(false); held && held->Is(RE::FormType::Weapon)) {
 								if (const char* n = held->GetName(); n && *n) v->killedWith = n;
 							}
@@ -753,7 +775,7 @@ namespace BSM::Tracker
 			case Report::Type::kBleedout:
 				if (!g_current || !(InBattle(a) || Belongs(a, nullptr, pc))) return;
 				Join(a);
-				g_current->Down(a_r.a, a_r.at);
+				g_current->Down(Key(a_r.a), a_r.at);
 				SKSE::log::debug("bleedout: {:08X} went down", a_r.a);
 				break;
 
@@ -796,8 +818,8 @@ namespace BSM::Tracker
 					!on.found     ? std::string(", damage effect no longer on the target") :
 									std::format(", damage effect, magnitude {:.1f}, {:.1f}s, {}", on.magnitude, on.duration, on.inForce ? "in force" : "doing nothing"));
 				// no caster: a potion heals its drinker; a hostile effect from nobody is a trap or a hazard
-				if (kind->heal) g_recentHeals.push_back({ a_r.a, b ? by : a_r.a, on.source, a_r.at });
-				else g_current->Effect(a_r.a, by, kind->label, on.source, kind->hostile, a_r.at, facts);
+				if (kind->heal) g_recentHeals.push_back({ Key(a_r.a), b ? by : a_r.a, on.source, a_r.at });  // target by key, healer by game ID
+				else g_current->Effect(Key(a_r.a), Key(by), kind->label, on.source, kind->hostile, a_r.at, facts);
 				break;
 			}
 			}
@@ -821,7 +843,8 @@ namespace BSM::Tracker
 		std::vector<std::pair<ActorId, std::string>> HealersOf(RE::Actor* a_actor, double a_now)
 		{
 			std::vector<std::pair<ActorId, std::string>> out;
-			const auto id = a_actor->GetFormID();
+			const auto id = a_actor->GetFormID();  // game IDs here; the caller credits by Key()
+			const auto key = Key(id);
 			const auto add = [&](ActorId a_healer, const std::string& a_source) {
 				if (a_healer == 0) a_healer = id;
 				if (std::ranges::find_if(out, [&](const auto& h) { return h.first == a_healer; }) == out.end()) out.emplace_back(a_healer, a_source);
@@ -832,7 +855,7 @@ namespace BSM::Tracker
 				if (Effects::RestoresHealth(base)) add(CasterOf(ae), SourceName(ae->spell, CasterOf(ae) != 0 ? CasterOf(ae) : id));
 			});
 			for (const auto& h : g_recentHeals) {
-				if (h.target == id && a_now - h.at <= 1.5) add(h.healer, h.source);
+				if (h.target == key && a_now - h.at <= 1.5) add(h.healer, h.source);
 			}
 			return out;
 		}
@@ -952,7 +975,7 @@ namespace BSM::Tracker
 								}
 								for (const auto& [healer, source] : healers) {
 									if (auto* h = Lookup(healer); h && h != actor && Near(h)) Join(h);
-									g_current->Heal(id, healer, gained / static_cast<float>(healers.size()), source, now);
+									g_current->Heal(id, Key(healer), gained / static_cast<float>(healers.size()), source, now);
 								}
 							}
 						}
@@ -1142,7 +1165,7 @@ namespace BSM::Tracker
 			Perf::Scope timed{ Perf::summary };
 			Summary r;
 			if (!a_viewer) return r;
-			const auto        id = a_viewer->GetFormID();
+			const auto        id = Key(a_viewer->GetFormID());
 			const char*       n = a_viewer->GetDisplayFullName();
 			const std::string name = n && *n ? n : Text::Get("name.someone");
 			const auto&       cfg = Settings::Get();
@@ -1203,6 +1226,7 @@ namespace BSM::Tracker
 		g_extra.clear();
 		g_live.clear();
 		g_recentHeals.clear();
+		g_alias.clear();
 		g_limbChecks.clear();
 		g_stale = false;
 		g_quiet = 0.0;
