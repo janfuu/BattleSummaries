@@ -125,6 +125,8 @@ namespace BSM::Text
 			{ "NearDeath", "brink.survived", ", but survived", "after brink.near_death" },
 			{ "NearDeath", "brink.rose", ", and rose again with their strength restored",
 				"after either, in place of the two above: back on their feet at a stroke with nobody's healing (a death-alternative mod, a power)" },
+			{ "NearDeath", "brink.risen", ", and got up again{how}",
+				"after either, in place of all three above: another mod that raises the fallen reported it (mod event BattleSummaries_Revived), nobody's rescue. {how} is empty or a space and what onlookers saw, in that mod's words" },
 			{ "NearDeath", "brink.by", "by {name}", "" },
 			{ "NearDeath", "brink.friendly", "(by accident: friendly fire)", "added after brink.by when it was their own side" },
 			{ "NearDeath", "times.twice", "twice", "" },
@@ -212,7 +214,7 @@ namespace BSM::Text
 			{ "Others", "other.easy", "None of them was seriously hurt or in any real danger.", "an easy fight: said in place of a line for each" },
 
 			{ "Memory", "memory.rescued", "{name} {brink}, and would most likely have died, but {deeds}: {saviors} saved {name}'s life.", "the remembered paragraph" },
-			{ "Memory", "memory.survived", "{name} {brink}.", "{brink} ends with how they came back from it (brink.got_up, brink.survived, brink.rose)" },
+			{ "Memory", "memory.survived", "{name} {brink}.", "{brink} ends with how they came back from it (brink.got_up, brink.survived, brink.rose, brink.risen)" },
 
 			// ---------------------------------------------------------------- what a magic effect is called
 			{ "EffectNames", "fx.healed", "healed", "" },

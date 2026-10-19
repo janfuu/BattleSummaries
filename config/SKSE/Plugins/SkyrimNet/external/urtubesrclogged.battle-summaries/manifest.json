@@ -22,7 +22,7 @@
   "languages": [
     "en"
   ],
-  "version": "1.5.0",
-  "changelog": "Teamwork: who did the work and the part each played, and a Followers Fight as a Team setting. A wind-down setting keeps a fight that starts again as one battle, told in clashes. Death-alternative mods: struck down is getting back up, and a battle you are moved away from ends where it was fought.",
+  "version": "1.5.0-risen.1",
+  "changelog": "Teamwork: who did the work and the part each played, and a Followers Fight as a Team setting. A wind-down setting keeps a fight that starts again as one battle, told in clashes. Death-alternative mods: struck down is getting back up, and a battle you are moved away from ends where it was fought. Fork: a mod that raises the fallen can say so (BattleSummaries_Revived), told in its words, and nobody is a savior while someone still lies in bleedout.",
   "min_skyrimnet_version": "0.25.0"
 }

@@ -262,9 +262,12 @@ namespace BSM
 		Rescue FindRescue(const Battle& a_b, const Participant& a_p, const NarrativeOptions& a_opt)
 		{
 			Rescue r;
-			// put back on their feet by something of their own (a death-alternative mod): nobody else's doing saved them
-			if (!a_p.WasCritical() || a_p.dead || a_p.roseAt >= 0.0) return r;
+			// put back on their feet by something of their own (a death-alternative mod, seen as health back at a stroke) or
+			// raised by another mod that said so (Revived): nobody else's doing saved them
+			if (!a_p.WasCritical() || a_p.dead || a_p.Risen() || a_p.roseAt >= 0.0) return r;
+			// while they still lie in bleedout nobody has saved them yet: they may rise by other means (Revived), or not at all
 			const auto addSavior = [&](ActorId a_id) {
+				if (a_p.isDown) return;
 				if (a_id != 0 && a_id != a_p.info.id && std::ranges::find(r.saviors, a_id) == r.saviors.end()) r.saviors.push_back(a_id);
 			};
 			const Side  mine = a_b.EffectiveSide(a_p);
@@ -308,6 +311,9 @@ namespace BSM
 			return r;
 		}
 
+		// fills {how} of the rise phrases: empty, or a space and what onlookers saw
+		std::string RisenHow(const Participant& a_p) { return a_p.risenHow.empty() ? std::string() : " " + a_p.risenHow; }
+
 		std::vector<std::string> Names(const Battle& a_b, const std::vector<ActorId>& a_ids)
 		{
 			std::vector<std::string> out;
@@ -320,7 +326,12 @@ namespace BSM
 		// to say who saved them.
 		std::string Brink(const Battle& a_b, const Participant& a_p, const NarrativeOptions& a_opt, bool a_recovery = true)
 		{
-			const auto recovery = [&](const char* a_key) { return a_recovery ? T(a_p.roseAt >= 0.0 ? "brink.rose" : a_key) : std::string(); };
+			// still lying there: how it ends is not known yet. Raised by another mod that said so: in its words.
+			const auto recovery = [&](const char* a_key) {
+				if (!a_recovery || a_p.isDown) return std::string();
+				if (a_p.risenAt >= 0.0) return F("brink.risen", { { "how", RisenHow(a_p) } });
+				return T(a_p.roseAt >= 0.0 ? "brink.rose" : a_key);
+			};
 			std::string by = a_p.broughtLowBy != 0 ? " " + F("brink.by", { { "name", NameOf(a_b, a_p.broughtLowBy) } }) : std::string();
 			if (OwnSide(a_b, a_p, a_p.broughtLowBy)) by = a_opt.ignoreFriendlyFire ? std::string() : by + " " + T("brink.friendly");
 			if (a_p.downs > 0) {
@@ -614,7 +625,7 @@ namespace BSM
 
 			if (!rescue.saviors.empty()) {
 				out.push_back(F("rescue.plain", { { "saviors", JoinList(Names(a_b, rescue.saviors)) }, { "name", n } }));
-			} else if (a_p.WasCritical() && !a_p.dead && rescue.deeds.empty()) {
+			} else if (a_p.WasCritical() && !a_p.dead && rescue.deeds.empty() && !a_p.Risen() && !a_p.isDown) {
 				out.push_back(F("rescue.none", { { "name", n } }));
 			}
 
