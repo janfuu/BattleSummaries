@@ -247,6 +247,7 @@ namespace BSM
 				const bool downedThem = id == a_p.broughtLowBy;
 				const auto assailant = NameOf(a_b, a->info.id);
 				if (a->killer == a_p.info.id) {
+					if (a_p.isDown) continue;  // their doing while they lay there (a poison, their blood), not a recovery
 					r.deeds.push_back(Cap(F(downedThem ? "rescue.recovered" : "rescue.recovered_wounded", { { "name", a_p.info.name }, { "assailant", assailant }, { "what", what } })));
 				} else if (a->killer != 0) {
 					r.deeds.push_back(Cap(F(downedThem ? "rescue.assailant_killed" : "rescue.assailant_wounded",

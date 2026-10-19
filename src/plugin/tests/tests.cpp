@@ -1020,6 +1020,25 @@ namespace
 			Check(!Has(arthur, "Brenna saved"), "healing from before the rise saves nobody later", arthur);
 		}
 
+		// the assailant dies of the fallen one's own doing while they still lie there (a vampire choking on their blood)
+		{
+			Battle b;
+			b.startedAt = 0.0;
+			b.Join(Info(kHero, "Arthur", Side::kPlayer, 400));
+			b.Join(Info(kWraith1, "Master Vampire", Side::kEnemy, 300));
+			b.Damage(kHero, kWraith1, 390, 0.02f, 10);
+			b.Down(kHero, 10.2);
+			b.Damage(kWraith1, kHero, 300, 0.0f, 24);
+			b.Death(kWraith1, kHero, 24);
+			const auto lying = SummaryText(BuildSummary(b, kHero, "Arthur", {}));
+			Check(!Has(lying, "recovered enough") && Has(lying, "Arthur 1 (Master Vampire)"), "no recovery while still down; the kill is still his", lying);
+			b.Revived(kHero, kSurge, 36.0);
+			b.Up(kHero);
+			b.endedAt = 40.0;
+			const auto risen = SummaryText(BuildSummary(b, kHero, "Arthur", {})) + BuildMemory(b, {});
+			Check(!Has(risen, "recovered enough") && !Has(risen, "but survived") && Has(risen, "got up again in a gust of wind"), "risen: told as the rise", risen);
+		}
+
 		// a rise reported for a fall the battle never saw: counted as a fall
 		{
 			Battle b;

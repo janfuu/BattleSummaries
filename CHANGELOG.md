@@ -8,7 +8,8 @@
   life: before, a companion who killed the one who had struck the player down while the player lay in bleedout was
   told as the player's savior, though the player was going to rise anyway.
 - Nobody is told as having saved someone while that person still lies in bleedout: what was done for them is told,
-  the verdict waits until they are up (they may still rise by other means, or not at all).
+  the verdict waits until they are up (they may still rise by other means, or not at all). Their own kill while they
+  lie there (a poison, a curse in their blood) is told as a kill, not as having "recovered enough" to make it.
 - While the player lies in bleedout after the last enemy fell, the battle stays open (up to a minute), so a rise can
   still be told before the battle is closed and remembered.
 
