@@ -80,7 +80,9 @@ namespace BSM
 
 	void Battle::MarkCritical(Participant& a_p, double a_now)
 	{
-		if (a_p.criticalAt < 0.0) {
+		if (a_p.Risen() && a_now - a_p.risenAt < kRiseGrace) return;  // still the fall they were raised from
+		// the first time, or the first time since they were raised: a new danger, with its own assailant
+		if (a_p.criticalAt < 0.0 || a_p.Risen()) {
 			a_p.criticalAt = a_now;
 			a_p.broughtLowBy = RecentAttacker(a_p, a_now);
 		}
@@ -148,7 +150,7 @@ namespace BSM
 		t->healingReceived += a_amount;
 		auto& h = t->healFrom[a_healer];
 		h.amount += a_amount;
-		if (t->WasCritical()) h.whileCritical += a_amount;
+		if (t->WasCritical() && !t->Risen()) h.whileCritical += a_amount;
 		if (!a_source.empty()) h.source = a_source;
 		if (auto* healer = Find(a_healer)) healer->healingDone += a_amount;
 	}
@@ -286,14 +288,29 @@ namespace BSM
 	{
 		auto* p = Find(a_id);
 		if (!p || p->dead || p->isDown) return;
+		if (p->Risen() && a_now - p->risenAt < kRiseGrace) return;  // the bleedout they were just raised from
 		p->isDown = true;
 		++p->downs;
+		p->downAt = a_now;
 		MarkCritical(*p, a_now);
 	}
 
 	void Battle::Up(ActorId a_id)
 	{
 		if (auto* p = Find(a_id)) p->isDown = false;
+	}
+
+	void Battle::Revived(ActorId a_id, const std::string& a_how, double a_now)
+	{
+		auto* p = Find(a_id);
+		if (!p || p->dead) return;
+		if (p->Risen() && a_now - p->risenAt < kRiseGrace) return;  // the same rise reported twice
+		// down in their present danger, or else a fall the battle missed
+		const bool downNow = p->isDown || (p->WasCritical() && !p->Risen() && p->downAt >= p->criticalAt);
+		if (!downNow) Down(a_id, a_now);
+		p->risenAt = a_now;
+		p->risenHow = a_how;
+		for (auto& [healer, h] : p->healFrom) h.whileCritical = 0.0f;  // healing while they lay there kept nobody alive
 	}
 
 	void Battle::Death(ActorId a_victim, ActorId a_killer, double a_now)

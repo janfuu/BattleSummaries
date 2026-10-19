@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.4.1
+
+**Revives**
+- A mod that raises the fallen can tell Battle Summaries so (mod event `BattleSummaries_Revived`, see "Other mods" in
+  the README). The person is then told as having got up again, in that mod's words, and nobody as having saved their
+  life: before, a companion who killed the one who had struck the player down while the player lay in bleedout was
+  told as the player's savior, though the player was going to rise anyway.
+- Nobody is told as having saved someone while that person still lies in bleedout: what was done for them is told,
+  the verdict waits until they are up (they may still rise by other means, or not at all).
+- While the player lies in bleedout after the last enemy fell, the battle stays open (up to a minute), so a rise can
+  still be told before the battle is closed and remembered.
+
 ## 1.4.0
 
 **Improvements**

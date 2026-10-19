@@ -74,6 +74,13 @@ None of these is required; each is picked up when present.
   (`sInjurySources`).
 - **Dismemberment** - [Dismembering Framework](https://www.nexusmods.com/skyrimspecialedition/mods/126203) for severed
   limbs, Next-Gen Decapitations for heads, and the game's own beheadings. Told with the kill: who beheaded whom, who severed a limb.
+- **Revives** - a mod that raises the fallen (a revive, a second wind, an immortal player) can say so, and then nobody
+  is told they saved that person's life: whatever their side did while the person lay there saved nobody. It sends,
+  BEFORE it gives the health back (else the health counts as someone's healing):
+  `akActor.SendModEvent("BattleSummaries_Revived", "in a surge of cold blue light, unhurt")`. The words are what
+  onlookers saw and are told as "Arthur got up again in a surge of cold blue light, unhurt." (empty: "got up again").
+  A fall the battle did not see counts as one. While the player lies in bleedout the battle stays open (up to a
+  minute) so that the rise can still be told before it is closed and remembered.
 
 ## Settings
 

@@ -44,7 +44,8 @@ namespace BSM::Tracker
 				kDeath,     // a died, killed by b
 				kBleedout,  // a went down
 				kEffect,    // magic effect `effect` from b took hold on a
-				kLimb       // a's body lost a limb (amount 2: the head), as another mod's script answered
+				kLimb,      // a's body lost a limb (amount 2: the head), as another mod's script answered
+				kRevived    // another mod raised a (mod event BattleSummaries_Revived); text = what onlookers saw
 			};
 			Type       type;
 			ActorId    a{ 0 };
@@ -54,6 +55,7 @@ namespace BSM::Tracker
 			RE::FormID effect{ 0 };
 			std::uintptr_t source{ 0 };  // kDamage: the hook's second argument as it came, never dereferenced there
 			double     at{ 0.0 };
+			std::string text;
 		};
 
 		std::mutex          g_queueLock;  // held only to push or swap; never across a game call
@@ -93,6 +95,7 @@ namespace BSM::Tracker
 			double          fightSeenAt{ -1.0 };     // the first of those
 			bool            fleeLogged{ false };
 			bool            enteredUnstruck{ false };  // the game reported them entering combat before anyone had struck them
+			double          risenAt{ -1.0 };  // another mod reported raising them: the health it gives back is no one's healing
 		};
 		std::unordered_map<ActorId, Live> g_live;
 
@@ -115,6 +118,8 @@ namespace BSM::Tracker
 		double                 g_injuryScanAt{ 0.0 };
 
 		double g_quiet{ 0.0 };
+		// how long a battle stays open for the player to get up from bleedout once nobody fights any more
+		constexpr double kWaitForPlayerUp = 60.0;
 		// The party is still "in combat" after its battle closed (a follower chasing a deer): no new battle is begun from
 		// that state alone, only from a blow, a death or someone newly entering combat with them.
 		bool   g_stale{ false };
@@ -620,6 +625,23 @@ namespace BSM::Tracker
 		}
 
 		// ---- working through the reports (caller holds g_lock, main thread) ----
+
+		// Another mod raised someone. Told in the battle underway, or in the one that has just closed (all the enemies fell
+		// while they lay there) as long as its remembered event has not gone out yet.
+		void Revive(const Report& a_r)
+		{
+			const ActorId key = Key(a_r.a);
+			Battle*       b = g_current && g_current->Find(key) ? &*g_current : nullptr;
+			if (!b && !g_history.empty() && !g_extra[g_history.front().id].remembered && g_history.front().Find(key)) b = &g_history.front();
+			if (!b) {
+				SKSE::log::debug("revived: {:08X} is in no battle being told; nothing to change", a_r.a);
+				return;
+			}
+			b->Revived(key, a_r.text, a_r.at);
+			g_live[key].risenAt = a_r.at;
+			if (!g_current || b != &*g_current) g_lastMemory = BuildMemory(*b, Opts());  // the closed one's account, retold
+			SKSE::log::info("Battle {}: {:08X} got up again, raised by another mod{}{}", b->id, a_r.a, a_r.text.empty() ? "" : ": ", a_r.text);
+		}
 		bool InBattle(RE::Actor* a_actor) { return g_current && a_actor && g_current->Find(Key(a_actor->GetFormID())) != nullptr; }
 
 		// A newcomer belongs to the battle when they are on the player's side, or the one they are fighting is on the
@@ -696,6 +718,10 @@ namespace BSM::Tracker
 		{
 			if (a_r.type == Report::Type::kLimb) {
 				RecordLimb(Key(a_r.a), a_r.amount > 1.5f);
+				return;
+			}
+			if (a_r.type == Report::Type::kRevived) {
+				Revive(a_r);
 				return;
 			}
 			auto* pc = RE::PlayerCharacter::GetSingleton();
@@ -968,7 +994,9 @@ namespace BSM::Tracker
 								g_current->Damage(id, 0, live.pendingLoss, hp / max, now);
 							}
 							live.pendingLoss = unexplained > 0.0f ? unexplained : 0.0f;
-							if (gained > 0.5f) {
+							if (gained > 0.5f && live.risenAt >= 0.0 && now - live.risenAt <= kRiseGrace) {
+								SKSE::log::debug("heal: {:08X} regained {:.1f} as they were raised; nobody's healing", id, gained);
+							} else if (gained > 0.5f) {
 								const auto healers = HealersOf(actor, now);
 								if (!healers.empty()) {
 									SKSE::log::debug("heal: {:08X} regained {:.1f} from {} healer(s), first {:08X} ({})", id, gained, healers.size(), healers.front().first, healers.front().second);
@@ -996,7 +1024,12 @@ namespace BSM::Tracker
 
 					if (fighting) g_lastBlow = now;  // an enemy still at it counts like a blow
 					if (!fighting && lingering && now - g_lastBlow <= 20.0) fighting = true;
-					g_quiet = fighting ? 0.0 : g_quiet + dt;
+					// The player lying in bleedout after the last enemy fell: not over until they get up or a minute has
+					// passed, so that a mod raising them can still say how they got up (Revive) before the battle is told
+					// as closed. The fight itself still ended with its last blow.
+					bool waiting = false;
+					if (const auto* me = g_current->Find(Key(pc->GetFormID())); me && me->isDown && !me->dead && now - me->downAt <= kWaitForPlayerUp) waiting = true;
+					g_quiet = fighting || waiting ? 0.0 : g_quiet + dt;
 					// it was fought until the last blow or the last moment an enemy was at it, not until the game let go
 					if (g_quiet >= cfg.endGraceSeconds) End(std::min(now - g_quiet, g_lastBlow));
 					else if (now - g_current->startedAt > 3600.0) End(now);  // something kept it open: close it
@@ -1016,7 +1049,8 @@ namespace BSM::Tracker
 			RE::BSTEventSink<RE::TESCombatEvent>,
 			RE::BSTEventSink<RE::TESDeathEvent>,
 			RE::BSTEventSink<RE::TESEnterBleedoutEvent>,
-			RE::BSTEventSink<RE::TESMagicEffectApplyEvent>
+			RE::BSTEventSink<RE::TESMagicEffectApplyEvent>,
+			RE::BSTEventSink<SKSE::ModCallbackEvent>
 		{
 			static Sink* Get()
 			{
@@ -1049,6 +1083,21 @@ namespace BSM::Tracker
 			{
 				Perf::Scope timed{ Perf::eventSink };
 				if (a_e && Id(a_e->actor)) Push({ Report::Type::kBleedout, Id(a_e->actor) });
+				return RE::BSEventNotifyControl::kContinue;
+			}
+
+			// A mod that raises the fallen (a revive, a second wind) tells it with
+			//   akActor.SendModEvent("BattleSummaries_Revived", "<what onlookers saw>")
+			// sent BEFORE it gives the health back, so that the health is not taken for anyone's healing. The words are
+			// told as "<name> got up again <words>"; empty: "<name> got up again".
+			RE::BSEventNotifyControl ProcessEvent(const SKSE::ModCallbackEvent* a_e, RE::BSTEventSource<SKSE::ModCallbackEvent>*) override
+			{
+				if (!a_e || a_e->eventName != "BattleSummaries_Revived" || !a_e->sender) return RE::BSEventNotifyControl::kContinue;
+				auto* actor = a_e->sender->As<RE::Actor>();
+				if (!actor) return RE::BSEventNotifyControl::kContinue;
+				Report r{ Report::Type::kRevived, actor->GetFormID() };
+				if (const char* how = a_e->strArg.c_str(); how) r.text = how;
+				Push(std::move(r));
 				return RE::BSEventNotifyControl::kContinue;
 			}
 
@@ -1190,6 +1239,7 @@ namespace BSM::Tracker
 		src->AddEventSink<RE::TESDeathEvent>(Sink::Get());
 		src->AddEventSink<RE::TESEnterBleedoutEvent>(Sink::Get());
 		src->AddEventSink<RE::TESMagicEffectApplyEvent>(Sink::Get());
+		if (auto* mods = SKSE::GetModCallbackEventSource()) mods->AddEventSink(Sink::Get());
 
 		// HandleHealthDamage is vfunc 0x104 on SE/AE and 0x106 on VR (CommonLibVR's Actor.h: VR's table gains two slots
 		// before it).
@@ -1280,8 +1330,9 @@ namespace BSM::Tracker
 		if (g_current) {
 			s += std::format("; battle {} underway at '{}', {} participants, quiet {:.1f}s:", g_current->id, g_current->location, g_current->participants.size(), g_quiet);
 			for (const auto& p : g_current->participants) {
-				s += std::format(" [{} {:08X} side {} taken {:.0f} dealt {:.0f} healed {:.0f} min {:.0f}% downs {}{}]", p.info.name, p.info.id,
-					static_cast<int>(g_current->EffectiveSide(p)), p.damageTaken, p.damageDealt, p.healingReceived, p.minHealthPct * 100.0f, p.downs, p.dead ? " dead" : "");
+				s += std::format(" [{} {:08X} side {} taken {:.0f} dealt {:.0f} healed {:.0f} min {:.0f}% downs {}{}{}]", p.info.name, p.info.id,
+					static_cast<int>(g_current->EffectiveSide(p)), p.damageTaken, p.damageDealt, p.healingReceived, p.minHealthPct * 100.0f, p.downs,
+					p.risenAt >= 0.0 ? " risen" : "", p.dead ? " dead" : "");
 			}
 		} else {
 			s += "; no battle underway";
@@ -1294,6 +1345,7 @@ namespace BSM::Tracker
 					p.minHealthPct * 100.0f, p.downs, p.nearDeath ? " neardeath" : "", p.dead ? " dead" : "");
 				if (b.Innocent(p)) s.insert(s.size() - 1, " notfighting");
 				if (p.cameToFight) s.insert(s.size() - 1, " cametofight");
+				if (p.risenAt >= 0.0) s.insert(s.size() - 1, " risen");
 				if (p.beheaded) s.insert(s.size() - 1, " beheaded");
 				else if (p.dismembered) s.insert(s.size() - 1, " dismembered");
 				for (const auto& i : p.injuries) s.insert(s.size() - 1, std::format(" injury:{}{}", i.name, i.carried ? "(carried)" : ""));

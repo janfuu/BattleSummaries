@@ -225,8 +225,10 @@ namespace BSM
 		Rescue FindRescue(const Battle& a_b, const Participant& a_p, const NarrativeOptions& a_opt)
 		{
 			Rescue r;
-			if (!a_p.WasCritical() || a_p.dead) return r;
+			if (!a_p.WasCritical() || a_p.dead || a_p.Risen()) return r;  // raised by another mod: nobody's rescue
+			// while they still lie in bleedout nobody has saved them yet: they may rise by other means (Revived), or not at all
 			const auto addSavior = [&](ActorId a_id) {
+				if (a_p.isDown) return;
 				if (a_id != 0 && a_id != a_p.info.id && std::ranges::find(r.saviors, a_id) == r.saviors.end()) r.saviors.push_back(a_id);
 			};
 			const Side  mine = a_b.EffectiveSide(a_p);
@@ -269,6 +271,9 @@ namespace BSM
 			}
 			return r;
 		}
+
+		// fills {how} of the rise phrases: empty, or a space and what onlookers saw
+		std::string RisenHow(const Participant& a_p) { return a_p.risenHow.empty() ? std::string() : " " + a_p.risenHow; }
 
 		std::vector<std::string> Names(const Battle& a_b, const std::vector<ActorId>& a_ids)
 		{
@@ -523,6 +528,7 @@ namespace BSM
 				out.push_back(F("personal.no_danger", { { "name", n } }));
 			}
 
+			if (a_p.risenAt >= 0.0 && !a_p.dead) out.push_back(F("rescue.risen", { { "name", n }, { "how", RisenHow(a_p) } }));
 			const auto rescue = FindRescue(a_b, a_p, a_opt);
 			for (const auto& d : rescue.deeds) out.push_back(d);
 
@@ -538,7 +544,7 @@ namespace BSM
 
 			if (!rescue.saviors.empty()) {
 				out.push_back(F("rescue.plain", { { "saviors", JoinList(Names(a_b, rescue.saviors)) }, { "name", n } }));
-			} else if (a_p.WasCritical() && !a_p.dead && rescue.deeds.empty()) {
+			} else if (a_p.WasCritical() && !a_p.dead && rescue.deeds.empty() && !a_p.Risen() && !a_p.isDown) {
 				out.push_back(F("rescue.none", { { "name", n } }));
 			}
 
@@ -593,6 +599,7 @@ namespace BSM
 			if (a_p.dead) bits.push_back(KilledBy(a_b, a_p.killer));
 			else if (const auto brink = Brink(a_b, a_p, a_opt); !brink.empty()) {
 				bits.push_back(brink);
+				if (a_p.risenAt >= 0.0) bits.push_back(F("other.risen", { { "how", RisenHow(a_p) } }));
 				const auto r = FindRescue(a_b, a_p, a_opt);
 				if (!r.saviors.empty()) bits.push_back(F("other.saved_by", { { "saviors", JoinList(Names(a_b, r.saviors)) } }));
 			} else if (a_p.startHealthPct < a_b.nearDeathPct) {
@@ -700,6 +707,8 @@ namespace BSM
 			const std::string brink = Brink(a_b, *p, a_opt);
 			if (!r.saviors.empty()) {
 				add(F("memory.rescued", { { "name", p->info.name }, { "brink", brink }, { "deeds", JoinList(r.brief) }, { "saviors", JoinList(Names(a_b, r.saviors)) } }));
+			} else if (p->risenAt >= 0.0) {
+				add(F("memory.risen", { { "name", p->info.name }, { "brink", brink }, { "how", RisenHow(*p) } }));
 			} else {
 				add(F("memory.survived", { { "name", p->info.name }, { "brink", brink } }));
 			}

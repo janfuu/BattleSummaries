@@ -117,6 +117,8 @@ namespace BSM::Text
 			{ "Rescue", "rescue.brief_healed", "{healer} healed {name}", "for the remembered paragraph" },
 			{ "Rescue", "rescue.plain", "In plain terms: {saviors} saved {name}'s life in this battle. Without that help {name} would most likely have died.", "" },
 			{ "Rescue", "rescue.none", "{name} survived that without anyone's rescue.", "" },
+			{ "Rescue", "rescue.risen", "{name} got up again{how}.",
+				"another mod that raises the fallen reported it (mod event BattleSummaries_Revived): nobody's rescue. {how} is empty or a space and what onlookers saw, in that mod's words" },
 			{ "Rescue", "rescue.saved_other", "{name} saved {other}'s life.{deeds}", "{deeds} is the rescue's own sentences, each after a space" },
 
 			{ "Healing", "heal.self", "{name} healed themself{with}, {restoring}.", "" },
@@ -164,6 +166,7 @@ namespace BSM::Text
 			// ---------------------------------------------------------------- the others, in one line each
 			{ "Others", "other.line", "{name}: {facts}.", "{facts} are joined with semicolons" },
 			{ "Others", "other.saved_by", "was saved by {saviors}", "" },
+			{ "Others", "other.risen", "got up again{how}", "" },
 			{ "Others", "other.already_low", "went in already close to death from earlier wounds", "" },
 			{ "Others", "other.no_danger", "was never near death", "" },
 			{ "Others", "other.injured", "was injured ({injuries})", "" },
@@ -174,6 +177,7 @@ namespace BSM::Text
 
 			{ "Memory", "memory.rescued", "{name} {brink}, and would most likely have died, but {deeds}: {saviors} saved {name}'s life.", "the remembered paragraph" },
 			{ "Memory", "memory.survived", "{name} {brink}, but survived.", "" },
+			{ "Memory", "memory.risen", "{name} {brink}, and got up again{how}.", "" },
 
 			// ---------------------------------------------------------------- what a magic effect is called
 			{ "EffectNames", "fx.healed", "healed", "" },

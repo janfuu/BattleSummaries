@@ -7,6 +7,7 @@
 #include "../src/Text.h"
 
 #include <cstdio>
+#include <format>
 #include <cstdlib>
 #include <set>
 #include <string>
@@ -925,6 +926,113 @@ namespace
 		Check(o.Find(kBandit1)->damageTaken == 35.0f && o.Find(kBandit2)->damageTaken == 100.0f && o.Find(kHero)->damageDealt == 135.0f, "overkill is not counted", "");
 		Check(!Significant(b, 3, 30.0) || b.Find(kHero)->WasCritical(), "significance", ongoing);
 	}
+
+	// Raised by another mod (a revive): the player lies in bleedout while a companion's atronach kills the one who struck
+	// them down and a healer tends them; then the reviving mod reports the rise, before it restores their health. Nobody
+	// saved their life. Struck down again later and saved for real, that second rescue is told as one.
+	constexpr ActorId kVaelyra = 0xFF000901, kBrenna = 0xFF000902, kWraith1 = 0xFF000903, kWraith2 = 0xFF000904, kMagdra = 0xFF000905;
+	constexpr const char* kSurge = "in a gust of wind and a surge of cold blue light, unhurt";
+
+	Battle Risen(double a_killAt, bool a_end = true)
+	{
+		Battle b;
+		b.id = 7;
+		b.startedAt = 90.0;
+		b.location = "Broken Fang Cave";
+		b.Join(Info(kHero, "Arthur", Side::kPlayer, 400));
+		b.Join(Info(kVaelyra, "Vaelyra", Side::kPlayer, 300));
+		b.Join(Info(kBrenna, "Brenna", Side::kPlayer, 200));
+		{
+			auto a = Info(kMagdra, "Magdra Ibrai", Side::kPlayer, 300, kVaelyra);
+			a.summon = true;
+			b.Join(a);
+		}
+		b.Join(Info(kWraith1, "Wraith", Side::kEnemy, 250));
+		b.Join(Info(kWraith2, "Wraith", Side::kEnemy, 250));
+		b.Damage(kWraith1, kVaelyra, 40, 0.84f, 95);
+		b.Damage(kHero, kWraith1, 380, 0.05f, 100);
+		b.Down(kHero, 100.2);
+		b.Heal(kHero, kBrenna, 90, "Healing Hands", 110);  // while he lay there
+		b.Damage(kWraith1, kMagdra, 210, 0.0f, a_killAt);
+		b.Death(kWraith1, kMagdra, a_killAt);
+		{
+			const auto lying = SummaryText(BuildSummary(b, kVaelyra, "Vaelyra", {})) + SummaryText(BuildSummary(b, kHero, "Arthur", {}));
+			Check(!Has(lying, "saved Arthur's life") && !Has(lying, "was saved by") && !Has(lying, "without anyone's rescue")
+					&& (a_killAt > 130.0 || Has(lying, "was then killed by Magdra Ibrai")),
+				"while he still lies there: the kill is told, nobody has saved him yet", lying);
+		}
+		b.Revived(kHero, kSurge, 130.0);
+		b.Sample(kHero, 0.02f, 130.4);  // the tick before the health comes back: still the same fall
+		b.Down(kHero, 130.5);
+		b.Heal(kHero, kBrenna, 380, "Healing Hands", 130.6);  // the restore, had the tracker taken it for healing
+		b.Revived(kHero, kSurge, 131.0);  // told twice
+		b.Up(kHero);
+		if (!a_end) return b;
+		b.Damage(kWraith2, kBrenna, 250, 0.0f, 160);
+		b.Death(kWraith2, kBrenna, 160);
+		b.endedAt = 165.0;
+		return b;
+	}
+
+	void TestRisen()
+	{
+		for (const double killAt : { 115.0, 140.0 }) {  // the assailant killed while he lay there, and after he rose
+			const auto b = Risen(killAt);
+			const auto* hero = b.Find(kHero);
+			Check(hero->downs == 1 && hero->Risen() && hero->risenAt == 130.0 && hero->criticalAt == 100.0, "one fall, one rise; the grace kept it one",
+				std::format("downs {} risen {} at {} critical {}", hero->downs, hero->Risen(), hero->risenAt, hero->criticalAt));
+
+			const auto arthur = SummaryText(BuildSummary(b, kHero, "Arthur", {}));
+			Check(Has(arthur, "Arthur was struck down by the first Wraith"), "the fall is told", arthur);
+			Check(Has(arthur, "Arthur got up again in a gust of wind and a surge of cold blue light, unhurt."), "the rise, in the reviver's words", arthur);
+			Check(!Has(arthur, "saved Arthur's life") && !Has(arthur, "would most likely have died"), "nobody saved him", arthur);
+			Check(!Has(arthur, "without anyone's rescue"), "no rescue verdict either way", arthur);
+			Check(Has(arthur, "Vaelyra 1 (") && Has(arthur, "through Magdra Ibrai"), "the atronach's kill still counts as a kill", arthur);
+
+			const auto vaelyra = SummaryText(BuildSummary(b, kVaelyra, "Vaelyra", {}));
+			Check(!Has(vaelyra, "Vaelyra saved Arthur's life"), "the kill is no rescue", vaelyra);
+			Check(Has(vaelyra, "Arthur: ") && Has(vaelyra, "got up again in a gust of wind"), "the others' line tells the rise", vaelyra);
+			Check(!Has(vaelyra, "was saved by"), "and names no savior", vaelyra);
+
+			const auto brenna = SummaryText(BuildSummary(b, kBrenna, "Brenna", {}));
+			Check(!Has(brenna, "Brenna saved Arthur's life"), "healing while he lay there is no rescue", brenna);
+
+			const auto memory = BuildMemory(b, {});
+			Check(Has(memory, "Arthur was struck down by the first Wraith") && Has(memory, "and got up again in a gust of wind and a surge of cold blue light, unhurt."),
+				"the remembered paragraph tells the rise", memory);
+			Check(!Has(memory, "saved Arthur's life"), "and no rescue", memory);
+		}
+
+		// down again after the rise, and this time Vaelyra's atronach kills the one who did it: a real rescue
+		{
+			auto b = Risen(115.0, false);
+			b.Damage(kHero, kWraith2, 390, 0.02f, 150);
+			b.Down(kHero, 150.2);
+			b.Damage(kWraith2, kMagdra, 250, 0.0f, 155);
+			b.Death(kWraith2, kMagdra, 155);
+			b.Up(kHero);
+			b.endedAt = 170.0;
+			const auto arthur = SummaryText(BuildSummary(b, kHero, "Arthur", {}));
+			Check(b.Find(kHero)->downs == 2 && !b.Find(kHero)->Risen(), "a second fall, not risen from", arthur);
+			Check(Has(arthur, "struck down twice"), "both falls", arthur);
+			Check(Has(arthur, "got up again in a gust of wind"), "the first rise is still told", arthur);
+			Check(Has(arthur, "Vaelyra saved Arthur's life"), "the second fall's rescue counts", arthur);
+			Check(!Has(arthur, "Brenna saved"), "healing from before the rise saves nobody later", arthur);
+		}
+
+		// a rise reported for a fall the battle never saw: counted as a fall
+		{
+			Battle b;
+			b.startedAt = 0.0;
+			b.Join(Info(kHero, "Arthur", Side::kPlayer, 400));
+			b.Join(Info(kWraith1, "Wraith", Side::kEnemy, 250));
+			b.Damage(kHero, kWraith1, 100, 0.75f, 2);
+			b.Revived(kHero, "", 5.0);
+			b.endedAt = 10.0;
+			const auto arthur = SummaryText(BuildSummary(b, kHero, "Arthur", {}));
+			Check(b.Find(kHero)->downs == 1 && Has(arthur, "Arthur got up again."), "a missed fall counts; no words: a plain rise", arthur);
+		}
+	}
 }
 
 int main(int argc, char** argv)
@@ -959,6 +1067,7 @@ int main(int argc, char** argv)
 	TestSameNames();
 	TestDuration();
 	TestEdges();
+	TestRisen();
 	std::printf("%d checks, %d failed\n", g_checks, g_failed);
 	if (std::getenv("BSM_SHOW")) {
 		const auto b = Rescue();

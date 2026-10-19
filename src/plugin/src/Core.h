@@ -12,6 +12,10 @@ namespace BSM
 {
 	using ActorId = std::uint32_t;  // a reference FormID; 0 = nobody / unknown
 
+	// After another mod reports that it raised someone (Battle::Revived), what the battle sees of them for this long is
+	// still that same fall and that same rise: the bleedout the game has not ended yet, the health the reviver restores.
+	inline constexpr double kRiseGrace = 3.0;
+
 	// Which side an actor is on, as the game sees it when they join.
 	enum class Side : std::uint8_t
 	{
@@ -108,6 +112,7 @@ namespace BSM
 		bool   nearDeath{ false };  // health fell below the near-death share while still standing
 		int    downs{ 0 };          // times knocked into bleedout
 		bool   isDown{ false };
+		double downAt{ -1.0 };      // when they last went down; -1 = never
 		double criticalAt{ -1.0 };  // when they first were near death or down; -1 = never
 		ActorId broughtLowBy{ 0 };  // who dealt the blows that did it
 
@@ -139,7 +144,14 @@ namespace BSM
 		ActorId lastAttacker{ 0 };
 		double  lastAttackedAt{ -1.0 };
 
+		// Got up again by something this battle cannot see: another mod that raises the fallen reported it (Revived). The
+		// danger they were in ended that way, so whatever their side did meanwhile saved nobody's life.
+		double      risenAt{ -1.0 };  // the last such rise; -1 = never
+		std::string risenHow;          // what onlookers saw, in the reviving mod's words; may be empty
+
 		[[nodiscard]] bool WasCritical() const { return criticalAt >= 0.0; }
+		// their last time near death or down ended in such a rise (and they have not been in danger again since)
+		[[nodiscard]] bool Risen() const { return risenAt >= 0.0 && risenAt >= criticalAt; }
 	};
 
 	class Battle
@@ -192,6 +204,9 @@ namespace BSM
 		void CameToFight(ActorId a_id);
 		void Down(ActorId a_id, double a_now);
 		void Up(ActorId a_id);
+		// Another mod raised a_id (up from bleedout, health restored): nobody's rescue. a_how is what onlookers saw, told as
+		// "got up again <a_how>". A fall the battle missed counts as one: the reviver knows they were down.
+		void Revived(ActorId a_id, const std::string& a_how, double a_now);
 		void Death(ActorId a_victim, ActorId a_killer, double a_now);
 
 		// The side used for telling the story: an "other" who fought the player's side counts as an enemy, one who only

@@ -22,7 +22,7 @@
   "languages": [
     "en"
   ],
-  "version": "1.4.0",
+  "version": "1.4.1",
   "changelog": "Bystanders are left out of summaries (a setting brings them back). Summons are their master's, and the enemy's summons are told as dispatched. Same-named enemies are numbered. Follower Death and Injury Chance injuries are supported.",
   "min_skyrimnet_version": "0.25.0"
 }
