@@ -1,5 +1,7 @@
 #include "Narrative.h"
 
+#include <map>
+
 #include "Text.h"
 
 #include <algorithm>
@@ -201,6 +203,27 @@ namespace BSM
 			return w + Points(taken, a_opt);
 		}
 
+		// a fighter's part of a category that earns them a mention in it, in a party of up to five
+		constexpr float kRoleShare = 0.2f;
+		// standing out: at least this many times an even share
+		constexpr float kStandOut = 1.2f;
+		// names told in one line before "and N others"
+		constexpr std::size_t kMaxNames = 3;
+
+		// what each of a_n would have had in an even split
+		float EvenShare(std::size_t a_n) { return a_n > 0 ? 1.0f / static_cast<float>(a_n) : 1.0f; }
+		// the part that earns a mention: a fifth, or an even share in a party too large for anyone to reach a fifth
+		float Line(std::size_t a_n) { return std::min(kRoleShare, EvenShare(a_n)); }
+
+		// a list of names kept short: past kMaxNames, the rest as "N others" (one over is shorter told by name)
+		std::string Names(const std::vector<std::string>& a_names)
+		{
+			if (a_names.size() <= kMaxNames + 1) return JoinList(a_names);
+			std::vector<std::string> items(a_names.begin(), a_names.begin() + kMaxNames);
+			items.push_back(F("list.others", { { "count", N(static_cast<int>(a_names.size() - kMaxNames)) } }));
+			return JoinList(items);
+		}
+
 		std::string Dealt(const Battle& a_b, const Participant& a_p, const NarrativeOptions& a_opt)
 		{
 			const Side  side = a_b.EffectiveSide(a_p);
@@ -208,13 +231,15 @@ namespace BSM
 			const float dealt = PartyDealt(a_b, a_p);
 			if (dealt <= 0.0f) return T("dealt.none");
 			std::string w;
-			if (a_b.Count(side) <= 1 || total <= 0.0f) w = T("dealt.all");
+			const auto  n = OnSide(a_b, side).size();
+			if (n <= 1 || total <= 0.0f) w = T("dealt.all");
 			else {
-				const float s = dealt / total;
-				if (s < 0.15f) w = T("dealt.small");
-				else if (s < 0.4f) w = T("dealt.fair");
-				else if (s < 0.7f) w = T("dealt.large");
-				else w = T("dealt.most");
+				// against what each would have done in an even split, so a fair part of a large party's work is not "small"
+				const float s = dealt / total, r = s * static_cast<float>(n);
+				if (r < 0.5f) w = T("dealt.small");
+				else if (r < kStandOut) w = T("dealt.fair");
+				else if (s >= 0.5f) w = T("dealt.most");
+				else w = T("dealt.large");
 			}
 			return w + Points(dealt, a_opt);
 		}
@@ -661,10 +686,7 @@ namespace BSM
 			return true;
 		}
 
-		// a fighter's part of a category that earns them a mention in it
-		constexpr float kRoleShare = 0.2f;
-
-		// Everyone whose part of the party's total is at least kRoleShare, largest first; at least the largest one when
+		// Everyone whose part of the party's total is over the line (Line), largest first; at least the largest one when
 		// there is anything at all.
 		std::vector<const Participant*> OverTheLine(const std::vector<std::pair<float, const Participant*>>& a_parts, float* a_total = nullptr)
 		{
@@ -676,7 +698,7 @@ namespace BSM
 			std::vector<const Participant*> out;
 			for (const auto& [v, p] : sorted) {
 				if (v <= 0.0f) break;
-				if (out.empty() || v >= kRoleShare * total) out.push_back(p);
+				if (out.empty() || v >= Line(a_parts.size()) * total) out.push_back(p);
 			}
 			return out;
 		}
@@ -687,25 +709,56 @@ namespace BSM
 		{
 			std::vector<std::string> out;
 			if (a_party.size() < 2) return out;
+			std::map<const Participant*, std::string> told;  // told otherwise than by name: "Kaira's Flame Atronach"
 			const auto names = [&](const std::vector<const Participant*>& a_ps) {
 				std::vector<std::string> n;
-				for (const auto* p : a_ps) n.push_back(NameOf(a_b, p->info.id));
-				return JoinList(n);
+				for (const auto* p : a_ps) n.push_back(told.contains(p) ? told[p] : NameOf(a_b, p->info.id));
+				return Names(n);
+			};
+			// the one other member a_p's help went to, when it went to only one
+			const auto onlyOther = [&](const Participant* a_p, auto&& a_got) -> std::string {
+				const Participant* one = nullptr;
+				for (const auto* q : a_party) {
+					if (q == a_p || !a_got(*q)) continue;
+					if (one) return {};
+					one = q;
+				}
+				return one ? NameOf(a_b, one->info.id) : std::string();
 			};
 			const auto inParty = [&](ActorId a_id) { return std::ranges::any_of(a_party, [&](const Participant* p) { return p->info.id == a_id; }); };
 
-			// the enemy's blows: a real tank took over half of what the party took; the others over the line took a share
+			// The enemy's blows: a real tank took over half of what the party took, and well over an even share (in a duo,
+			// three parts in four); the others over the line took a share. Nobody standing out: they fell evenly. A summon's
+			// blows are its master's part, told as the summon's when it took more of them than its master did.
 			{
+				const auto fromFoes = [&](const Participant& a_p) {
+					float sum = 0.0f;
+					for (const auto& [by, dmg] : a_p.damageFrom) {
+						const auto* q = a_b.Find(by);
+						if (q && a_b.EffectiveSide(*q) == Opposing(a_b.EffectiveSide(a_p))) sum += dmg;
+					}
+					return sum;
+				};
 				std::vector<std::pair<float, const Participant*>> taken;
 				float                                             health = 0.0f;
 				for (const auto* p : a_party) {
-					float fromFoes = 0.0f;
-					for (const auto& [by, dmg] : p->damageFrom) {
-						const auto* q = a_b.Find(by);
-						if (q && a_b.EffectiveSide(*q) == Opposing(a_b.EffectiveSide(*p))) fromFoes += dmg;
+					const float                                       own = fromFoes(*p);
+					float                                             pets = 0.0f;
+					std::vector<std::pair<float, const Participant*>> mine;
+					for (const auto& q : a_b.participants) {
+						if (!q.info.summon || q.info.master != p->info.id || !a_b.Involved(q)) continue;
+						if (const float d = fromFoes(q); d > 0.0f) {
+							pets += d;
+							mine.emplace_back(d, &q);
+						}
 					}
-					taken.emplace_back(fromFoes, p);
+					taken.emplace_back(own + pets, p);
 					health += p->info.maxHealth;
+					if (pets > own) {
+						// one by its name; several (an atronach and a raised corpse) together, so a list of names stays a list
+						if (mine.size() == 1) told[p] = F("name.summons_of", { { "master", NameOf(a_b, p->info.id) }, { "summons", mine.front().second->info.name } });
+						else told[p] = F("name.summons_many", { { "master", NameOf(a_b, p->info.id) } });
+					}
 				}
 				float total = 0.0f;
 				auto  over = OverTheLine(taken, &total);
@@ -717,11 +770,13 @@ namespace BSM
 					for (const auto& [v, p] : taken) {
 						if (p == over.front()) top = v;
 					}
-					if (top > 0.5f * total) {
+					const float even = EvenShare(a_party.size());
+					if (top > std::max(0.5f, 1.5f * even) * total) {
 						out.push_back(F("role.front_brunt", { { "names", names({ over.front() }) } }));
 						over.erase(over.begin());
 						if (!over.empty()) out.push_back(F("role.front_also", { { "names", names(over) } }));
-					} else if (over.size() >= 2) out.push_back(F("role.front_shared", { { "names", names(over) } }));
+					} else if (top < kStandOut * even * total) out.push_back(T("role.front_even"));
+					else if (over.size() >= 2) out.push_back(F("role.front_shared", { { "names", names(over) } }));
 					else out.push_back(F("role.front_most", { { "names", names(over) } }));
 				}
 			}
@@ -738,7 +793,11 @@ namespace BSM
 				}
 				float      total = 0.0f;
 				const auto over = OverTheLine(given, &total);
-				if (!over.empty() && total >= 0.15f * a_party.front()->info.maxHealth) out.push_back(F("role.healer", { { "names", names(over) } }));
+				if (!over.empty() && total >= 0.15f * a_party.front()->info.maxHealth) {
+					const auto other = over.size() == 1 ? onlyOther(over.front(), [&](const Participant& q) { return q.healFrom.contains(over.front()->info.id); }) : std::string();
+					if (!other.empty()) out.push_back(F("role.healer_one", { { "names", names(over) }, { "other", other } }));
+					else out.push_back(F("role.healer", { { "names", names(over) } }));
+				}
 			}
 			// help cast on others, and harm that hindered the enemy, by how often it took hold
 			{
@@ -764,7 +823,14 @@ namespace BSM
 					hindered.emplace_back(held, p);
 				}
 				float total = 0.0f;
-				if (const auto over = OverTheLine(shielded, &total); !over.empty() && total >= 2.0f) out.push_back(F("role.protector", { { "names", names(over) } }));
+				if (const auto over = OverTheLine(shielded, &total); !over.empty() && total >= 2.0f) {
+					const auto helped = [&](const Participant& q) {
+						return std::ranges::any_of(q.effects, [&](const EffectNote& e) { return e.by == over.front()->info.id && !e.hostile; });
+					};
+					const auto other = over.size() == 1 ? onlyOther(over.front(), helped) : std::string();
+					if (!other.empty()) out.push_back(F("role.protector_one", { { "names", names(over) }, { "other", other } }));
+					else out.push_back(F("role.protector", { { "names", names(over) } }));
+				}
 				if (const auto over = OverTheLine(hindered, &total); !over.empty() && total >= 2.0f) {
 					out.push_back(F("role.controller", { { "names", names(over) }, { "effects", JoinList(kinds) } }));
 				}
@@ -786,8 +852,9 @@ namespace BSM
 
 			if (auto o = Outcome(a_b, Side::kEnemy); !o.empty()) out.push_back(std::move(o));
 			if (const auto t = KillTally(a_b, Side::kEnemy); !t.empty()) out.push_back(F("tally.line", { { "tally", t } }));
-			// A kill goes to the last blow; the damage is the fight. Those who did most of it, up to three, until they make up
-			// most of the party's: a follower who wore the dragon down is named though the player struck the last blow.
+			// A kill goes to the last blow; the damage is the fight. Those who stood out (well over an even share), up to three,
+			// until they make up most of it: a follower who wore the dragon down is named though the player struck the last
+			// blow. "Most of" only when they did over half; nobody standing out, an even fight is said plainly.
 			if (party.size() >= 2) {
 				const float total = SideDealtToFoes(a_b, Side::kPlayer);
 				std::vector<std::pair<float, const Participant*>> shares;
@@ -795,23 +862,29 @@ namespace BSM
 					if (const float d = PartyDealt(a_b, *p); d > 0.0f) shares.emplace_back(d, p);
 				}
 				std::ranges::stable_sort(shares, [](const auto& x, const auto& y) { return x.first > y.first; });
-				std::vector<std::string> names;
-				float                    covered = 0.0f;
-				for (const auto& [d, p] : shares) {
-					if (names.size() >= 3 || (total > 0.0f && covered >= 0.6f * total)) break;
-					covered += d;
-					std::string name = NameOf(a_b, p->info.id);
-					if (a_opt.showNumbers && total > 0.0f) name += " " + F("share.percent", { { "percent", N(static_cast<int>(std::lround(100.0f * d / total))) } });
-					names.push_back(name);
-				}
-				if (!names.empty() && total > 0.0f) {
-					out.push_back(F("battle.damage_by", { { "names", JoinList(names) } }));
-					// the others who did a real part of it
-					std::vector<std::string> also;
-					for (std::size_t i = names.size(); i < shares.size(); ++i) {
-						if (shares[i].first >= kRoleShare * total) also.push_back(NameOf(a_b, shares[i].second->info.id));
+				const float even = EvenShare(party.size());
+				if (total > 0.0f && !shares.empty()) {
+					if (shares.front().first < kStandOut * even * total) out.push_back(T("battle.damage_even"));
+					else {
+						std::vector<std::string> names;
+						float                    covered = 0.0f;
+						std::size_t              i = 0;
+						for (; i < shares.size(); ++i) {
+							const auto& [d, p] = shares[i];
+							if (names.size() >= 3 || covered >= 0.6f * total || d < kStandOut * even * total) break;
+							covered += d;
+							std::string name = NameOf(a_b, p->info.id);
+							if (a_opt.showNumbers) name += " " + F("share.percent", { { "percent", N(static_cast<int>(std::lround(100.0f * d / total))) } });
+							names.push_back(name);
+						}
+						out.push_back(F(covered > 0.5f * total ? "battle.damage_by" : "battle.damage_led", { { "names", JoinList(names) } }));
+						// the others who did a real part of it
+						std::vector<std::string> also;
+						for (; i < shares.size(); ++i) {
+							if (shares[i].first >= Line(party.size()) * total) also.push_back(NameOf(a_b, shares[i].second->info.id));
+						}
+						if (!also.empty()) out.push_back(F("battle.damage_also", { { "names", Names(also) } }));
 					}
-					if (!also.empty()) out.push_back(F("battle.damage_also", { { "names", JoinList(also) } }));
 				}
 			}
 			for (auto& l : Roles(a_b, party)) out.push_back(std::move(l));

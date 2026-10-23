@@ -934,7 +934,7 @@ namespace
 		const auto told = SummaryText(BuildSummary(b, kArcher, "Jenassa", {}));
 		Check(Has(told, "Most of the party's damage to the enemy was dealt by Kaira and Jenassa.") && Has(told, "Lydia also did a real part of it."), "the most, then those over the line", told);
 		Check(Has(told, "Lydia, Kaira and Marcurio took the enemy's blows between them.") && !Has(told, "brunt"), "no real tank: shared, and the archer who took none is not named", told);
-		Check(Has(told, "Marcurio kept the others on their feet with healing.") && Has(told, "Marcurio shielded the others with magic."), "healing and shielding", told);
+		Check(Has(told, "Marcurio kept Lydia going with healing.") && Has(told, "Marcurio shielded the others with magic."), "healing one other, shielding two", told);
 		Check(Has(told, "Jenassa held the enemy back (paralyzed and slowed)."), "hindering the enemy", told);
 
 		Battle t;  // a real tank
@@ -964,6 +964,70 @@ namespace
 		const auto tank = SummaryText(BuildSummary(t, kHero, "Kaira", {}));
 		Check(Has(tank, "Lydia bore the brunt of the enemy's blows.") && Has(tank, "Kaira also took a share of the enemy's blows.") && !Has(tank, "Jenassa also took"),
 			"over half: the brunt; a fifth or more: a share; less: nothing", tank);
+	}
+
+	// Shares are measured against an even split: what a fifth means in a party of four is not what it means in one of ten
+	void TestEvenShares()
+	{
+		constexpr ActorId kBase = 0xFF000960, kFoe = 0xFF000970;
+		const char*       names[] = { "Kaira", "Lydia", "Marcurio", "Aela", "Brelyna", "J'zargo", "Uthgerd", "Jenassa", "Erik", "Borgakh" };
+		const auto        party = [&](Battle& a_b, int a_n) {
+			a_b.startedAt = 0;
+			for (int i = 0; i < a_n; ++i) a_b.Join(Info(i == 0 ? kHero : kBase + i, names[i], Side::kPlayer, 300));
+		};
+		const auto id = [&](int i) { return i == 0 ? kHero : kBase + i; };
+
+		Battle even;  // ten who did the same: nobody singled out
+		party(even, 10);
+		for (int k = 0; k < 4; ++k) {
+			even.Join(Info(kFoe + k, "Bandit", Side::kEnemy, 1000));
+			for (int i = 0; i < 10; ++i) {
+				even.Damage(id(i), kFoe + k, 30, 0.8f, k * 10 + i * 0.1);
+				even.Damage(kFoe + k, id(i), 100, 1.0f - 0.1f * (i + 1), k * 10 + i * 0.1 + 0.05);
+			}
+			even.Death(kFoe + k, id(k), k * 10 + 1);
+		}
+		even.endedAt = 50;
+		const auto e = SummaryText(BuildSummary(even, kBase + 1, "Lydia", {}));
+		Check(Has(e, "The party shared the damage to the enemy evenly.") && !Has(e, "Most of the party's damage"), "an even fight: no false \"most\"", e);
+		Check(Has(e, "The enemy's blows fell evenly across the party.") && !Has(e, "largest share"), "even blows: nobody took the largest share", e);
+		Check(Has(e, "Lydia took solid wounds and dealt a fair share"), "a tenth of ten is a fair share, not a small part", e);
+
+		Battle duo;  // a duo: more than the other is not yet the brunt
+		party(duo, 2);
+		duo.Join(Info(kFoe, "Troll", Side::kEnemy, 600));
+		duo.Damage(kBase + 1, kFoe, 150, 0.5f, 1);
+		duo.Damage(kHero, kFoe, 80, 0.75f, 2);
+		duo.Damage(kFoe, kHero, 330, 0.45f, 3);
+		duo.Damage(kFoe, kBase + 1, 270, 0.0f, 4);
+		duo.Death(kFoe, kBase + 1, 4);
+		duo.endedAt = 5;
+		const auto d = SummaryText(BuildSummary(duo, kBase + 1, "Lydia", {}));
+		Check(!Has(d, "brunt") && Has(d, "Lydia and Kaira took the enemy's blows between them."), "a duo at 65%: shared, not the brunt", d);
+		Check(Has(d, "The party shared the damage to the enemy evenly.") && !Has(d, "dealt by Kaira and Lydia"), "a duo's damage line never names both", d);
+
+		Battle pets;  // the atronach took the blows: told as Kaira's, not as Lydia's few scratches
+		party(pets, 3);
+		pets.Join(Info(kBase + 20, "Flame Atronach", Side::kPlayer, 300, kHero)).info.summon = true;
+		pets.Join(Info(kFoe, "Troll", Side::kEnemy, 600));
+		pets.Damage(kBase + 20, kFoe, 250, 0.2f, 1);
+		pets.Damage(kBase + 1, kFoe, 40, 0.9f, 2);
+		pets.Damage(kFoe, kBase + 20, 300, 0.5f, 3);
+		pets.Damage(kFoe, kBase + 1, 300, 0.0f, 4);
+		pets.Death(kFoe, kBase + 1, 4);
+		pets.endedAt = 5;
+		const auto t = SummaryText(BuildSummary(pets, kBase + 1, "Lydia", {}));
+		Check(Has(t, "Kaira's Flame Atronach bore the brunt of the enemy's blows."), "a summon that drew the blows is told as its master's", t);
+
+		Battle many;  // a long list of names is cut short
+		party(many, 10);
+		many.Join(Info(kFoe, "Giant", Side::kEnemy, 3000));
+		for (int i = 0; i < 10; ++i) many.Damage(id(i), kFoe, i < 6 ? 60.0f : 5.0f, 0.8f, i * 0.2);
+		many.Damage(kFoe, kHero, 1500, 0.0f, 3);
+		many.Death(kFoe, kHero, 3);
+		many.endedAt = 4;
+		const auto m = SummaryText(BuildSummary(many, kBase + 1, "Lydia", {}));
+		Check(Has(m, "took the enemy's blows between them") && Has(m, "and 3 others took the enemy's blows"), "six names over the line: three and \"3 others\"", m);
 	}
 
 	void TestDuration()
@@ -1057,6 +1121,7 @@ int main(int argc, char** argv)
 	TestSameNames();
 	TestDamageAndItems();
 	TestRoles();
+	TestEvenShares();
 	TestDuration();
 	TestEdges();
 	std::printf("%d checks, %d failed\n", g_checks, g_failed);

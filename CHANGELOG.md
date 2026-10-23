@@ -10,6 +10,13 @@
   shielded the others with magic", "Jenassa held the enemy back (paralyzed and slowed)".
 - Potions and poisons: "Kaira drank 3 potions in the fight: Potion of Healing x2 and Potion of Fortify Two-handed",
   "Lydia used a poison in the fight: Deadly Venom".
+- Fair to any size of party: shares are measured against an even split, so an even fight is told as one ("The party
+  shared the damage to the enemy evenly", "The enemy's blows fell evenly across the party"), a duo needs three parts in
+  four to bear the brunt, and a follower doing their part in a party of ten is not told they did "only a small part".
+- Summons that drew the enemy's blows are told as their master's: "Kaira's Flame Atronach bore the brunt of the
+  enemy's blows".
+- Short lists: past four names, "and 3 others". Help given to one person names them: "Brelyna kept Kaira going with
+  healing".
 
 ## 1.4.0
 

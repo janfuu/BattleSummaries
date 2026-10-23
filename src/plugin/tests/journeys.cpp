@@ -18,7 +18,7 @@ using namespace BSM;
 
 namespace
 {
-	enum class Role { kPlayer, kTank, kMelee, kMage, kArcher, kSupport };
+	enum class Role { kPlayer, kTank, kMelee, kMage, kArcher, kSupport, kSummon };
 
 	struct Member
 	{
@@ -26,6 +26,7 @@ namespace
 		const char* name;
 		Role        role;
 		float       hp;
+		int         master{ -1 };  // a summon or a raised corpse: the index of whoever commands it
 	};
 
 	// the player, then followers in the order they join: the first four are a party, all nine a large one
@@ -51,18 +52,19 @@ namespace
 	using Weights = std::vector<float>;
 
 	// a weight per role: how much of the party's damage each deals, or how much of the enemy's they take
-	Weights ByRole(const std::vector<Member>& a_m, float a_player, float a_tank, float a_melee, float a_mage, float a_archer, float a_support)
+	Weights ByRole(const std::vector<Member>& a_m, float a_player, float a_tank, float a_melee, float a_mage, float a_archer, float a_support,
+		float a_summon = 0.8f)
 	{
 		Weights w;
 		for (const auto& m : a_m) {
-			const float by[] = { a_player, a_tank, a_melee, a_mage, a_archer, a_support };
+			const float by[] = { a_player, a_tank, a_melee, a_mage, a_archer, a_support, a_summon };
 			w.push_back(by[static_cast<int>(m.role)]);
 		}
 		return w;
 	}
 
 	Weights Dealt(const std::vector<Member>& a_m) { return ByRole(a_m, 1.2f, 1.0f, 1.0f, 1.0f, 1.0f, 0.3f); }
-	Weights Taken(const std::vector<Member>& a_m) { return ByRole(a_m, 1.2f, 1.6f, 1.2f, 0.7f, 0.5f, 0.6f); }
+	Weights Taken(const std::vector<Member>& a_m) { return ByRole(a_m, 1.2f, 1.6f, 1.2f, 0.7f, 0.5f, 0.6f, 4.0f); }
 	Weights Even(const std::vector<Member>& a_m) { return Weights(a_m.size(), 1.0f); }
 
 	// the member at a_index gets a_share of the whole; the others keep their weights between them
@@ -85,6 +87,15 @@ namespace
 		std::vector<bool>        dead;
 		double                   t{ 0 };
 
+		void Join(const Member& a_m)
+		{
+			ActorInfo info{ a_m.id, a_m.name, Side::kPlayer, a_m.id == 0x14, a_m.master >= 0 ? party[a_m.master].id : 0, a_m.hp };
+			info.summon = a_m.role == Role::kSummon;
+			b.Join(info);
+			party.push_back(a_m);
+			health.push_back(a_m.hp);
+			dead.push_back(false);
+		}
 		[[nodiscard]] int Find(Role a_role) const
 		{
 			for (std::size_t i = 0; i < party.size(); ++i)
@@ -144,6 +155,7 @@ namespace
 		std::function<Weights(const std::vector<Member>&)>   hurt;
 		std::function<void(Fight&, std::size_t)>             before; // before the party finishes off foe k
 		bool                                                 solo{ true };
+		std::function<void(Fight&)>                          setup{};  // before the first blow: summons cast
 	};
 
 	std::vector<Foe> Many(const char* a_name, float a_hp, int a_count, std::vector<Foe> a_first = {})
@@ -157,12 +169,10 @@ namespace
 		auto& b = a_f.b;
 		b.startedAt = 0;
 		b.location = "the road to Whiterun";
-		for (const auto& m : a_f.party) {
-			ActorInfo info{ m.id, m.name, Side::kPlayer, m.id == 0x14, 0, m.hp };
-			b.Join(info);
-			a_f.health.push_back(m.hp);
-			a_f.dead.push_back(false);
-		}
+		const auto members = std::move(a_f.party);
+		a_f.party.clear();
+		for (const auto& m : members) a_f.Join(m);
+		if (a_j.setup) a_j.setup(a_f);
 		const auto foes = a_j.foes(a_f.party.size());
 		float foeHealth = 0, partyHealth = 0;
 		for (std::size_t k = 0; k < foes.size(); ++k) {
@@ -173,12 +183,14 @@ namespace
 			foeHealth += foes[k].hp;
 		}
 		for (const auto& m : a_f.party) partyHealth += m.hp;
-		const auto dealt = a_j.dealt(a_f.party);
-		const auto hurt = a_j.hurt(a_f.party);
-		std::vector<float> credit(a_f.party.size(), 0.0f);  // kills follow the damage dealt: the largest remainder takes the next
+		std::vector<float> credit;  // kills follow the damage dealt: the largest remainder takes the next
 
 		for (std::size_t k = 0; k < foes.size(); ++k) {
 			const ActorId foe = a_f.foes[k];
+			// again for each foe: a corpse raised mid-fight joins in
+			auto dealt = a_j.dealt(a_f.party);
+			const auto hurt = a_j.hurt(a_f.party);
+			credit.resize(a_f.party.size(), 0.0f);
 			// the foe's share of the enemy's damage, among those still standing
 			float hw = 0, dw = 0;
 			for (std::size_t i = 0; i < a_f.party.size(); ++i) {
@@ -190,6 +202,10 @@ namespace
 			for (std::size_t i = 0; i < a_f.party.size() && hw > 0 && share > 0; ++i)
 				if (!a_f.dead[i] && hurt[i] > 0) a_f.Hurt(static_cast<int>(i), foe, share * hurt[i] / hw);
 			if (a_j.before) a_j.before(a_f, k);
+			dealt.resize(a_f.party.size(), 0.0f);
+			dw = 0;
+			for (std::size_t i = 0; i < a_f.party.size(); ++i)
+				if (!a_f.dead[i]) dw += dealt[i];
 
 			int killer = -1;
 			for (std::size_t i = 0; i < a_f.party.size(); ++i) {
@@ -285,6 +301,18 @@ namespace
 				if (k == 2) f.Effect(f.foes[k], mage, "fx.fear", "Fear", true);
 				if (k == 1 || k == 3) f.Heal(0, support, 60, "Heal Other");
 			} });
+		j.push_back({ "Summoners",
+			"Six bandits. The player sends in a flame atronach, Brelyna another when she is there, and the player raises the first bandit to "
+			"fall. The summons draw most of the enemy's blows. The duo is the player and Brelyna.",
+			[](std::size_t) { return Many("Bandit", 150, 6); }, 4, 0.4f, Dealt, Taken,
+			[](Fight& f, std::size_t k) {
+				if (k == 1) f.Join({ 0xFF000D00, "Bandit", Role::kSummon, 150, 0 });
+			},
+			true,
+			[](Fight& f) {
+				f.Join({ 0xFF000D01, "Flame Atronach", Role::kSummon, 300, 0 });
+				if (const int brelyna = f.Find("Brelyna"); brelyna >= 0) f.Join({ 0xFF000D02, "Flame Atronach", Role::kSummon, 300, brelyna });
+			} });
 		return j;
 	}
 
@@ -327,6 +355,7 @@ int RunJourneys(const char* a_path)
 			}
 			bool first = true;
 			for (std::size_t i = 1; i < f.party.size(); ++i) {
+				if (f.party[i].role == Role::kSummon) continue;
 				const auto s = BuildSummary(f.b, f.party[i].id, f.party[i].name, {});
 				if (first) Print(out, "told to everyone", s.general);
 				Print(out, (std::string(f.party[i].name) + ", about themself").c_str(), s.personal);
