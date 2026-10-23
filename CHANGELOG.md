@@ -1,5 +1,12 @@
 # Changelog
 
+## Next release
+
+- Who did the work, not only who struck the last blow: "Most of the party's damage to the enemy was dealt by Lydia",
+  and every companion's line now says how much of the fighting they did.
+- Potions and poisons: "Kaira drank 3 potions in the fight: Potion of Healing x2 and Potion of Fortify Two-handed",
+  "Lydia used a poison in the fight: Deadly Venom".
+
 ## 1.4.0
 
 **Improvements**

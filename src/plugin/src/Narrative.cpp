@@ -145,6 +145,17 @@ namespace BSM
 			return sum;
 		}
 
+		// with what their summons did: Scrap's bites are Remiel's share
+		float PartyDealt(const Battle& a_b, const Participant& a_p)
+		{
+			float sum = DealtToFoes(a_b, a_p);
+			if (a_p.info.summon) return sum;
+			for (const auto& q : a_b.participants) {
+				if (q.info.summon && q.info.master == a_p.info.id) sum += DealtToFoes(a_b, q);
+			}
+			return sum;
+		}
+
 		float SideDealtToFoes(const Battle& a_b, Side a_side)
 		{
 			float sum = 0.0f;
@@ -193,7 +204,7 @@ namespace BSM
 		{
 			const Side  side = a_b.EffectiveSide(a_p);
 			const float total = SideDealtToFoes(a_b, side);
-			const float dealt = DealtToFoes(a_b, a_p);
+			const float dealt = PartyDealt(a_b, a_p);
 			if (dealt <= 0.0f) return T("dealt.none");
 			std::string w;
 			if (a_b.Count(side) <= 1 || total <= 0.0f) w = T("dealt.all");
@@ -479,6 +490,31 @@ namespace BSM
 		}
 
 		// the participant's own kills of the other side, and their summons' (a_bySummons counts those, a_summons names them)
+		std::string ItemList(const std::vector<ItemUse>& a_items, int* a_total = nullptr)
+		{
+			std::vector<std::string> names;
+			int                      total = 0;
+			for (const auto& u : a_items) {
+				if (u.count <= 0) continue;
+				total += u.count;
+				names.push_back(u.count > 1 ? F("list.times", { { "name", u.name }, { "count", N(u.count) } }) : u.name);
+			}
+			if (a_total) *a_total = total;
+			return JoinList(names);
+		}
+
+		// "drank 4 potions", "used a poison": short, for a companion's line
+		void ItemBits(const Participant& a_p, std::vector<std::string>& a_bits)
+		{
+			int n = 0;
+			ItemList(a_p.potions, &n);
+			if (n == 1) a_bits.push_back(T("other.potion"));
+			else if (n > 1) a_bits.push_back(F("other.potions", { { "count", N(n) } }));
+			ItemList(a_p.poisons, &n);
+			if (n == 1) a_bits.push_back(T("other.poison"));
+			else if (n > 1) a_bits.push_back(F("other.poisons", { { "count", N(n) } }));
+		}
+
 		int EnemyKills(const Battle& a_b, const Participant& a_p, Side a_foes, std::vector<const Participant*>* a_out = nullptr, int* a_bySummons = nullptr,
 			std::vector<const Participant*>* a_summons = nullptr, bool a_summonedVictims = false)
 		{
@@ -556,6 +592,11 @@ namespace BSM
 				// a bystander was on nobody's side: not "their own side's attacks"
 				if (!own.empty()) out.push_back(F(Bystander(a_b, a_p) ? "friendly.crossfire_line" : "friendly.line", { { "name", n }, { "what", own } }));
 			}
+			{
+				int cnt = 0;
+				if (const auto items = ItemList(a_p.potions, &cnt); cnt > 0) out.push_back(F(cnt == 1 ? "items.potion" : "items.potions", { { "name", n }, { "count", N(cnt) }, { "items", items } }));
+				if (const auto items = ItemList(a_p.poisons, &cnt); cnt > 0) out.push_back(F(cnt == 1 ? "items.poison" : "items.poisons", { { "name", n }, { "count", N(cnt) }, { "items", items } }));
+			}
 			if (const auto good = Effects(a_b, a_p, false, a_opt.maxEffects); !good.empty()) out.push_back(F("effects.helped", { { "name", n }, { "effects", good } }));
 
 			std::vector<const Participant*> victims, summons;
@@ -589,7 +630,7 @@ namespace BSM
 		std::string OtherLine(const Battle& a_b, const Participant& a_p, const NarrativeOptions& a_opt)
 		{
 			const Side foes = Opposing(a_b.EffectiveSide(a_p));
-			std::vector<std::string> bits{ Wounds(a_b, a_p, a_opt) };
+			std::vector<std::string> bits{ Wounds(a_b, a_p, a_opt), Dealt(a_b, a_p, a_opt) };
 			if (a_p.dead) bits.push_back(KilledBy(a_b, a_p.killer));
 			else if (const auto brink = Brink(a_b, a_p, a_opt); !brink.empty()) {
 				bits.push_back(brink);
@@ -599,6 +640,7 @@ namespace BSM
 				bits.push_back(T("other.already_low"));
 			} else bits.push_back(T("other.no_danger"));
 			if (const auto hurt = Injuries(a_b, a_p, false, false); !hurt.empty() && !a_p.dead) bits.push_back(F("other.injured", { { "injuries", hurt } }));
+			ItemBits(a_p, bits);
 			const int kills = EnemyKills(a_b, a_p, foes);
 			bits.push_back(kills == 0 ? T("other.kills_none") : F("other.kills", { { "count", N(kills) } }));
 			std::vector<const Participant*> dispatched;
@@ -618,7 +660,7 @@ namespace BSM
 			return true;
 		}
 
-		std::vector<std::string> General(const Battle& a_b)
+		std::vector<std::string> General(const Battle& a_b, const NarrativeOptions& a_opt)
 		{
 			std::vector<std::string> out;
 			const auto               party = OnSide(a_b, Side::kPlayer), enemies = OnSide(a_b, Side::kEnemy), others = OnSide(a_b, Side::kOther);
@@ -632,6 +674,26 @@ namespace BSM
 
 			if (auto o = Outcome(a_b, Side::kEnemy); !o.empty()) out.push_back(std::move(o));
 			if (const auto t = KillTally(a_b, Side::kEnemy); !t.empty()) out.push_back(F("tally.line", { { "tally", t } }));
+			// A kill goes to the last blow; the damage is the fight. Those who did most of it, up to three, until they make up
+			// most of the party's: a follower who wore the dragon down is named though the player struck the last blow.
+			if (party.size() >= 2) {
+				const float total = SideDealtToFoes(a_b, Side::kPlayer);
+				std::vector<std::pair<float, const Participant*>> shares;
+				for (const auto* p : party) {
+					if (const float d = PartyDealt(a_b, *p); d > 0.0f) shares.emplace_back(d, p);
+				}
+				std::ranges::stable_sort(shares, [](const auto& x, const auto& y) { return x.first > y.first; });
+				std::vector<std::string> names;
+				float                    covered = 0.0f;
+				for (const auto& [d, p] : shares) {
+					if (names.size() >= 3 || (total > 0.0f && covered >= 0.6f * total)) break;
+					covered += d;
+					std::string name = NameOf(a_b, p->info.id);
+					if (a_opt.showNumbers && total > 0.0f) name += " " + F("share.percent", { { "percent", N(static_cast<int>(std::lround(100.0f * d / total))) } });
+					names.push_back(name);
+				}
+				if (!names.empty() && total > 0.0f) out.push_back(F("battle.damage_by", { { "names", JoinList(names) } }));
+			}
 			if (const auto t = KillTally(a_b, Side::kEnemy, true); !t.empty()) out.push_back(F("summons.dispatched", { { "tally", t } }));
 			for (const auto* p : party) {
 				if (!p->dead) continue;
@@ -657,7 +719,7 @@ namespace BSM
 		r.show = true;
 		r.ongoing = a_b.Ongoing();
 		r.name = a_viewerName;
-		r.general = General(a_b);
+		r.general = General(a_b, a_opt);
 		for (auto& l : r.general) l = Cap(std::move(l));
 
 		const auto* me = a_b.Find(a_viewer);
@@ -691,7 +753,7 @@ namespace BSM
 			if (!s.empty()) s += ' ';
 			s += Cap(a_line);
 		};
-		for (const auto& l : General(a_b)) add(l);
+		for (const auto& l : General(a_b, a_opt)) add(l);
 		for (const auto* p : OnSide(a_b, Side::kPlayer)) {
 			if (p->dead) continue;
 			if (const auto hurt = Injuries(a_b, *p, false); !hurt.empty()) add(F("injury.memory", { { "name", p->info.name }, { "injuries", hurt } }));

@@ -92,7 +92,7 @@ namespace
 		Check(Has(lydia, "Who killed the enemies: Kaira 3 (Bandit Chief, Bandit and Bandit Mage); Lydia 1 (Bandit)."), "kill tally, most kills first", lydia);
 		Check(Has(lydia, "All 4 enemies were killed."), "outcome", lydia);
 		Check(Has(lydia, "Kaira and Lydia fought against Bandit Chief, Bandit x2 and Bandit Mage."), "sides, same names counted", lydia);
-		Check(Has(lydia, "Kaira: took only light wounds; was never near death; killed 3 of the other side."), "the player's line among the others", lydia);
+		Check(Has(lydia, "Kaira: took only light wounds; dealt most of their side's damage; was never near death; killed 3 of the other side."), "the player's line among the others", lydia);
 		Check(!Has(lydia, "points"), "no raw figures unless asked for", lydia);
 
 		const auto hero = SummaryText(BuildSummary(b, kHero, "Kaira", opt));
@@ -254,7 +254,7 @@ namespace
 		const auto elk = BuildSummary(b, kElk, "Elk", {});
 		Check(!elk.participant && elk.personal.empty(), "what never fought is a witness, not a fighter", SummaryText(elk));
 		const auto other = SummaryText(BuildSummary(b, kLydia, "Jenassa", {}));
-		Check(Has(other, "Kaira: took no damage worth the name; went in already close to death from earlier wounds; killed 1 of the other side."), "the companion's line", other);
+		Check(Has(other, "Kaira: took no damage worth the name; dealt most of their side's damage; went in already close to death from earlier wounds; killed 1 of the other side."), "the companion's line", other);
 
 		// someone who fights an enemy of the party is part of it; hurt further while already low counts as near death
 		Battle c;
@@ -333,7 +333,7 @@ namespace
 		Check(Has(lydia, "Lydia was injured in this fight and still carries it: Leg Injury (dealt by Bandit Chief)."), "a new injury, once, with its dealer", lydia);
 		Check(Has(lydia, "Lydia beheaded Bandit Chief."), "a beheading is credited to the killer", lydia);
 		Check(Has(lydia, "Kaira dismembered Bandit x2, severing a limb."), "severed limbs, grouped per killer", lydia);
-		Check(Has(lydia, "Kaira: took only light wounds; was never near death; was injured (Major Injury); killed 2 of the other side."), "a companion's injury", lydia);
+		Check(Has(lydia, "Kaira: took only light wounds; dealt a fair share of their side's damage; was never near death; was injured (Major Injury); killed 2 of the other side."), "a companion's injury", lydia);
 		Check(!b.Find(kLydia)->dismembered, "only the dead are dismembered", lydia);
 
 		const auto hero = SummaryText(BuildSummary(b, kHero, "Kaira", {}));
@@ -450,7 +450,7 @@ namespace
 		NarrativeOptions quiet;
 		quiet.ignoreFriendlyFire = true;
 		const auto hidden = SummaryText(BuildSummary(b, kLydia, "Lydia", quiet));
-		Check(!Has(hidden, "Fireball") && !Has(hidden, "friendly fire") && !Has(hidden, "by Kaira"), "friendly fire left out", hidden);
+		Check(!Has(hidden, "Fireball") && !Has(hidden, "friendly fire") && !Has(hidden, "edge of death by Kaira"), "friendly fire left out", hidden);
 		Check(Has(hidden, "Lydia took only light wounds") && !Has(hidden, "Part of the damage"), "and their damage is no part of the wounds told", hidden);
 		Check(Has(hidden, "Lydia suffered: poisoned by Bandit (Weak Poison).") && Has(hidden, "Lydia was brought to the very edge of death, with almost no health left."), "the rest still told", hidden);
 		Check(!Has(BuildMemory(b, quiet), "Kaira (by accident"), "and left out of what is remembered", BuildMemory(b, quiet));
@@ -872,6 +872,37 @@ namespace
 		Check(Has(hero, "Kaira saved Lydia's life. The first Troll, who had struck down Lydia, was then killed by Kaira."), "and every sentence within one", hero);
 	}
 
+	// Players' reports: followers measured themselves by kills alone ("whoever deals the last 10 damage to the dragon
+	// gets the glory"), and nobody knew who had drunk what.
+	void TestDamageAndItems()
+	{
+		constexpr ActorId kDragon = 0xFF000941;
+		Battle b;
+		b.startedAt = 0;
+		b.Join(Info(kHero, "Kaira", Side::kPlayer, 200));
+		b.Join(Info(kLydia, "Lydia", Side::kPlayer, 300));
+		b.Join(Info(kDragon, "Dragon", Side::kEnemy, 2000));
+		b.Damage(kDragon, kLydia, 1990, 0.005f, 1);
+		b.Damage(kDragon, kHero, 10, 0.0f, 2);
+		b.Death(kDragon, kHero, 2);
+		b.UsedItem(kHero, "Potion of Healing", false, 0.5);
+		b.UsedItem(kHero, "Potion of Healing", false, 0.6);  // the same drink's other effect
+		b.UsedItem(kHero, "Potion of Healing", false, 3.0);
+		b.UsedItem(kHero, "Potion of Fortify Two-handed", false, 3.1);
+		b.UsedItem(kLydia, "Deadly Venom", true, 1.0);
+		b.endedAt = 5;
+		const auto hero = SummaryText(BuildSummary(b, kHero, "Kaira", {}));
+		Check(Has(hero, "Who killed the enemies: Kaira 1 (Dragon).") && Has(hero, "Most of the party's damage to the enemy was dealt by Lydia."),
+			"the kill and the work, told apart", hero);
+		Check(Has(hero, "Kaira drank 3 potions in the fight: Potion of Healing x2 and Potion of Fortify Two-handed."), "potions drunk, one drink counted once", hero);
+		const auto lydia = SummaryText(BuildSummary(b, kLydia, "Lydia", {}));
+		Check(Has(lydia, "Lydia took no damage worth the name and dealt most of their side's damage.") && Has(lydia, "Lydia used a poison in the fight: Deadly Venom."),
+			"her own share and her poison", lydia);
+		NarrativeOptions numbers;
+		numbers.showNumbers = true;
+		Check(Has(SummaryText(BuildSummary(b, kHero, "Kaira", numbers)), "dealt by Lydia (about 100%)"), "shares as figures only when asked for", "");
+	}
+
 	void TestDuration()
 	{
 		const auto is = [](double a_s, const char* a_want) { Check(DurationText(a_s) == a_want, a_want, DurationText(a_s)); };
@@ -957,6 +988,7 @@ int main(int argc, char** argv)
 	TestSummons();
 	TestEnemySummonsDispatched();
 	TestSameNames();
+	TestDamageAndItems();
 	TestDuration();
 	TestEdges();
 	std::printf("%d checks, %d failed\n", g_checks, g_failed);

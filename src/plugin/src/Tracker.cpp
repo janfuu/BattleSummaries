@@ -799,6 +799,20 @@ namespace BSM::Tracker
 					b = Lookup(by);
 					if (b && b != a && b->IsDead()) return;
 				}
+				// a potion drunk or a poison landed: counted whatever its effects are (many are told as nothing else)
+				if (on.item && (on.item->GetSpellType() == RE::MagicSystem::SpellType::kPotion || on.item->GetSpellType() == RE::MagicSystem::SpellType::kPoison)) {
+					const auto* alch = on.item->As<RE::AlchemyItem>();
+					const bool  poison = on.item->GetSpellType() == RE::MagicSystem::SpellType::kPoison || (alch && alch->IsPoison());
+					const char* name = on.item->GetFullName();
+					if (name && *name && !(alch && alch->IsFood())) {
+						// a potion is its drinker's; a poison is its user's, the one who struck with it
+						RE::Actor* user = poison ? b : a;
+						if (user && user != (poison ? a : nullptr) && InBattle(user)) {
+							g_current->UsedItem(Key(user->GetFormID()), name, poison, a_r.at);
+							SKSE::log::debug("item: {:08X} {} {}", user->GetFormID(), poison ? "used poison" : "drank", name);
+						}
+					}
+				}
 				const auto kind = Effects::Classify(effect, on.item, b == a);
 				if (!kind) return;
 				// harm someone does to themself is their own spell's price or another mod's bookkeeping, not the battle's

@@ -239,6 +239,17 @@ namespace BSM
 		if (a_beheaded) p->beheaded = true;
 	}
 
+	void Battle::UsedItem(ActorId a_id, const std::string& a_name, bool a_poison, double a_now)
+	{
+		auto* p = Find(a_id);
+		if (!p || a_name.empty()) return;
+		auto& list = a_poison ? p->poisons : p->potions;
+		auto  it = std::ranges::find_if(list, [&](const ItemUse& u) { return u.name == a_name; });
+		if (it == list.end()) it = list.insert(list.end(), { a_name, 0, -1.0e9 });
+		if (a_now - it->lastAt > 1.0) ++it->count;  // its other effects, a moment later, are the same drink
+		it->lastAt = a_now;
+	}
+
 	void Battle::Armed(ActorId a_id)
 	{
 		if (auto* p = Find(a_id)) p->armed = true;

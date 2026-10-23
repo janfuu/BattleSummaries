@@ -69,6 +69,14 @@ namespace BSM
 		double        lasts{ 0.0 };     // its duration in seconds; 0 = instant
 	};
 
+	// A potion drunk or a poison used, by name, and how many times.
+	struct ItemUse
+	{
+		std::string name;
+		int         count{ 0 };
+		double      lastAt{ -1.0e9 };
+	};
+
 	// A lasting injury an injury mod put on a participant ("Leg Injury", "Major Injury").
 	struct InjuryNote
 	{
@@ -123,6 +131,8 @@ namespace BSM
 		std::vector<ActorId>    kills;
 		std::vector<EffectNote> effects;
 		std::vector<InjuryNote> injuries;
+		std::vector<ItemUse>    potions;  // drunk in this battle
+		std::vector<ItemUse>    poisons;  // put on a weapon and landed on a foe
 
 		// Fought the player's side directly (traded a blow, a kill or a hostile spell with one of them)...
 		// seen with a weapon, spell or fists raised during the battle
@@ -185,6 +195,8 @@ namespace BSM
 		// the dead participant's body lost a limb (a_beheaded: the head)
 		void Dismember(ActorId a_id, bool a_beheaded);
 		void Armed(ActorId a_id);
+		// a potion (or poison) taking hold; the several effects of one potion, arriving together, are one use
+		void UsedItem(ActorId a_id, const std::string& a_name, bool a_poison, double a_now);
 		[[nodiscard]] bool Fought(const Participant& a_p) const;  // did anything hostile in this battle
 		// Harmed or killed in it without being a fighter: not on the player's side, not someone who would fight the player,
 		// and did nothing hostile. Left out of the battle altogether with omitBystanders.

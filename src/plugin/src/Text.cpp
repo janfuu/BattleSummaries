@@ -63,6 +63,8 @@ namespace BSM::Text
 			{ "Outcome", "outcome.some", "{dead} of the {total} {foes} were killed; the rest fled, yielded or broke off.", "" },
 			{ "Outcome", "tally.line", "Who killed the enemies: {tally}.", "{tally} reads \"Kaira 3 (Bandit x2 and Bandit Chief); Lydia 1 (Bandit)\"" },
 			{ "Outcome", "tally.unknown", "unknown causes", "" },
+			{ "Outcome", "battle.damage_by", "Most of the party's damage to the enemy was dealt by {names}.", "a kill goes to the last blow; this says who did the work" },
+			{ "Outcome", "share.percent", "(about {percent}%)", "only with bShowNumbers: a fighter's part of the party's damage" },
 			{ "Outcome", "summons.dispatched", "Summoned creatures dispatched: {tally}.", "the enemy's summoned or raised creatures, by who put an end to them" },
 			{ "Outcome", "tally.through", "{count} through {summons}", "kills a summoned creature made, credited to whoever summoned it" },
 
@@ -128,6 +130,15 @@ namespace BSM::Text
 			{ "Healing", "heal.most", "most or all of", "" },
 
 			// ---------------------------------------------------------------- injuries, magic, friendly fire
+			{ "Items", "items.potion", "{name} drank a potion in the fight: {items}.", "" },
+			{ "Items", "items.potions", "{name} drank {count} potions in the fight: {items}.", "{items} reads \"Potion of Healing x3 and Potion of Fortify Two-handed\"" },
+			{ "Items", "items.poison", "{name} used a poison in the fight: {items}.", "" },
+			{ "Items", "items.poisons", "{name} used {count} poisons in the fight: {items}.", "" },
+			{ "Items", "other.potion", "drank a potion", "for a companion's line" },
+			{ "Items", "other.potions", "drank {count} potions", "" },
+			{ "Items", "other.poison", "used a poison", "" },
+			{ "Items", "other.poisons", "used {count} poisons", "" },
+
 			{ "Injuries", "injury.carried", "{name} went into this fight already carrying: {injuries}.", "" },
 			{ "Injuries", "injury.new", "{name} was injured in this fight and still carries it: {injuries}.", "" },
 			{ "Injuries", "injury.memory", "{name} came out of it injured: {injuries}.", "for the remembered paragraph" },
