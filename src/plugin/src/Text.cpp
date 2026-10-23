@@ -65,6 +65,7 @@ namespace BSM::Text
 			{ "Outcome", "tally.unknown", "unknown causes", "" },
 			{ "Outcome", "battle.damage_by", "Most of the party's damage to the enemy was dealt by {names}.", "a kill goes to the last blow; this says who did the work" },
 			{ "Outcome", "battle.damage_also", "{names} also did a real part of it.", "others whose part of the party's damage was at least a fifth" },
+			{ "Roles", "role.front_none", "The enemy never landed a blow on the party.", "the party took no damage from the enemy at all" },
 			{ "Roles", "role.front_brunt", "{names} bore the brunt of the enemy's blows.", "took over half of all the party took from the enemy" },
 			{ "Roles", "role.front_also", "{names} also took a share of the enemy's blows.", "the others who took at least a fifth of it" },
 			{ "Roles", "role.front_shared", "{names} took the enemy's blows between them.", "no one took over half; these took at least a fifth each" },

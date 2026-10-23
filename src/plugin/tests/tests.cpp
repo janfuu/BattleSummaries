@@ -949,6 +949,18 @@ namespace
 		t.Damage(kOgre, kHero, 900, 0.0f, 4);
 		t.Death(kOgre, kHero, 4);
 		t.endedAt = 5;
+		Battle clean;  // the party took nothing: no share of blows for anyone, and that said plainly
+		clean.startedAt = 0;
+		clean.Join(Info(kHero, "Kaira", Side::kPlayer, 200));
+		clean.Join(Info(kLydia, "Lydia", Side::kPlayer, 300));
+		clean.Join(Info(kOgre, "Troll", Side::kEnemy, 900));
+		clean.Damage(kOgre, kLydia, 450, 0.5f, 1);
+		clean.Damage(kOgre, kHero, 450, 0.0f, 2);
+		clean.Death(kOgre, kHero, 2);
+		clean.endedAt = 3;
+		const auto none = SummaryText(BuildSummary(clean, kLydia, "Lydia", {}));
+		Check(Has(none, "The enemy never landed a blow on the party.") && !Has(none, "blows between them") && !Has(none, "brunt") && !Has(none, "share of the enemy"),
+			"no damage taken: said plainly, and no share of blows for anyone", none);
 		const auto tank = SummaryText(BuildSummary(t, kHero, "Kaira", {}));
 		Check(Has(tank, "Lydia bore the brunt of the enemy's blows.") && Has(tank, "Kaira also took a share of the enemy's blows.") && !Has(tank, "Jenassa also took"),
 			"over half: the brunt; a fifth or more: a share; less: nothing", tank);

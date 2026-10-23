@@ -709,6 +709,8 @@ namespace BSM
 				}
 				float total = 0.0f;
 				auto  over = OverTheLine(taken, &total);
+				// the enemy never touched them (a clean ambush, a fight won from range): said so, and no share of anything
+				if (total <= 0.0f && a_b.Count(Side::kEnemy) > 0) out.push_back(T("role.front_none"));
 				// worth telling once the party, between them, lost a real part of one body's health
 				if (!over.empty() && total >= 0.25f * health / static_cast<float>(a_party.size())) {
 					float top = 0.0f;
