@@ -1021,8 +1021,12 @@ namespace
 	}
 }
 
+int RunJourneys(const char* a_path);  // journeys.cpp
+
 int main(int argc, char** argv)
 {
+	// build.ps1: the journey maps, every summary of a set of typical battles, for reading
+	if (argc == 3 && std::string(argv[1]) == "--journeys") return RunJourneys(argv[2]);
 	// build.ps1: write the reference file that ships with the mod
 	if (argc == 3 && std::string(argv[1]) == "--write-reference") {
 		std::FILE* f = std::fopen(argv[2], "wb");

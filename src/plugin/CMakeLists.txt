@@ -27,4 +27,4 @@ target_compile_definitions(BattleSummaries PRIVATE _UNICODE UNICODE NOMINMAX
 set_target_properties(BattleSummaries PROPERTIES OUTPUT_NAME "BattleSummaries")
 
 # Offline tests: build.ps1 builds and runs them before the DLL counts as built.
-add_executable(BattleSummariesTests ${CORE_SOURCES} tests/tests.cpp)
+add_executable(BattleSummariesTests ${CORE_SOURCES} tests/tests.cpp tests/journeys.cpp)

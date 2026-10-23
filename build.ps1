@@ -46,6 +46,9 @@ if (-not $Only -or $Only -eq "dll" -or $Only -eq "test") {
   # the reference file of every phrase the mod writes, from the same table the DLL uses
   & "$src\build\BattleSummariesTests.exe" --write-reference "$root\config\SKSE\Plugins\BattleSummaries_Text.default.ini"
   if ($LASTEXITCODE -ne 0) { throw "could not write BattleSummaries_Text.default.ini" }
+  # the journey maps: what NPCs are told after a set of typical battles; a rule change shows as a diff of this file
+  & "$src\build\BattleSummariesTests.exe" --journeys "$src\tests\journeys.txt"
+  if ($LASTEXITCODE -ne 0) { throw "could not write the journey maps" }
   if ($Only -ne "test") {
     cmd /c "`"$vc`" >nul 2>&1 && `"$cm`" --build $src\build --target BattleSummaries 2>&1"
     if ($LASTEXITCODE -ne 0) { throw "DLL build failed" }

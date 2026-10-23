@@ -1,0 +1,964 @@
+Battle Summaries journey maps: what each NPC is told after the same kinds of battle, solo, as a duo, with a party of four
+followers and with nine. Written by build.ps1; read the diff when a rule changes. The player (Kaira) is told nothing:
+summaries go to the NPCs. Solo, the one shown is a witness who watched.
+
+==== Washout / solo (1) ====
+Three bandits go down without landing a blow.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 4 seconds. Kaira fought against Bandit x3. All 3 enemies were killed. Who killed the enemies: Kaira 3 (Bandit x3).
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 4 seconds.
+    Kaira fought against Bandit x3.
+    All 3 enemies were killed.
+    Who killed the enemies: Kaira 3 (Bandit x3).
+  [a witness, about the fighters]
+    None of them was seriously hurt or in any real danger.
+
+==== Washout / duo (2) ====
+Three bandits go down without landing a blow.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 5 seconds. Kaira and Lydia fought against Bandit x3. All 3 enemies were killed. Who killed the enemies: Kaira 2 (Bandit x2); Lydia 1 (Bandit). Most of the party's damage to the enemy was dealt by Kaira and Lydia. The enemy never landed a blow on the party.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 5 seconds.
+    Kaira and Lydia fought against Bandit x3.
+    All 3 enemies were killed.
+    Who killed the enemies: Kaira 2 (Bandit x2); Lydia 1 (Bandit).
+    Most of the party's damage to the enemy was dealt by Kaira and Lydia.
+    The enemy never landed a blow on the party.
+  [Lydia, about themself]
+    Lydia took no damage worth the name and dealt a large share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 1 of the 3 who died on the other side: Bandit.
+  [Lydia, about the others]
+    None of them was seriously hurt or in any real danger.
+
+==== Washout / party (5) ====
+Three bandits go down without landing a blow.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 9 seconds. Kaira, Lydia, Marcurio, Aela and Brelyna fought against Bandit x3. All 3 enemies were killed. Who killed the enemies: Kaira 1 (Bandit); Lydia 1 (Bandit); Marcurio 1 (Bandit). Most of the party's damage to the enemy was dealt by Kaira, Aela and Lydia. Marcurio also did a real part of it. The enemy never landed a blow on the party.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 9 seconds.
+    Kaira, Lydia, Marcurio, Aela and Brelyna fought against Bandit x3.
+    All 3 enemies were killed.
+    Who killed the enemies: Kaira 1 (Bandit); Lydia 1 (Bandit); Marcurio 1 (Bandit).
+    Most of the party's damage to the enemy was dealt by Kaira, Aela and Lydia.
+    Marcurio also did a real part of it.
+    The enemy never landed a blow on the party.
+  [Lydia, about themself]
+    Lydia took no damage worth the name and dealt a fair share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 1 of the 3 who died on the other side: Bandit.
+  [Lydia, about the others]
+    None of them was seriously hurt or in any real danger.
+  [Marcurio, about themself]
+    Marcurio took no damage worth the name and dealt a fair share of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed 1 of the 3 who died on the other side: Bandit.
+  [Aela, about themself]
+    Aela took no damage worth the name and dealt a fair share of their side's damage.
+    Aela was never in serious danger.
+    Aela killed none of the 3 who died on the other side.
+  [Brelyna, about themself]
+    Brelyna took no damage worth the name and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed none of the 3 who died on the other side.
+
+==== Washout / large (10) ====
+Three bandits go down without landing a blow.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 15 seconds. Kaira, Lydia, Marcurio, Aela and 6 others fought against Bandit x3. All 3 enemies were killed. Who killed the enemies: Kaira 1 (Bandit); Lydia 1 (Bandit); Marcurio 1 (Bandit). Most of the party's damage to the enemy was dealt by Kaira, Lydia and Marcurio. The enemy never landed a blow on the party.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 15 seconds.
+    Kaira, Lydia, Marcurio, Aela and 6 others fought against Bandit x3.
+    All 3 enemies were killed.
+    Who killed the enemies: Kaira 1 (Bandit); Lydia 1 (Bandit); Marcurio 1 (Bandit).
+    Most of the party's damage to the enemy was dealt by Kaira, Lydia and Marcurio.
+    The enemy never landed a blow on the party.
+  [Lydia, about themself]
+    Lydia took no damage worth the name and dealt only a small part of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 1 of the 3 who died on the other side: Bandit.
+  [Lydia, about the others]
+    None of them was seriously hurt or in any real danger.
+  [Marcurio, about themself]
+    Marcurio took no damage worth the name and dealt only a small part of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed 1 of the 3 who died on the other side: Bandit.
+  [Aela, about themself]
+    Aela took no damage worth the name and dealt only a small part of their side's damage.
+    Aela was never in serious danger.
+    Aela killed none of the 3 who died on the other side.
+  [Brelyna, about themself]
+    Brelyna took no damage worth the name and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed none of the 3 who died on the other side.
+  [J'zargo, about themself]
+    J'zargo took no damage worth the name and dealt only a small part of their side's damage.
+    J'zargo was never in serious danger.
+    J'zargo killed none of the 3 who died on the other side.
+  [Uthgerd, about themself]
+    Uthgerd took no damage worth the name and dealt only a small part of their side's damage.
+    Uthgerd was never in serious danger.
+    Uthgerd killed none of the 3 who died on the other side.
+  [Jenassa, about themself]
+    Jenassa took no damage worth the name and dealt only a small part of their side's damage.
+    Jenassa was never in serious danger.
+    Jenassa killed none of the 3 who died on the other side.
+  [Erik, about themself]
+    Erik took no damage worth the name and dealt only a small part of their side's damage.
+    Erik was never in serious danger.
+    Erik killed none of the 3 who died on the other side.
+  [Borgakh, about themself]
+    Borgakh took no damage worth the name and dealt only a small part of their side's damage.
+    Borgakh was never in serious danger.
+    Borgakh killed none of the 3 who died on the other side.
+
+==== Tough / solo (1) ====
+A Briarheart and six Forsworn wear the party down: the player is injured, Lydia nearly falls, and someone dies (Lydia in a duo, Aela in a party). Brelyna heals when she is there; alone, the player drinks potions.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 14 seconds. Kaira fought against Forsworn Briarheart and Forsworn x6. All 7 enemies were killed. Who killed the enemies: Kaira 7. Kaira came out of it injured: a broken arm (dealt by the first Forsworn). Kaira was brought to the very edge of death by the third Forsworn, with almost no health left, but survived.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 14 seconds.
+    Kaira fought against Forsworn Briarheart and Forsworn x6.
+    All 7 enemies were killed.
+    Who killed the enemies: Kaira 7.
+  [a witness, about the fighters]
+    Kaira: took more damage than a body can survive in one go, and only kept going thanks to healing; dealt all the damage on their side; was brought to the very edge of death by the third Forsworn, with almost no health left; was injured (a broken arm); drank 2 potions; killed 7 of the other side.
+
+==== Tough / duo (2) ====
+A Briarheart and six Forsworn wear the party down: the player is injured, Lydia nearly falls, and someone dies (Lydia in a duo, Aela in a party). Brelyna heals when she is there; alone, the player drinks potions.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 15 seconds. Kaira and Lydia fought against Forsworn Briarheart and Forsworn x6. All 7 enemies were killed. Who killed the enemies: Kaira 5; Lydia 2 (Forsworn x2). Most of the party's damage to the enemy was dealt by Kaira. Lydia also did a real part of it. Lydia bore the brunt of the enemy's blows. Kaira also took a share of the enemy's blows. Lydia was killed by the fourth Forsworn. Kaira came out of it injured: a broken arm (dealt by the first Forsworn).
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 15 seconds.
+    Kaira and Lydia fought against Forsworn Briarheart and Forsworn x6.
+    All 7 enemies were killed.
+    Who killed the enemies: Kaira 5; Lydia 2 (Forsworn x2).
+    Most of the party's damage to the enemy was dealt by Kaira.
+    Lydia also did a real part of it.
+    Lydia bore the brunt of the enemy's blows.
+    Kaira also took a share of the enemy's blows.
+    Lydia was killed by the fourth Forsworn.
+  [Lydia, about themself]
+    Lydia took a brutal amount of damage and dealt a fair share of their side's damage.
+    Lydia was killed by the fourth Forsworn.
+    Lydia killed 2 of the 7 who died on the other side: Forsworn x2.
+  [Lydia, about the others]
+    Kaira: was badly hurt, taking nearly a full body's worth of damage; dealt a large share of their side's damage; was never near death; was injured (a broken arm); killed 5 of the other side.
+
+==== Tough / party (5) ====
+A Briarheart and six Forsworn wear the party down: the player is injured, Lydia nearly falls, and someone dies (Lydia in a duo, Aela in a party). Brelyna heals when she is there; alone, the player drinks potions.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 34 seconds. Kaira, Lydia, Marcurio, Aela and Brelyna fought against Forsworn Briarheart and Forsworn x6. All 7 enemies were killed. Who killed the enemies: Kaira 2 (Forsworn Briarheart and Forsworn); Lydia 2 (Forsworn x2); Marcurio 1 (Forsworn); Aela 1 (Forsworn); Brelyna 1 (Forsworn). Most of the party's damage to the enemy was dealt by Kaira, Lydia and Marcurio. Lydia took the largest share of the enemy's blows. Brelyna kept the others on their feet with healing. Aela was killed by the fourth Forsworn. Kaira came out of it injured: a broken arm (dealt by the first Forsworn). Lydia was brought to the very edge of death by the second Forsworn, with almost no health left, and would most likely have died, but Marcurio killed the second Forsworn and Brelyna healed Lydia: Marcurio and Brelyna saved Lydia's life.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 34 seconds.
+    Kaira, Lydia, Marcurio, Aela and Brelyna fought against Forsworn Briarheart and Forsworn x6.
+    All 7 enemies were killed.
+    Who killed the enemies: Kaira 2 (Forsworn Briarheart and Forsworn); Lydia 2 (Forsworn x2); Marcurio 1 (Forsworn); Aela 1 (Forsworn); Brelyna 1 (Forsworn).
+    Most of the party's damage to the enemy was dealt by Kaira, Lydia and Marcurio.
+    Lydia took the largest share of the enemy's blows.
+    Brelyna kept the others on their feet with healing.
+    Aela was killed by the fourth Forsworn.
+  [Lydia, about themself]
+    Lydia took more damage than a body can survive in one go, and only kept going thanks to healing and dealt a fair share of their side's damage.
+    Lydia was brought to the very edge of death by the second Forsworn, with almost no health left.
+    The second Forsworn, who had nearly killed Lydia, was then killed by Marcurio.
+    While Lydia was at death's door, Brelyna healed Lydia with Healing Hands, restoring a good part of Lydia's health.
+    In plain terms: Marcurio and Brelyna saved Lydia's life in this battle. Without that help Lydia would most likely have died.
+    Lydia killed 2 of the 7 who died on the other side: Forsworn x2.
+  [Lydia, about the others]
+    Kaira: was badly hurt, taking nearly a full body's worth of damage; dealt a fair share of their side's damage; was never near death; was injured (a broken arm); killed 2 of the other side.
+    Marcurio: took solid wounds; dealt a fair share of their side's damage; was never near death; killed 1 of the other side.
+    Aela: took a brutal amount of damage; dealt only a small part of their side's damage; was killed by the fourth Forsworn; killed 1 of the other side.
+    Brelyna: took solid wounds; dealt only a small part of their side's damage; was never near death; killed 1 of the other side.
+  [Marcurio, about themself]
+    Marcurio took solid wounds and dealt a fair share of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed 1 of the 7 who died on the other side: Forsworn.
+    Marcurio saved Lydia's life. The second Forsworn, who had nearly killed Lydia, was then killed by Marcurio. While Lydia was at death's door, Brelyna healed Lydia with Healing Hands, restoring a good part of Lydia's health.
+  [Aela, about themself]
+    Aela took a brutal amount of damage and dealt only a small part of their side's damage.
+    Aela was killed by the fourth Forsworn.
+    Aela killed 1 of the 7 who died on the other side: Forsworn.
+  [Brelyna, about themself]
+    Brelyna took solid wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed 1 of the 7 who died on the other side: Forsworn.
+    Brelyna saved Lydia's life. The second Forsworn, who had nearly killed Lydia, was then killed by Marcurio. While Lydia was at death's door, Brelyna healed Lydia with Healing Hands, restoring a good part of Lydia's health.
+
+==== Tough / large (10) ====
+A Briarheart and six Forsworn wear the party down: the player is injured, Lydia nearly falls, and someone dies (Lydia in a duo, Aela in a party). Brelyna heals when she is there; alone, the player drinks potions.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted about 1 minute. Kaira, Lydia, Marcurio, Aela and 6 others fought against Forsworn Briarheart and Forsworn x6. All 7 enemies were killed. Who killed the enemies: Kaira 1 (Forsworn Briarheart); Lydia 1 (Forsworn); Marcurio 1 (Forsworn); Aela 1 (Forsworn); J'zargo 1 (Forsworn); Uthgerd 1 (Forsworn); Jenassa 1 (Forsworn). Most of the party's damage to the enemy was dealt by Kaira, J'zargo and Lydia. Lydia took the largest share of the enemy's blows. Brelyna kept the others on their feet with healing. Aela was killed by the fourth Forsworn. Kaira came out of it injured: a broken arm (dealt by the first Forsworn). Lydia was brought to the very edge of death by the second Forsworn, with almost no health left, and would most likely have died, but Marcurio killed the second Forsworn and Brelyna healed Lydia: Marcurio and Brelyna saved Lydia's life.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted about 1 minute.
+    Kaira, Lydia, Marcurio, Aela and 6 others fought against Forsworn Briarheart and Forsworn x6.
+    All 7 enemies were killed.
+    Who killed the enemies: Kaira 1 (Forsworn Briarheart); Lydia 1 (Forsworn); Marcurio 1 (Forsworn); Aela 1 (Forsworn); J'zargo 1 (Forsworn); Uthgerd 1 (Forsworn); Jenassa 1 (Forsworn).
+    Most of the party's damage to the enemy was dealt by Kaira, J'zargo and Lydia.
+    Lydia took the largest share of the enemy's blows.
+    Brelyna kept the others on their feet with healing.
+    Aela was killed by the fourth Forsworn.
+  [Lydia, about themself]
+    Lydia took more damage than a body can survive in one go, and only kept going thanks to healing and dealt only a small part of their side's damage.
+    Lydia was brought to the very edge of death by the second Forsworn, with almost no health left.
+    The second Forsworn, who had nearly killed Lydia, was then killed by Marcurio.
+    While Lydia was at death's door, Brelyna healed Lydia with Healing Hands, restoring a good part of Lydia's health.
+    In plain terms: Marcurio and Brelyna saved Lydia's life in this battle. Without that help Lydia would most likely have died.
+    Lydia killed 1 of the 7 who died on the other side: Forsworn.
+  [Lydia, about the others]
+    Kaira: was badly hurt, taking nearly a full body's worth of damage; dealt only a small part of their side's damage; was never near death; was injured (a broken arm); killed 1 of the other side.
+    Marcurio: took solid wounds; dealt only a small part of their side's damage; was never near death; killed 1 of the other side.
+    Aela: took a brutal amount of damage; dealt only a small part of their side's damage; was killed by the fourth Forsworn; killed 1 of the other side.
+    Brelyna: took solid wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    J'zargo: took solid wounds; dealt only a small part of their side's damage; was never near death; killed 1 of the other side.
+    Uthgerd: was badly hurt, taking nearly a full body's worth of damage; dealt only a small part of their side's damage; was never near death; killed 1 of the other side.
+  [Marcurio, about themself]
+    Marcurio took solid wounds and dealt only a small part of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed 1 of the 7 who died on the other side: Forsworn.
+    Marcurio saved Lydia's life. The second Forsworn, who had nearly killed Lydia, was then killed by Marcurio. While Lydia was at death's door, Brelyna healed Lydia with Healing Hands, restoring a good part of Lydia's health.
+  [Aela, about themself]
+    Aela took a brutal amount of damage and dealt only a small part of their side's damage.
+    Aela was killed by the fourth Forsworn.
+    Aela killed 1 of the 7 who died on the other side: Forsworn.
+  [Brelyna, about themself]
+    Brelyna took solid wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed none of the 7 who died on the other side.
+    Brelyna saved Lydia's life. The second Forsworn, who had nearly killed Lydia, was then killed by Marcurio. While Lydia was at death's door, Brelyna healed Lydia with Healing Hands, restoring a good part of Lydia's health.
+  [J'zargo, about themself]
+    J'zargo took solid wounds and dealt only a small part of their side's damage.
+    J'zargo was never in serious danger.
+    J'zargo killed 1 of the 7 who died on the other side: Forsworn.
+  [Uthgerd, about themself]
+    Uthgerd was badly hurt, taking nearly a full body's worth of damage and dealt only a small part of their side's damage.
+    Uthgerd was hurt badly at the worst of it, but was never at death's door.
+    Uthgerd killed 1 of the 7 who died on the other side: Forsworn.
+  [Jenassa, about themself]
+    Jenassa took solid wounds and dealt only a small part of their side's damage.
+    Jenassa was never in serious danger.
+    Jenassa killed 1 of the 7 who died on the other side: Forsworn.
+  [Erik, about themself]
+    Erik was badly hurt, taking nearly a full body's worth of damage and dealt only a small part of their side's damage.
+    Erik was hurt badly at the worst of it, but was never at death's door.
+    Erik killed none of the 7 who died on the other side.
+  [Borgakh, about themself]
+    Borgakh was badly hurt, taking nearly a full body's worth of damage and dealt only a small part of their side's damage.
+    Borgakh was hurt badly at the worst of it, but was never at death's door.
+    Borgakh killed none of the 7 who died on the other side.
+
+==== Lopsided: player / solo (1) ====
+The player deals most of the damage (85%) and most of the kills.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 11 seconds. Kaira fought against Bandit x7. All 7 enemies were killed. Who killed the enemies: Kaira 7.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 11 seconds.
+    Kaira fought against Bandit x7.
+    All 7 enemies were killed.
+    Who killed the enemies: Kaira 7.
+  [a witness, about the fighters]
+    None of them was seriously hurt or in any real danger.
+
+==== Lopsided: player / duo (2) ====
+The player deals most of the damage (85%) and most of the kills.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 16 seconds. Kaira and Lydia fought against Bandit x7. All 7 enemies were killed. Who killed the enemies: Kaira 6; Lydia 1 (Bandit). Most of the party's damage to the enemy was dealt by Kaira. Lydia bore the brunt of the enemy's blows. Kaira also took a share of the enemy's blows.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 16 seconds.
+    Kaira and Lydia fought against Bandit x7.
+    All 7 enemies were killed.
+    Who killed the enemies: Kaira 6; Lydia 1 (Bandit).
+    Most of the party's damage to the enemy was dealt by Kaira.
+    Lydia bore the brunt of the enemy's blows.
+    Kaira also took a share of the enemy's blows.
+  [Lydia, about themself]
+    Lydia took only light wounds and dealt only a small part of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 1 of the 7 who died on the other side: Bandit.
+  [Lydia, about the others]
+    None of them was seriously hurt or in any real danger.
+
+==== Lopsided: player / party (5) ====
+The player deals most of the damage (85%) and most of the kills.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 33 seconds. Kaira, Lydia, Marcurio, Aela and Brelyna fought against Bandit x7. All 7 enemies were killed. Who killed the enemies: Kaira 6; Lydia 1 (Bandit). Most of the party's damage to the enemy was dealt by Kaira. Lydia and Kaira took the enemy's blows between them.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 33 seconds.
+    Kaira, Lydia, Marcurio, Aela and Brelyna fought against Bandit x7.
+    All 7 enemies were killed.
+    Who killed the enemies: Kaira 6; Lydia 1 (Bandit).
+    Most of the party's damage to the enemy was dealt by Kaira.
+    Lydia and Kaira took the enemy's blows between them.
+  [Lydia, about themself]
+    Lydia took solid wounds and dealt only a small part of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 1 of the 7 who died on the other side: Bandit.
+  [Lydia, about the others]
+    Kaira: took only light wounds; dealt most of their side's damage; was never near death; killed 6 of the other side.
+    Marcurio: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    Aela: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    Brelyna: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+  [Marcurio, about themself]
+    Marcurio took only light wounds and dealt only a small part of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed none of the 7 who died on the other side.
+  [Aela, about themself]
+    Aela took only light wounds and dealt only a small part of their side's damage.
+    Aela was never in serious danger.
+    Aela killed none of the 7 who died on the other side.
+  [Brelyna, about themself]
+    Brelyna took only light wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed none of the 7 who died on the other side.
+
+==== Lopsided: player / large (10) ====
+The player deals most of the damage (85%) and most of the kills.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted about 1 minute. Kaira, Lydia, Marcurio, Aela and 6 others fought against Bandit x7. All 7 enemies were killed. Who killed the enemies: Kaira 6; Lydia 1 (Bandit). Most of the party's damage to the enemy was dealt by Kaira. Lydia took the largest share of the enemy's blows.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted about 1 minute.
+    Kaira, Lydia, Marcurio, Aela and 6 others fought against Bandit x7.
+    All 7 enemies were killed.
+    Who killed the enemies: Kaira 6; Lydia 1 (Bandit).
+    Most of the party's damage to the enemy was dealt by Kaira.
+    Lydia took the largest share of the enemy's blows.
+  [Lydia, about themself]
+    Lydia took solid wounds and dealt only a small part of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 1 of the 7 who died on the other side: Bandit.
+  [Lydia, about the others]
+    Kaira: took only light wounds; dealt most of their side's damage; was never near death; killed 6 of the other side.
+    Marcurio: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    Aela: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    Brelyna: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    J'zargo: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    Uthgerd: took solid wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+  [Marcurio, about themself]
+    Marcurio took only light wounds and dealt only a small part of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed none of the 7 who died on the other side.
+  [Aela, about themself]
+    Aela took only light wounds and dealt only a small part of their side's damage.
+    Aela was never in serious danger.
+    Aela killed none of the 7 who died on the other side.
+  [Brelyna, about themself]
+    Brelyna took only light wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed none of the 7 who died on the other side.
+  [J'zargo, about themself]
+    J'zargo took only light wounds and dealt only a small part of their side's damage.
+    J'zargo was never in serious danger.
+    J'zargo killed none of the 7 who died on the other side.
+  [Uthgerd, about themself]
+    Uthgerd took solid wounds and dealt only a small part of their side's damage.
+    Uthgerd was never in serious danger.
+    Uthgerd killed none of the 7 who died on the other side.
+  [Jenassa, about themself]
+    Jenassa took only light wounds and dealt only a small part of their side's damage.
+    Jenassa was never in serious danger.
+    Jenassa killed none of the 7 who died on the other side.
+  [Erik, about themself]
+    Erik took only light wounds and dealt only a small part of their side's damage.
+    Erik was never in serious danger.
+    Erik killed none of the 7 who died on the other side.
+  [Borgakh, about themself]
+    Borgakh took solid wounds and dealt only a small part of their side's damage.
+    Borgakh was never in serious danger.
+    Borgakh killed none of the 7 who died on the other side.
+
+==== Lopsided: follower / duo (2) ====
+Marcurio deals most of the damage (80%) and most of the kills.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 16 seconds. Kaira and Marcurio fought against Draugr x7. All 7 enemies were killed. Who killed the enemies: Marcurio 6; Kaira 1 (Draugr). Most of the party's damage to the enemy was dealt by Marcurio. Kaira bore the brunt of the enemy's blows. Marcurio also took a share of the enemy's blows.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 16 seconds.
+    Kaira and Marcurio fought against Draugr x7.
+    All 7 enemies were killed.
+    Who killed the enemies: Marcurio 6; Kaira 1 (Draugr).
+    Most of the party's damage to the enemy was dealt by Marcurio.
+    Kaira bore the brunt of the enemy's blows.
+    Marcurio also took a share of the enemy's blows.
+  [Marcurio, about themself]
+    Marcurio took only light wounds and dealt most of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed 6 of the 7 who died on the other side.
+  [Marcurio, about the others]
+    None of them was seriously hurt or in any real danger.
+
+==== Lopsided: follower / party (5) ====
+Marcurio deals most of the damage (80%) and most of the kills.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 33 seconds. Kaira, Lydia, Marcurio, Aela and Brelyna fought against Draugr x7. All 7 enemies were killed. Who killed the enemies: Marcurio 6; Kaira 1 (Draugr). Most of the party's damage to the enemy was dealt by Marcurio. Lydia and Kaira took the enemy's blows between them.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 33 seconds.
+    Kaira, Lydia, Marcurio, Aela and Brelyna fought against Draugr x7.
+    All 7 enemies were killed.
+    Who killed the enemies: Marcurio 6; Kaira 1 (Draugr).
+    Most of the party's damage to the enemy was dealt by Marcurio.
+    Lydia and Kaira took the enemy's blows between them.
+  [Lydia, about themself]
+    Lydia took solid wounds and dealt only a small part of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed none of the 7 who died on the other side.
+  [Lydia, about the others]
+    Kaira: took only light wounds; dealt only a small part of their side's damage; was never near death; killed 1 of the other side.
+    Marcurio: took only light wounds; dealt most of their side's damage; was never near death; killed 6 of the other side.
+    Aela: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    Brelyna: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+  [Marcurio, about themself]
+    Marcurio took only light wounds and dealt most of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed 6 of the 7 who died on the other side.
+  [Aela, about themself]
+    Aela took only light wounds and dealt only a small part of their side's damage.
+    Aela was never in serious danger.
+    Aela killed none of the 7 who died on the other side.
+  [Brelyna, about themself]
+    Brelyna took only light wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed none of the 7 who died on the other side.
+
+==== Lopsided: follower / large (10) ====
+Marcurio deals most of the damage (80%) and most of the kills.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted about 1 minute. Kaira, Lydia, Marcurio, Aela and 6 others fought against Draugr x7. All 7 enemies were killed. Who killed the enemies: Marcurio 6; Kaira 1 (Draugr). Most of the party's damage to the enemy was dealt by Marcurio. Lydia took the largest share of the enemy's blows.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted about 1 minute.
+    Kaira, Lydia, Marcurio, Aela and 6 others fought against Draugr x7.
+    All 7 enemies were killed.
+    Who killed the enemies: Marcurio 6; Kaira 1 (Draugr).
+    Most of the party's damage to the enemy was dealt by Marcurio.
+    Lydia took the largest share of the enemy's blows.
+  [Lydia, about themself]
+    Lydia took solid wounds and dealt only a small part of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed none of the 7 who died on the other side.
+  [Lydia, about the others]
+    Kaira: took only light wounds; dealt only a small part of their side's damage; was never near death; killed 1 of the other side.
+    Marcurio: took only light wounds; dealt most of their side's damage; was never near death; killed 6 of the other side.
+    Aela: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    Brelyna: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    J'zargo: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    Uthgerd: took solid wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+  [Marcurio, about themself]
+    Marcurio took only light wounds and dealt most of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed 6 of the 7 who died on the other side.
+  [Aela, about themself]
+    Aela took only light wounds and dealt only a small part of their side's damage.
+    Aela was never in serious danger.
+    Aela killed none of the 7 who died on the other side.
+  [Brelyna, about themself]
+    Brelyna took only light wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed none of the 7 who died on the other side.
+  [J'zargo, about themself]
+    J'zargo took only light wounds and dealt only a small part of their side's damage.
+    J'zargo was never in serious danger.
+    J'zargo killed none of the 7 who died on the other side.
+  [Uthgerd, about themself]
+    Uthgerd took solid wounds and dealt only a small part of their side's damage.
+    Uthgerd was never in serious danger.
+    Uthgerd killed none of the 7 who died on the other side.
+  [Jenassa, about themself]
+    Jenassa took only light wounds and dealt only a small part of their side's damage.
+    Jenassa was never in serious danger.
+    Jenassa killed none of the 7 who died on the other side.
+  [Erik, about themself]
+    Erik took only light wounds and dealt only a small part of their side's damage.
+    Erik was never in serious danger.
+    Erik killed none of the 7 who died on the other side.
+  [Borgakh, about themself]
+    Borgakh took solid wounds and dealt only a small part of their side's damage.
+    Borgakh was never in serious danger.
+    Borgakh killed none of the 7 who died on the other side.
+
+==== Mobs / solo (1) ====
+Twenty skeevers, thirty health each.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 29 seconds. Kaira fought against Skeever x20. All 20 enemies were killed. Who killed the enemies: Kaira 20.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 29 seconds.
+    Kaira fought against Skeever x20.
+    All 20 enemies were killed.
+    Who killed the enemies: Kaira 20.
+  [a witness, about the fighters]
+    None of them was seriously hurt or in any real danger.
+
+==== Mobs / duo (2) ====
+Twenty skeevers, thirty health each.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 45 seconds. Kaira and Lydia fought against Skeever x20. All 20 enemies were killed. Who killed the enemies: Kaira 11; Lydia 9. Most of the party's damage to the enemy was dealt by Kaira and Lydia. Lydia bore the brunt of the enemy's blows. Kaira also took a share of the enemy's blows.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 45 seconds.
+    Kaira and Lydia fought against Skeever x20.
+    All 20 enemies were killed.
+    Who killed the enemies: Kaira 11; Lydia 9.
+    Most of the party's damage to the enemy was dealt by Kaira and Lydia.
+    Lydia bore the brunt of the enemy's blows.
+    Kaira also took a share of the enemy's blows.
+  [Lydia, about themself]
+    Lydia took only light wounds and dealt a large share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 9 of the 20 who died on the other side.
+  [Lydia, about the others]
+    None of them was seriously hurt or in any real danger.
+
+==== Mobs / party (5) ====
+Twenty skeevers, thirty health each.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted about 2 minutes. Kaira, Lydia, Marcurio, Aela and Brelyna fought against Skeever x20. All 20 enemies were killed. Who killed the enemies: Kaira 5; Marcurio 5; Lydia 4; Aela 4; Brelyna 2 (Skeever x2). Most of the party's damage to the enemy was dealt by Kaira, Lydia and Marcurio. Aela also did a real part of it. Lydia and Kaira took the enemy's blows between them.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted about 2 minutes.
+    Kaira, Lydia, Marcurio, Aela and Brelyna fought against Skeever x20.
+    All 20 enemies were killed.
+    Who killed the enemies: Kaira 5; Marcurio 5; Lydia 4; Aela 4; Brelyna 2 (Skeever x2).
+    Most of the party's damage to the enemy was dealt by Kaira, Lydia and Marcurio.
+    Aela also did a real part of it.
+    Lydia and Kaira took the enemy's blows between them.
+  [Lydia, about themself]
+    Lydia took only light wounds and dealt a fair share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 4 of the 20 who died on the other side.
+  [Lydia, about the others]
+    None of them was seriously hurt or in any real danger.
+  [Marcurio, about themself]
+    Marcurio took only light wounds and dealt a fair share of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed 5 of the 20 who died on the other side.
+  [Aela, about themself]
+    Aela took only light wounds and dealt a fair share of their side's damage.
+    Aela was never in serious danger.
+    Aela killed 4 of the 20 who died on the other side.
+  [Brelyna, about themself]
+    Brelyna took only light wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed 2 of the 20 who died on the other side: Skeever x2.
+
+==== Mobs / large (10) ====
+Twenty skeevers, thirty health each.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted about 3 minutes. Kaira, Lydia, Marcurio, Aela and 6 others fought against Skeever x20. All 20 enemies were killed. Who killed the enemies: Kaira 3 (Skeever x3); Lydia 2 (Skeever x2); Marcurio 2 (Skeever x2); Aela 2 (Skeever x2); J'zargo 2 (Skeever x2); Uthgerd 2 (Skeever x2); Jenassa 2 (Skeever x2); Erik 2 (Skeever x2); Borgakh 2 (Skeever x2); Brelyna 1 (Skeever). Most of the party's damage to the enemy was dealt by Kaira, Lydia and Marcurio. Lydia took the largest share of the enemy's blows.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted about 3 minutes.
+    Kaira, Lydia, Marcurio, Aela and 6 others fought against Skeever x20.
+    All 20 enemies were killed.
+    Who killed the enemies: Kaira 3 (Skeever x3); Lydia 2 (Skeever x2); Marcurio 2 (Skeever x2); Aela 2 (Skeever x2); J'zargo 2 (Skeever x2); Uthgerd 2 (Skeever x2); Jenassa 2 (Skeever x2); Erik 2 (Skeever x2); Borgakh 2 (Skeever x2); Brelyna 1 (Skeever).
+    Most of the party's damage to the enemy was dealt by Kaira, Lydia and Marcurio.
+    Lydia took the largest share of the enemy's blows.
+  [Lydia, about themself]
+    Lydia took only light wounds and dealt only a small part of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 2 of the 20 who died on the other side: Skeever x2.
+  [Lydia, about the others]
+    None of them was seriously hurt or in any real danger.
+  [Marcurio, about themself]
+    Marcurio took only light wounds and dealt only a small part of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed 2 of the 20 who died on the other side: Skeever x2.
+  [Aela, about themself]
+    Aela took only light wounds and dealt only a small part of their side's damage.
+    Aela was never in serious danger.
+    Aela killed 2 of the 20 who died on the other side: Skeever x2.
+  [Brelyna, about themself]
+    Brelyna took only light wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed 1 of the 20 who died on the other side: Skeever.
+  [J'zargo, about themself]
+    J'zargo took only light wounds and dealt only a small part of their side's damage.
+    J'zargo was never in serious danger.
+    J'zargo killed 2 of the 20 who died on the other side: Skeever x2.
+  [Uthgerd, about themself]
+    Uthgerd took only light wounds and dealt only a small part of their side's damage.
+    Uthgerd was never in serious danger.
+    Uthgerd killed 2 of the 20 who died on the other side: Skeever x2.
+  [Jenassa, about themself]
+    Jenassa took only light wounds and dealt only a small part of their side's damage.
+    Jenassa was never in serious danger.
+    Jenassa killed 2 of the 20 who died on the other side: Skeever x2.
+  [Erik, about themself]
+    Erik took only light wounds and dealt only a small part of their side's damage.
+    Erik was never in serious danger.
+    Erik killed 2 of the 20 who died on the other side: Skeever x2.
+  [Borgakh, about themself]
+    Borgakh took only light wounds and dealt only a small part of their side's damage.
+    Borgakh was never in serious danger.
+    Borgakh killed 2 of the 20 who died on the other side: Skeever x2.
+
+==== Boss / solo (1) ====
+One enemy soaks up the party's damage: a giant alone, a dragon otherwise. Lydia takes 60% of what it deals; the player drinks a potion, Brelyna heals Lydia.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 4 seconds. Kaira fought against Giant. The one enemy was killed. Who killed the enemies: Kaira 1 (Giant).
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 4 seconds.
+    Kaira fought against Giant.
+    The one enemy was killed.
+    Who killed the enemies: Kaira 1 (Giant).
+  [a witness, about the fighters]
+    Kaira: took solid wounds; dealt all the damage on their side; was never near death; drank a potion; killed 1 of the other side.
+
+==== Boss / duo (2) ====
+One enemy soaks up the party's damage: a giant alone, a dragon otherwise. Lydia takes 60% of what it deals; the player drinks a potion, Brelyna heals Lydia.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 5 seconds. Kaira and Lydia fought against Blood Dragon. The one enemy was killed. Who killed the enemies: Kaira 1 (Blood Dragon). Most of the party's damage to the enemy was dealt by Kaira and Lydia. Lydia bore the brunt of the enemy's blows. Kaira also took a share of the enemy's blows.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 5 seconds.
+    Kaira and Lydia fought against Blood Dragon.
+    The one enemy was killed.
+    Who killed the enemies: Kaira 1 (Blood Dragon).
+    Most of the party's damage to the enemy was dealt by Kaira and Lydia.
+    Lydia bore the brunt of the enemy's blows.
+    Kaira also took a share of the enemy's blows.
+  [Lydia, about themself]
+    Lydia took solid wounds and dealt a large share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed none of the 1 who died on the other side.
+  [Lydia, about the others]
+    Kaira: took solid wounds; dealt a large share of their side's damage; was never near death; drank a potion; killed 1 of the other side.
+
+==== Boss / party (5) ====
+One enemy soaks up the party's damage: a giant alone, a dragon otherwise. Lydia takes 60% of what it deals; the player drinks a potion, Brelyna heals Lydia.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 7 seconds. Kaira, Lydia, Marcurio, Aela and Brelyna fought against Blood Dragon. The one enemy was killed. Who killed the enemies: Kaira 1 (Blood Dragon). Most of the party's damage to the enemy was dealt by Kaira, Lydia and Marcurio. Aela also did a real part of it. Lydia bore the brunt of the enemy's blows. Brelyna kept the others on their feet with healing.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 7 seconds.
+    Kaira, Lydia, Marcurio, Aela and Brelyna fought against Blood Dragon.
+    The one enemy was killed.
+    Who killed the enemies: Kaira 1 (Blood Dragon).
+    Most of the party's damage to the enemy was dealt by Kaira, Lydia and Marcurio.
+    Aela also did a real part of it.
+    Lydia bore the brunt of the enemy's blows.
+    Brelyna kept the others on their feet with healing.
+  [Lydia, about themself]
+    Lydia was badly hurt, taking nearly a full body's worth of damage and dealt a fair share of their side's damage.
+    Lydia was hurt badly at the worst of it, but was never at death's door.
+    Brelyna healed Lydia with Heal Other, restoring a little of Lydia's health.
+    Lydia killed none of the 1 who died on the other side.
+  [Lydia, about the others]
+    Kaira: took only light wounds; dealt a fair share of their side's damage; was never near death; drank a potion; killed 1 of the other side.
+    Marcurio: took only light wounds; dealt a fair share of their side's damage; was never near death; killed none of the other side.
+    Aela: took only light wounds; dealt a fair share of their side's damage; was never near death; killed none of the other side.
+    Brelyna: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+  [Marcurio, about themself]
+    Marcurio took only light wounds and dealt a fair share of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed none of the 1 who died on the other side.
+  [Aela, about themself]
+    Aela took only light wounds and dealt a fair share of their side's damage.
+    Aela was never in serious danger.
+    Aela killed none of the 1 who died on the other side.
+  [Brelyna, about themself]
+    Brelyna took only light wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed none of the 1 who died on the other side.
+
+==== Boss / large (10) ====
+One enemy soaks up the party's damage: a giant alone, a dragon otherwise. Lydia takes 60% of what it deals; the player drinks a potion, Brelyna heals Lydia.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 11 seconds. Kaira, Lydia, Marcurio, Aela and 6 others fought against Blood Dragon. The one enemy was killed. Who killed the enemies: Kaira 1 (Blood Dragon). Most of the party's damage to the enemy was dealt by Kaira, Lydia and Marcurio. Lydia bore the brunt of the enemy's blows. Brelyna kept the others on their feet with healing.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 11 seconds.
+    Kaira, Lydia, Marcurio, Aela and 6 others fought against Blood Dragon.
+    The one enemy was killed.
+    Who killed the enemies: Kaira 1 (Blood Dragon).
+    Most of the party's damage to the enemy was dealt by Kaira, Lydia and Marcurio.
+    Lydia bore the brunt of the enemy's blows.
+    Brelyna kept the others on their feet with healing.
+  [Lydia, about themself]
+    Lydia took more damage than a body can survive in one go, and only kept going thanks to healing and dealt only a small part of their side's damage.
+    Lydia was hurt badly at the worst of it, but was never at death's door.
+    Brelyna healed Lydia with Heal Other, restoring a little of Lydia's health.
+    Lydia killed none of the 1 who died on the other side.
+  [Lydia, about the others]
+    Kaira: took only light wounds; dealt only a small part of their side's damage; was never near death; drank a potion; killed 1 of the other side.
+    Marcurio: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    Aela: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    Brelyna: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    J'zargo: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    Uthgerd: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+  [Marcurio, about themself]
+    Marcurio took only light wounds and dealt only a small part of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed none of the 1 who died on the other side.
+  [Aela, about themself]
+    Aela took only light wounds and dealt only a small part of their side's damage.
+    Aela was never in serious danger.
+    Aela killed none of the 1 who died on the other side.
+  [Brelyna, about themself]
+    Brelyna took only light wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed none of the 1 who died on the other side.
+  [J'zargo, about themself]
+    J'zargo took only light wounds and dealt only a small part of their side's damage.
+    J'zargo was never in serious danger.
+    J'zargo killed none of the 1 who died on the other side.
+  [Uthgerd, about themself]
+    Uthgerd took only light wounds and dealt only a small part of their side's damage.
+    Uthgerd was never in serious danger.
+    Uthgerd killed none of the 1 who died on the other side.
+  [Jenassa, about themself]
+    Jenassa took only light wounds and dealt only a small part of their side's damage.
+    Jenassa was never in serious danger.
+    Jenassa killed none of the 1 who died on the other side.
+  [Erik, about themself]
+    Erik took only light wounds and dealt only a small part of their side's damage.
+    Erik was never in serious danger.
+    Erik killed none of the 1 who died on the other side.
+  [Borgakh, about themself]
+    Borgakh took only light wounds and dealt only a small part of their side's damage.
+    Borgakh was never in serious danger.
+    Borgakh killed none of the 1 who died on the other side.
+
+==== Balanced / solo (1) ====
+Eight bandits; damage dealt, kills and blows taken shared evenly.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 12 seconds. Kaira fought against Bandit x8. All 8 enemies were killed. Who killed the enemies: Kaira 8.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 12 seconds.
+    Kaira fought against Bandit x8.
+    All 8 enemies were killed.
+    Who killed the enemies: Kaira 8.
+  [a witness, about the fighters]
+    Kaira: took solid wounds; dealt all the damage on their side; was never near death; killed 8 of the other side.
+
+==== Balanced / duo (2) ====
+Eight bandits; damage dealt, kills and blows taken shared evenly.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 19 seconds. Kaira and Lydia fought against Bandit x8. All 8 enemies were killed. Who killed the enemies: Kaira 4; Lydia 4. Most of the party's damage to the enemy was dealt by Kaira and Lydia. Kaira and Lydia took the enemy's blows between them.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 19 seconds.
+    Kaira and Lydia fought against Bandit x8.
+    All 8 enemies were killed.
+    Who killed the enemies: Kaira 4; Lydia 4.
+    Most of the party's damage to the enemy was dealt by Kaira and Lydia.
+    Kaira and Lydia took the enemy's blows between them.
+  [Lydia, about themself]
+    Lydia took solid wounds and dealt a large share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 4 of the 8 who died on the other side.
+  [Lydia, about the others]
+    Kaira: took solid wounds; dealt a large share of their side's damage; was never near death; killed 4 of the other side.
+
+==== Balanced / party (5) ====
+Eight bandits; damage dealt, kills and blows taken shared evenly.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 38 seconds. Kaira, Lydia, Marcurio, Aela and Brelyna fought against Bandit x8. All 8 enemies were killed. Who killed the enemies: Marcurio 2 (Bandit x2); Aela 2 (Bandit x2); Brelyna 2 (Bandit x2); Kaira 1 (Bandit); Lydia 1 (Bandit). Most of the party's damage to the enemy was dealt by Kaira, Lydia and Marcurio. Aela and Brelyna also did a real part of it. Kaira, Lydia, Marcurio, Aela and Brelyna took the enemy's blows between them.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 38 seconds.
+    Kaira, Lydia, Marcurio, Aela and Brelyna fought against Bandit x8.
+    All 8 enemies were killed.
+    Who killed the enemies: Marcurio 2 (Bandit x2); Aela 2 (Bandit x2); Brelyna 2 (Bandit x2); Kaira 1 (Bandit); Lydia 1 (Bandit).
+    Most of the party's damage to the enemy was dealt by Kaira, Lydia and Marcurio.
+    Aela and Brelyna also did a real part of it.
+    Kaira, Lydia, Marcurio, Aela and Brelyna took the enemy's blows between them.
+  [Lydia, about themself]
+    Lydia took only light wounds and dealt a fair share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 1 of the 8 who died on the other side: Bandit.
+  [Lydia, about the others]
+    Kaira: took solid wounds; dealt a fair share of their side's damage; was never near death; killed 1 of the other side.
+    Marcurio: took solid wounds; dealt a fair share of their side's damage; was never near death; killed 2 of the other side.
+    Aela: took solid wounds; dealt a fair share of their side's damage; was never near death; killed 2 of the other side.
+    Brelyna: took solid wounds; dealt a fair share of their side's damage; was never near death; killed 2 of the other side.
+  [Marcurio, about themself]
+    Marcurio took solid wounds and dealt a fair share of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed 2 of the 8 who died on the other side: Bandit x2.
+  [Aela, about themself]
+    Aela took solid wounds and dealt a fair share of their side's damage.
+    Aela was never in serious danger.
+    Aela killed 2 of the 8 who died on the other side: Bandit x2.
+  [Brelyna, about themself]
+    Brelyna took solid wounds and dealt a fair share of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed 2 of the 8 who died on the other side: Bandit x2.
+
+==== Balanced / large (10) ====
+Eight bandits; damage dealt, kills and blows taken shared evenly.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted about 1 minute. Kaira, Lydia, Marcurio, Aela and 6 others fought against Bandit x8. All 8 enemies were killed. Who killed the enemies: Kaira 1 (Bandit); Lydia 1 (Bandit); Marcurio 1 (Bandit); Aela 1 (Bandit); Brelyna 1 (Bandit); J'zargo 1 (Bandit); Uthgerd 1 (Bandit); Jenassa 1 (Bandit). Most of the party's damage to the enemy was dealt by Kaira, Lydia and Marcurio. Kaira took the largest share of the enemy's blows.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted about 1 minute.
+    Kaira, Lydia, Marcurio, Aela and 6 others fought against Bandit x8.
+    All 8 enemies were killed.
+    Who killed the enemies: Kaira 1 (Bandit); Lydia 1 (Bandit); Marcurio 1 (Bandit); Aela 1 (Bandit); Brelyna 1 (Bandit); J'zargo 1 (Bandit); Uthgerd 1 (Bandit); Jenassa 1 (Bandit).
+    Most of the party's damage to the enemy was dealt by Kaira, Lydia and Marcurio.
+    Kaira took the largest share of the enemy's blows.
+  [Lydia, about themself]
+    Lydia took only light wounds and dealt only a small part of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 1 of the 8 who died on the other side: Bandit.
+  [Lydia, about the others]
+    Kaira: took solid wounds; dealt only a small part of their side's damage; was never near death; killed 1 of the other side.
+    Marcurio: took solid wounds; dealt only a small part of their side's damage; was never near death; killed 1 of the other side.
+    Aela: took solid wounds; dealt only a small part of their side's damage; was never near death; killed 1 of the other side.
+    Brelyna: took solid wounds; dealt only a small part of their side's damage; was never near death; killed 1 of the other side.
+    J'zargo: took solid wounds; dealt only a small part of their side's damage; was never near death; killed 1 of the other side.
+    Uthgerd: took solid wounds; dealt only a small part of their side's damage; was never near death; killed 1 of the other side.
+  [Marcurio, about themself]
+    Marcurio took solid wounds and dealt only a small part of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed 1 of the 8 who died on the other side: Bandit.
+  [Aela, about themself]
+    Aela took solid wounds and dealt only a small part of their side's damage.
+    Aela was never in serious danger.
+    Aela killed 1 of the 8 who died on the other side: Bandit.
+  [Brelyna, about themself]
+    Brelyna took solid wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed 1 of the 8 who died on the other side: Bandit.
+  [J'zargo, about themself]
+    J'zargo took solid wounds and dealt only a small part of their side's damage.
+    J'zargo was never in serious danger.
+    J'zargo killed 1 of the 8 who died on the other side: Bandit.
+  [Uthgerd, about themself]
+    Uthgerd took solid wounds and dealt only a small part of their side's damage.
+    Uthgerd was never in serious danger.
+    Uthgerd killed 1 of the 8 who died on the other side: Bandit.
+  [Jenassa, about themself]
+    Jenassa took solid wounds and dealt only a small part of their side's damage.
+    Jenassa was never in serious danger.
+    Jenassa killed 1 of the 8 who died on the other side: Bandit.
+  [Erik, about themself]
+    Erik took solid wounds and dealt only a small part of their side's damage.
+    Erik was never in serious danger.
+    Erik killed none of the 8 who died on the other side.
+  [Borgakh, about themself]
+    Borgakh took solid wounds and dealt only a small part of their side's damage.
+    Borgakh was never in serious danger.
+    Borgakh killed none of the 8 who died on the other side.
+
+==== Teamwork / solo (1) ====
+A bandit chief and five bandits. The player holds the front (55% of the blows), Marcurio burns and paralyzes and frightens, Aela shoots and poisons, Brelyna heals and casts Oakflesh. The duo is the player and Brelyna.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 9 seconds. Kaira fought against Bandit Chief and Bandit x5. All 6 enemies were killed. Who killed the enemies: Kaira 6.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 9 seconds.
+    Kaira fought against Bandit Chief and Bandit x5.
+    All 6 enemies were killed.
+    Who killed the enemies: Kaira 6.
+  [a witness, about the fighters]
+    Kaira: took solid wounds; dealt all the damage on their side; was never near death; killed 6 of the other side.
+
+==== Teamwork / duo (2) ====
+A bandit chief and five bandits. The player holds the front (55% of the blows), Marcurio burns and paralyzes and frightens, Aela shoots and poisons, Brelyna heals and casts Oakflesh. The duo is the player and Brelyna.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 16 seconds. Kaira and Brelyna fought against Bandit Chief and Bandit x5. All 6 enemies were killed. Who killed the enemies: Kaira 5; Brelyna 1 (Bandit). Most of the party's damage to the enemy was dealt by Kaira. Kaira bore the brunt of the enemy's blows. Brelyna also took a share of the enemy's blows. Brelyna kept the others on their feet with healing. Brelyna shielded the others with magic.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 16 seconds.
+    Kaira and Brelyna fought against Bandit Chief and Bandit x5.
+    All 6 enemies were killed.
+    Who killed the enemies: Kaira 5; Brelyna 1 (Bandit).
+    Most of the party's damage to the enemy was dealt by Kaira.
+    Kaira bore the brunt of the enemy's blows.
+    Brelyna also took a share of the enemy's blows.
+    Brelyna kept the others on their feet with healing.
+    Brelyna shielded the others with magic.
+  [Brelyna, about themself]
+    Brelyna took solid wounds and dealt a fair share of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed 1 of the 6 who died on the other side: Bandit.
+  [Brelyna, about the others]
+    Kaira: took solid wounds; dealt most of their side's damage; was never near death; killed 5 of the other side.
+
+==== Teamwork / party (5) ====
+A bandit chief and five bandits. The player holds the front (55% of the blows), Marcurio burns and paralyzes and frightens, Aela shoots and poisons, Brelyna heals and casts Oakflesh. The duo is the player and Brelyna.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 32 seconds. Kaira, Lydia, Marcurio, Aela and Brelyna fought against Bandit Chief and Bandit x5. All 6 enemies were killed. Who killed the enemies: Marcurio 2 (Bandit Chief and Bandit); Kaira 2 (Bandit x2); Aela 1 (Bandit); Lydia 1 (Bandit). Most of the party's damage to the enemy was dealt by Marcurio, Kaira and Aela. Kaira bore the brunt of the enemy's blows. Lydia also took a share of the enemy's blows. Brelyna kept the others on their feet with healing. Brelyna shielded the others with magic. Marcurio held the enemy back (paralyzed and struck with magical fear).
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 32 seconds.
+    Kaira, Lydia, Marcurio, Aela and Brelyna fought against Bandit Chief and Bandit x5.
+    All 6 enemies were killed.
+    Who killed the enemies: Marcurio 2 (Bandit Chief and Bandit); Kaira 2 (Bandit x2); Aela 1 (Bandit); Lydia 1 (Bandit).
+    Most of the party's damage to the enemy was dealt by Marcurio, Kaira and Aela.
+    Kaira bore the brunt of the enemy's blows.
+    Lydia also took a share of the enemy's blows.
+    Brelyna kept the others on their feet with healing.
+    Brelyna shielded the others with magic.
+    Marcurio held the enemy back (paralyzed and struck with magical fear).
+  [Lydia, about themself]
+    Lydia took solid wounds and dealt a fair share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia was helped by: shielded by magical armor by Brelyna (Oakflesh).
+    Lydia killed 1 of the 6 who died on the other side: Bandit.
+  [Lydia, about the others]
+    Kaira: was badly hurt, taking nearly a full body's worth of damage; dealt a fair share of their side's damage; was never near death; killed 2 of the other side.
+    Marcurio: took only light wounds; dealt a fair share of their side's damage; was never near death; killed 2 of the other side.
+    Aela: took only light wounds; dealt a fair share of their side's damage; was never near death; used a poison; killed 1 of the other side.
+    Brelyna: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+  [Marcurio, about themself]
+    Marcurio took only light wounds and dealt a fair share of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio was helped by: shielded by magical armor by Brelyna (Oakflesh).
+    Marcurio killed 2 of the 6 who died on the other side: Bandit Chief and Bandit.
+  [Aela, about themself]
+    Aela took only light wounds and dealt a fair share of their side's damage.
+    Aela was never in serious danger.
+    Aela used a poison in the fight: Poison of Lingering Damage.
+    Aela killed 1 of the 6 who died on the other side: Bandit.
+  [Brelyna, about themself]
+    Brelyna took only light wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed none of the 6 who died on the other side.
+
+==== Teamwork / large (10) ====
+A bandit chief and five bandits. The player holds the front (55% of the blows), Marcurio burns and paralyzes and frightens, Aela shoots and poisons, Brelyna heals and casts Oakflesh. The duo is the player and Brelyna.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 56 seconds. Kaira, Lydia, Marcurio, Aela and 6 others fought against Bandit Chief and Bandit x5. All 6 enemies were killed. Who killed the enemies: Marcurio 1 (Bandit Chief); J'zargo 1 (Bandit); Kaira 1 (Bandit); Aela 1 (Bandit); Jenassa 1 (Bandit); Lydia 1 (Bandit). Most of the party's damage to the enemy was dealt by Marcurio, J'zargo and Kaira. Kaira bore the brunt of the enemy's blows. Brelyna kept the others on their feet with healing. Brelyna shielded the others with magic. Marcurio held the enemy back (paralyzed and struck with magical fear).
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 56 seconds.
+    Kaira, Lydia, Marcurio, Aela and 6 others fought against Bandit Chief and Bandit x5.
+    All 6 enemies were killed.
+    Who killed the enemies: Marcurio 1 (Bandit Chief); J'zargo 1 (Bandit); Kaira 1 (Bandit); Aela 1 (Bandit); Jenassa 1 (Bandit); Lydia 1 (Bandit).
+    Most of the party's damage to the enemy was dealt by Marcurio, J'zargo and Kaira.
+    Kaira bore the brunt of the enemy's blows.
+    Brelyna kept the others on their feet with healing.
+    Brelyna shielded the others with magic.
+    Marcurio held the enemy back (paralyzed and struck with magical fear).
+  [Lydia, about themself]
+    Lydia took only light wounds and dealt only a small part of their side's damage.
+    Lydia was never in serious danger.
+    Lydia was helped by: shielded by magical armor by Brelyna (Oakflesh).
+    Lydia killed 1 of the 6 who died on the other side: Bandit.
+  [Lydia, about the others]
+    Kaira: took more damage than a body can survive in one go, and only kept going thanks to healing; dealt only a small part of their side's damage; was never near death; killed 1 of the other side.
+    Marcurio: took only light wounds; dealt only a small part of their side's damage; was never near death; killed 1 of the other side.
+    Aela: took only light wounds; dealt only a small part of their side's damage; was never near death; used a poison; killed 1 of the other side.
+    Brelyna: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    J'zargo: took only light wounds; dealt only a small part of their side's damage; was never near death; killed 1 of the other side.
+    Uthgerd: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+  [Marcurio, about themself]
+    Marcurio took only light wounds and dealt only a small part of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio was helped by: shielded by magical armor by Brelyna (Oakflesh).
+    Marcurio killed 1 of the 6 who died on the other side: Bandit Chief.
+  [Aela, about themself]
+    Aela took only light wounds and dealt only a small part of their side's damage.
+    Aela was never in serious danger.
+    Aela used a poison in the fight: Poison of Lingering Damage.
+    Aela killed 1 of the 6 who died on the other side: Bandit.
+  [Brelyna, about themself]
+    Brelyna took only light wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed none of the 6 who died on the other side.
+  [J'zargo, about themself]
+    J'zargo took only light wounds and dealt only a small part of their side's damage.
+    J'zargo was never in serious danger.
+    J'zargo killed 1 of the 6 who died on the other side: Bandit.
+  [Uthgerd, about themself]
+    Uthgerd took only light wounds and dealt only a small part of their side's damage.
+    Uthgerd was never in serious danger.
+    Uthgerd killed none of the 6 who died on the other side.
+  [Jenassa, about themself]
+    Jenassa took only light wounds and dealt only a small part of their side's damage.
+    Jenassa was never in serious danger.
+    Jenassa killed 1 of the 6 who died on the other side: Bandit.
+  [Erik, about themself]
+    Erik took solid wounds and dealt only a small part of their side's damage.
+    Erik was never in serious danger.
+    Erik killed none of the 6 who died on the other side.
+  [Borgakh, about themself]
+    Borgakh took solid wounds and dealt only a small part of their side's damage.
+    Borgakh was never in serious danger.
+    Borgakh killed none of the 6 who died on the other side.
