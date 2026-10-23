@@ -4,6 +4,10 @@
 
 - Who did the work, not only who struck the last blow: "Most of the party's damage to the enemy was dealt by Lydia",
   and every companion's line now says how much of the fighting they did.
+- Credit for the part each played, wherever it was a real part: "Lydia also did a real part of it" (the damage),
+  "Lydia bore the brunt of the enemy's blows" (a real tank, over half of what the party took) or "Kaira, Lydia and
+  Marcurio took the enemy's blows between them", "Marcurio kept the others on their feet with healing", "Marcurio
+  shielded the others with magic", "Jenassa held the enemy back (paralyzed and slowed)".
 - Potions and poisons: "Kaira drank 3 potions in the fight: Potion of Healing x2 and Potion of Fortify Two-handed",
   "Lydia used a poison in the fight: Deadly Venom".
 

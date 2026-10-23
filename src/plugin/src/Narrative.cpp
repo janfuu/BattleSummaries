@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include <format>
+#include <set>
 
 namespace BSM
 {
@@ -660,6 +661,115 @@ namespace BSM
 			return true;
 		}
 
+		// a fighter's part of a category that earns them a mention in it
+		constexpr float kRoleShare = 0.2f;
+
+		// Everyone whose part of the party's total is at least kRoleShare, largest first; at least the largest one when
+		// there is anything at all.
+		std::vector<const Participant*> OverTheLine(const std::vector<std::pair<float, const Participant*>>& a_parts, float* a_total = nullptr)
+		{
+			float total = 0.0f;
+			for (const auto& [v, p] : a_parts) total += v;
+			if (a_total) *a_total = total;
+			auto sorted = a_parts;
+			std::ranges::stable_sort(sorted, [](const auto& x, const auto& y) { return x.first > y.first; });
+			std::vector<const Participant*> out;
+			for (const auto& [v, p] : sorted) {
+				if (v <= 0.0f) break;
+				if (out.empty() || v >= kRoleShare * total) out.push_back(p);
+			}
+			return out;
+		}
+
+		// What each did for the party besides damage, told only where it was earned: holding the line, healing, shielding
+		// the others, hindering the enemy. Plain facts from the record; nobody is given a part they did not play.
+		std::vector<std::string> Roles(const Battle& a_b, const std::vector<const Participant*>& a_party)
+		{
+			std::vector<std::string> out;
+			if (a_party.size() < 2) return out;
+			const auto names = [&](const std::vector<const Participant*>& a_ps) {
+				std::vector<std::string> n;
+				for (const auto* p : a_ps) n.push_back(NameOf(a_b, p->info.id));
+				return JoinList(n);
+			};
+			const auto inParty = [&](ActorId a_id) { return std::ranges::any_of(a_party, [&](const Participant* p) { return p->info.id == a_id; }); };
+
+			// the enemy's blows: a real tank took over half of what the party took; the others over the line took a share
+			{
+				std::vector<std::pair<float, const Participant*>> taken;
+				float                                             health = 0.0f;
+				for (const auto* p : a_party) {
+					float fromFoes = 0.0f;
+					for (const auto& [by, dmg] : p->damageFrom) {
+						const auto* q = a_b.Find(by);
+						if (q && a_b.EffectiveSide(*q) == Opposing(a_b.EffectiveSide(*p))) fromFoes += dmg;
+					}
+					taken.emplace_back(fromFoes, p);
+					health += p->info.maxHealth;
+				}
+				float total = 0.0f;
+				auto  over = OverTheLine(taken, &total);
+				// worth telling once the party, between them, lost a real part of one body's health
+				if (!over.empty() && total >= 0.25f * health / static_cast<float>(a_party.size())) {
+					float top = 0.0f;
+					for (const auto& [v, p] : taken) {
+						if (p == over.front()) top = v;
+					}
+					if (top > 0.5f * total) {
+						out.push_back(F("role.front_brunt", { { "names", names({ over.front() }) } }));
+						over.erase(over.begin());
+						if (!over.empty()) out.push_back(F("role.front_also", { { "names", names(over) } }));
+					} else if (over.size() >= 2) out.push_back(F("role.front_shared", { { "names", names(over) } }));
+					else out.push_back(F("role.front_most", { { "names", names(over) } }));
+				}
+			}
+			// healing given to others
+			{
+				std::vector<std::pair<float, const Participant*>> given;
+				for (const auto* p : a_party) {
+					float sum = 0.0f;
+					for (const auto& q : a_b.participants) {
+						if (q.info.id == p->info.id || !inParty(q.info.id)) continue;
+						if (const auto it = q.healFrom.find(p->info.id); it != q.healFrom.end()) sum += it->second.amount;
+					}
+					given.emplace_back(sum, p);
+				}
+				float      total = 0.0f;
+				const auto over = OverTheLine(given, &total);
+				if (!over.empty() && total >= 0.15f * a_party.front()->info.maxHealth) out.push_back(F("role.healer", { { "names", names(over) } }));
+			}
+			// help cast on others, and harm that hindered the enemy, by how often it took hold
+			{
+				const std::set<std::string> hinder{ T("fx.paralyzed"), T("fx.fear"), T("fx.frenzy"), T("fx.calm"), T("fx.staggered"), T("fx.disarmed"), T("fx.slowed"), T("fx.turned") };
+				std::vector<std::pair<float, const Participant*>> shielded, hindered;
+				std::vector<std::string>                          kinds;
+				for (const auto* p : a_party) {
+					float help = 0.0f, held = 0.0f;
+					for (const auto& q : a_b.participants) {
+						if (q.info.id == p->info.id) continue;
+						const bool friend_ = inParty(q.info.id);
+						const bool foe = a_b.Involved(q) && a_b.EffectiveSide(q) == Opposing(a_b.EffectiveSide(*p));
+						for (const auto& e : q.effects) {
+							if (e.by != p->info.id) continue;
+							if (!e.hostile && friend_) help += static_cast<float>(e.count);
+							if (e.hostile && foe && hinder.contains(e.label) && a_b.Landed(q, e)) {
+								held += static_cast<float>(e.count);
+								if (std::ranges::find(kinds, e.label) == kinds.end()) kinds.push_back(e.label);
+							}
+						}
+					}
+					shielded.emplace_back(help, p);
+					hindered.emplace_back(held, p);
+				}
+				float total = 0.0f;
+				if (const auto over = OverTheLine(shielded, &total); !over.empty() && total >= 2.0f) out.push_back(F("role.protector", { { "names", names(over) } }));
+				if (const auto over = OverTheLine(hindered, &total); !over.empty() && total >= 2.0f) {
+					out.push_back(F("role.controller", { { "names", names(over) }, { "effects", JoinList(kinds) } }));
+				}
+			}
+			return out;
+		}
+
 		std::vector<std::string> General(const Battle& a_b, const NarrativeOptions& a_opt)
 		{
 			std::vector<std::string> out;
@@ -692,8 +802,17 @@ namespace BSM
 					if (a_opt.showNumbers && total > 0.0f) name += " " + F("share.percent", { { "percent", N(static_cast<int>(std::lround(100.0f * d / total))) } });
 					names.push_back(name);
 				}
-				if (!names.empty() && total > 0.0f) out.push_back(F("battle.damage_by", { { "names", JoinList(names) } }));
+				if (!names.empty() && total > 0.0f) {
+					out.push_back(F("battle.damage_by", { { "names", JoinList(names) } }));
+					// the others who did a real part of it
+					std::vector<std::string> also;
+					for (std::size_t i = names.size(); i < shares.size(); ++i) {
+						if (shares[i].first >= kRoleShare * total) also.push_back(NameOf(a_b, shares[i].second->info.id));
+					}
+					if (!also.empty()) out.push_back(F("battle.damage_also", { { "names", JoinList(also) } }));
+				}
 			}
+			for (auto& l : Roles(a_b, party)) out.push_back(std::move(l));
 			if (const auto t = KillTally(a_b, Side::kEnemy, true); !t.empty()) out.push_back(F("summons.dispatched", { { "tally", t } }));
 			for (const auto* p : party) {
 				if (!p->dead) continue;

@@ -903,6 +903,57 @@ namespace
 		Check(Has(SummaryText(BuildSummary(b, kHero, "Kaira", numbers)), "dealt by Lydia (about 100%)"), "shares as figures only when asked for", "");
 	}
 
+	// The author's rule: credit for every part played over the line, the tank only for a real tank.
+	void TestRoles()
+	{
+		constexpr ActorId kArcher = 0xFF000951, kMagus = 0xFF000952, kOgre = 0xFF000953, kOgre2 = 0xFF000954;
+		Battle b;
+		b.startedAt = 0;
+		b.Join(Info(kHero, "Kaira", Side::kPlayer, 200));
+		b.Join(Info(kLydia, "Lydia", Side::kPlayer, 300));
+		b.Join(Info(kArcher, "Jenassa", Side::kPlayer, 150));
+		b.Join(Info(kMagus, "Marcurio", Side::kPlayer, 150));
+		b.Join(Info(kOgre, "Troll", Side::kEnemy, 900));
+		b.Join(Info(kOgre2, "Troll", Side::kEnemy, 900));
+		// Kaira, Lydia and Marcurio take the blows between them; Jenassa shoots from afar and takes none
+		b.Damage(kHero, kOgre, 90, 0.55f, 1);
+		b.Damage(kLydia, kOgre, 120, 0.6f, 2);
+		b.Damage(kMagus, kOgre2, 70, 0.5f, 3);
+		b.Heal(kLydia, kMagus, 100, "Heal Other", 4);
+		b.Effect(kHero, kMagus, "shielded by magical armor", "Oakflesh", false, 4);
+		b.Effect(kLydia, kMagus, "shielded by magical armor", "Oakflesh", false, 4);
+		b.Effect(kOgre, kArcher, Text::Get("fx.paralyzed"), "Paralyze Poison", true, 5);
+		b.Effect(kOgre2, kArcher, Text::Get("fx.slowed"), "Ice Arrow", true, 5);
+		b.Damage(kOgre, kArcher, 500, 0.4f, 6);
+		b.Damage(kOgre, kLydia, 400, 0.0f, 7);
+		b.Death(kOgre, kLydia, 7);
+		b.Damage(kOgre2, kHero, 700, 0.2f, 8);
+		b.Damage(kOgre2, kArcher, 200, 0.0f, 9);
+		b.Death(kOgre2, kArcher, 9);
+		b.endedAt = 10;
+		const auto told = SummaryText(BuildSummary(b, kArcher, "Jenassa", {}));
+		Check(Has(told, "Most of the party's damage to the enemy was dealt by Kaira and Jenassa.") && Has(told, "Lydia also did a real part of it."), "the most, then those over the line", told);
+		Check(Has(told, "Lydia, Kaira and Marcurio took the enemy's blows between them.") && !Has(told, "brunt"), "no real tank: shared, and the archer who took none is not named", told);
+		Check(Has(told, "Marcurio kept the others on their feet with healing.") && Has(told, "Marcurio shielded the others with magic."), "healing and shielding", told);
+		Check(Has(told, "Jenassa held the enemy back (paralyzed and slowed)."), "hindering the enemy", told);
+
+		Battle t;  // a real tank
+		t.startedAt = 0;
+		t.Join(Info(kHero, "Kaira", Side::kPlayer, 200));
+		t.Join(Info(kLydia, "Lydia", Side::kPlayer, 300));
+		t.Join(Info(kArcher, "Jenassa", Side::kPlayer, 150));
+		t.Join(Info(kOgre, "Troll", Side::kEnemy, 900));
+		t.Damage(kLydia, kOgre, 250, 0.2f, 1);
+		t.Damage(kHero, kOgre, 90, 0.55f, 2);
+		t.Damage(kArcher, kOgre, 10, 0.9f, 3);
+		t.Damage(kOgre, kHero, 900, 0.0f, 4);
+		t.Death(kOgre, kHero, 4);
+		t.endedAt = 5;
+		const auto tank = SummaryText(BuildSummary(t, kHero, "Kaira", {}));
+		Check(Has(tank, "Lydia bore the brunt of the enemy's blows.") && Has(tank, "Kaira also took a share of the enemy's blows.") && !Has(tank, "Jenassa also took"),
+			"over half: the brunt; a fifth or more: a share; less: nothing", tank);
+	}
+
 	void TestDuration()
 	{
 		const auto is = [](double a_s, const char* a_want) { Check(DurationText(a_s) == a_want, a_want, DurationText(a_s)); };
@@ -989,6 +1040,7 @@ int main(int argc, char** argv)
 	TestEnemySummonsDispatched();
 	TestSameNames();
 	TestDamageAndItems();
+	TestRoles();
 	TestDuration();
 	TestEdges();
 	std::printf("%d checks, %d failed\n", g_checks, g_failed);
