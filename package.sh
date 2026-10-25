@@ -43,9 +43,29 @@ files.append((j("config", "SKSE", "Plugins", "SkyrimNet", "config", "plugins", "
 files += [(j("LICENSE"), "docs/Battle Summaries/LICENSE.txt"), (j("LICENSE-CONTENT.md"), "docs/Battle Summaries/LICENSE-CONTENT.md"),
           (j("THIRD_PARTY_NOTICES.md"), "docs/Battle Summaries/THIRD_PARTY_NOTICES.md"), (j("README.md"), "docs/Battle Summaries/README.md"),
           (j("CHANGELOG.md"), "docs/Battle Summaries/CHANGELOG.md")]
+# A compiled script's header records where and by whom it was compiled: the source path, the user name and the computer
+# name. None of that may be published, so each .pex goes in with the script's own file name and neutral names instead.
+# (Skyrim .pex: big-endian; magic, version, game, compile time, then three strings of a 16-bit length and the bytes.)
+def scrubbed(path):
+    import struct
+    d = open(path, "rb").read()
+    if d[:4] != bytes.fromhex("fa57c0de"):
+        sys.exit(f"{path}: not a Skyrim .pex")
+    pos, parts = 16, []
+    for _ in range(3):
+        (n,) = struct.unpack(">H", d[pos:pos + 2])
+        parts.append(d[pos + 2:pos + 2 + n])
+        pos += 2 + n
+    name = os.path.basename(path)[:-4].encode() + b".psc"
+    head = b"".join(struct.pack(">H", len(x)) + x for x in (name, b"author", b"build"))
+    return d[:16] + head + d[pos:]
+
 with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
     for src, arc in files:
-        z.write(src, arc)
+        if arc.endswith(".pex"):
+            z.writestr(arc, scrubbed(src))
+        else:
+            z.write(src, arc)
 print(f"{out}: {len(files)} files, {os.path.getsize(out) / 1e6:.2f} MB")
 for _, arc in files:
     print("  " + arc)
