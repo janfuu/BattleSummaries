@@ -15,6 +15,10 @@
   four to bear the brunt, and a follower doing their part in a party of ten is not told they did "only a small part".
 - Summons that drew the enemy's blows are told as their master's: "Kaira's Flame Atronach bore the brunt of the
   enemy's blows".
+- A battle stays where it was fought: when you are moved away mid-fight (a death-alternative mod carrying you to an
+  inn, a teleport, a door), it ends there. Nobody at the new place is told it as a witness or counted as a fighter, and
+  enemies still alive are not said to have fled: "The fight was cut short; by then 8 of the 14 enemies had been killed."
+  Witnesses are now those who stood near while it was fought, not whoever is near when it ends.
 - Short lists: past four names, "and 3 others". Help given to one person names them: "Brelyna kept Kaira going with
   healing".
 

@@ -166,6 +166,9 @@ namespace BSM
 		// Non-combatants (NonCombatant) are left out: not listed, not counted, not told. Off: the one killed is told as not
 		// actively engaged in combat (Innocent).
 		bool        omitBystanders{ false };
+		// The player was moved away from it (a teleport, a door, a death-alternative mod) while it was being fought: it
+		// ended there, and enemies still alive are not told as having fled.
+		bool        cutShort{ false };
 
 		std::vector<Participant> participants;  // in the order they joined
 

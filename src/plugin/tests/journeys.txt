@@ -1080,3 +1080,243 @@ Six bandits. The player sends in a flame atronach, Brelyna another when she is t
     Borgakh took solid wounds and dealt a fair share of their side's damage.
     Borgakh was never in serious danger.
     Borgakh killed none of the 6 who died on the other side.
+
+==== Carried off / solo (1) ====
+Six Forsworn. Two fall, then the player is struck down and carried away mid-fight (a death-alternative mod like Revenge and Respawn, or a teleport): the battle ends there with four Forsworn alive.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 8 seconds. Kaira fought against Forsworn x6. The fight was cut short; by then 2 of the 6 enemies had been killed. Who killed the enemies: Kaira 2 (Forsworn x2). Kaira was struck down by the third Forsworn: collapsed, helpless and bleeding out, unable to fight, but survived.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 8 seconds.
+    Kaira fought against Forsworn x6.
+    The fight was cut short; by then 2 of the 6 enemies had been killed.
+    Who killed the enemies: Kaira 2 (Forsworn x2).
+  [a witness, about the fighters]
+    Kaira: took a brutal amount of damage; dealt all the damage on their side; was struck down by the third Forsworn: collapsed, helpless and bleeding out, unable to fight; killed 2 of the other side.
+
+==== Carried off / duo (2) ====
+Six Forsworn. Two fall, then the player is struck down and carried away mid-fight (a death-alternative mod like Revenge and Respawn, or a teleport): the battle ends there with four Forsworn alive.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 13 seconds. Kaira and Lydia fought against Forsworn x6. The fight was cut short; by then 2 of the 6 enemies had been killed. Who killed the enemies: Kaira 1 (Forsworn); Lydia 1 (Forsworn). The party shared the damage to the enemy evenly. Kaira bore the brunt of the enemy's blows. Kaira was struck down by the third Forsworn: collapsed, helpless and bleeding out, unable to fight, but survived.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 13 seconds.
+    Kaira and Lydia fought against Forsworn x6.
+    The fight was cut short; by then 2 of the 6 enemies had been killed.
+    Who killed the enemies: Kaira 1 (Forsworn); Lydia 1 (Forsworn).
+    The party shared the damage to the enemy evenly.
+    Kaira bore the brunt of the enemy's blows.
+  [Lydia, about themself]
+    Lydia took only light wounds and dealt a fair share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 1 of the 2 who died on the other side: Forsworn.
+  [Lydia, about the others]
+    Kaira: took a brutal amount of damage; dealt a fair share of their side's damage; was struck down by the third Forsworn: collapsed, helpless and bleeding out, unable to fight; killed 1 of the other side.
+
+==== Carried off / party (5) ====
+Six Forsworn. Two fall, then the player is struck down and carried away mid-fight (a death-alternative mod like Revenge and Respawn, or a teleport): the battle ends there with four Forsworn alive.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 29 seconds. Kaira, Lydia, Marcurio, Aela and Brelyna fought against Forsworn x6. The fight was cut short; by then 2 of the 6 enemies had been killed. Who killed the enemies: Kaira 1 (Forsworn); Lydia 1 (Forsworn). Kaira led the party's damage to the enemy. Marcurio, Aela and Lydia also did a real part of it. Kaira bore the brunt of the enemy's blows. Kaira was struck down by the third Forsworn: collapsed, helpless and bleeding out, unable to fight, but survived.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 29 seconds.
+    Kaira, Lydia, Marcurio, Aela and Brelyna fought against Forsworn x6.
+    The fight was cut short; by then 2 of the 6 enemies had been killed.
+    Who killed the enemies: Kaira 1 (Forsworn); Lydia 1 (Forsworn).
+    Kaira led the party's damage to the enemy.
+    Marcurio, Aela and Lydia also did a real part of it.
+    Kaira bore the brunt of the enemy's blows.
+  [Lydia, about themself]
+    Lydia took only light wounds and dealt a fair share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 1 of the 2 who died on the other side: Forsworn.
+  [Lydia, about the others]
+    Kaira: took a brutal amount of damage; dealt a large share of their side's damage; was struck down by the third Forsworn: collapsed, helpless and bleeding out, unable to fight; killed 1 of the other side.
+    Marcurio: took only light wounds; dealt a fair share of their side's damage; was never near death; killed none of the other side.
+    Aela: took only light wounds; dealt a fair share of their side's damage; was never near death; killed none of the other side.
+    Brelyna: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+  [Marcurio, about themself]
+    Marcurio took only light wounds and dealt a fair share of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed none of the 2 who died on the other side.
+  [Aela, about themself]
+    Aela took only light wounds and dealt a fair share of their side's damage.
+    Aela was never in serious danger.
+    Aela killed none of the 2 who died on the other side.
+  [Brelyna, about themself]
+    Brelyna took only light wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed none of the 2 who died on the other side.
+
+==== Carried off / large (10) ====
+Six Forsworn. Two fall, then the player is struck down and carried away mid-fight (a death-alternative mod like Revenge and Respawn, or a teleport): the battle ends there with four Forsworn alive.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 55 seconds. Kaira, Lydia, Marcurio, Aela and 6 others fought against Forsworn x6. The fight was cut short; by then 2 of the 6 enemies had been killed. Who killed the enemies: Kaira 1 (Forsworn); Lydia 1 (Forsworn). Kaira led the party's damage to the enemy. Lydia, Marcurio, Aela and 5 others also did a real part of it. Kaira, Lydia, Uthgerd and Borgakh took the enemy's blows between them. Kaira was struck down by the third Forsworn: collapsed, helpless and bleeding out, unable to fight, but survived.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 55 seconds.
+    Kaira, Lydia, Marcurio, Aela and 6 others fought against Forsworn x6.
+    The fight was cut short; by then 2 of the 6 enemies had been killed.
+    Who killed the enemies: Kaira 1 (Forsworn); Lydia 1 (Forsworn).
+    Kaira led the party's damage to the enemy.
+    Lydia, Marcurio, Aela and 5 others also did a real part of it.
+    Kaira, Lydia, Uthgerd and Borgakh took the enemy's blows between them.
+  [Lydia, about themself]
+    Lydia took only light wounds and dealt a fair share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 1 of the 2 who died on the other side: Forsworn.
+  [Lydia, about the others]
+    Kaira: took a brutal amount of damage; dealt a large share of their side's damage; was struck down by the third Forsworn: collapsed, helpless and bleeding out, unable to fight; killed 1 of the other side.
+    Marcurio: took only light wounds; dealt a fair share of their side's damage; was never near death; killed none of the other side.
+    Aela: took only light wounds; dealt a fair share of their side's damage; was never near death; killed none of the other side.
+    Brelyna: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    J'zargo: took only light wounds; dealt a fair share of their side's damage; was never near death; killed none of the other side.
+    Uthgerd: took only light wounds; dealt a fair share of their side's damage; was never near death; killed none of the other side.
+  [Marcurio, about themself]
+    Marcurio took only light wounds and dealt a fair share of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed none of the 2 who died on the other side.
+  [Aela, about themself]
+    Aela took only light wounds and dealt a fair share of their side's damage.
+    Aela was never in serious danger.
+    Aela killed none of the 2 who died on the other side.
+  [Brelyna, about themself]
+    Brelyna took only light wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed none of the 2 who died on the other side.
+  [J'zargo, about themself]
+    J'zargo took only light wounds and dealt a fair share of their side's damage.
+    J'zargo was never in serious danger.
+    J'zargo killed none of the 2 who died on the other side.
+  [Uthgerd, about themself]
+    Uthgerd took only light wounds and dealt a fair share of their side's damage.
+    Uthgerd was never in serious danger.
+    Uthgerd killed none of the 2 who died on the other side.
+  [Jenassa, about themself]
+    Jenassa took only light wounds and dealt a fair share of their side's damage.
+    Jenassa was never in serious danger.
+    Jenassa killed none of the 2 who died on the other side.
+  [Erik, about themself]
+    Erik took only light wounds and dealt a fair share of their side's damage.
+    Erik was never in serious danger.
+    Erik killed none of the 2 who died on the other side.
+  [Borgakh, about themself]
+    Borgakh took only light wounds and dealt a fair share of their side's damage.
+    Borgakh was never in serious danger.
+    Borgakh killed none of the 2 who died on the other side.
+
+==== Fled / solo (1) ====
+Six Forsworn are too much: two fall, the party takes a beating and runs, and the Forsworn give up the chase. The battle ends where it was, with four Forsworn alive.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 9 seconds. Kaira fought against Forsworn x6. 2 of the 6 enemies were killed; the rest fled, yielded or broke off. Who killed the enemies: Kaira 2 (Forsworn x2).
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 9 seconds.
+    Kaira fought against Forsworn x6.
+    2 of the 6 enemies were killed; the rest fled, yielded or broke off.
+    Who killed the enemies: Kaira 2 (Forsworn x2).
+  [a witness, about the fighters]
+    Kaira: took solid wounds; dealt all the damage on their side; was never near death; drank a potion; killed 2 of the other side.
+
+==== Fled / duo (2) ====
+Six Forsworn are too much: two fall, the party takes a beating and runs, and the Forsworn give up the chase. The battle ends where it was, with four Forsworn alive.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 14 seconds. Kaira and Lydia fought against Forsworn x6. 2 of the 6 enemies were killed; the rest fled, yielded or broke off. Who killed the enemies: Kaira 1 (Forsworn); Lydia 1 (Forsworn). The party shared the damage to the enemy evenly. The enemy's blows fell evenly across the party.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 14 seconds.
+    Kaira and Lydia fought against Forsworn x6.
+    2 of the 6 enemies were killed; the rest fled, yielded or broke off.
+    Who killed the enemies: Kaira 1 (Forsworn); Lydia 1 (Forsworn).
+    The party shared the damage to the enemy evenly.
+    The enemy's blows fell evenly across the party.
+  [Lydia, about themself]
+    Lydia took solid wounds and dealt a fair share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 1 of the 2 who died on the other side: Forsworn.
+  [Lydia, about the others]
+    Kaira: took only light wounds; dealt a fair share of their side's damage; was never near death; drank a potion; killed 1 of the other side.
+
+==== Fled / party (5) ====
+Six Forsworn are too much: two fall, the party takes a beating and runs, and the Forsworn give up the chase. The battle ends where it was, with four Forsworn alive.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 30 seconds. Kaira, Lydia, Marcurio, Aela and Brelyna fought against Forsworn x6. 2 of the 6 enemies were killed; the rest fled, yielded or broke off. Who killed the enemies: Kaira 1 (Forsworn); Lydia 1 (Forsworn). Kaira led the party's damage to the enemy. Marcurio, Aela and Lydia also did a real part of it. Lydia and Kaira took the enemy's blows between them.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 30 seconds.
+    Kaira, Lydia, Marcurio, Aela and Brelyna fought against Forsworn x6.
+    2 of the 6 enemies were killed; the rest fled, yielded or broke off.
+    Who killed the enemies: Kaira 1 (Forsworn); Lydia 1 (Forsworn).
+    Kaira led the party's damage to the enemy.
+    Marcurio, Aela and Lydia also did a real part of it.
+    Lydia and Kaira took the enemy's blows between them.
+  [Lydia, about themself]
+    Lydia took solid wounds and dealt a fair share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 1 of the 2 who died on the other side: Forsworn.
+  [Lydia, about the others]
+    Kaira: took solid wounds; dealt a large share of their side's damage; was never near death; drank a potion; killed 1 of the other side.
+    Marcurio: took only light wounds; dealt a fair share of their side's damage; was never near death; killed none of the other side.
+    Aela: took only light wounds; dealt a fair share of their side's damage; was never near death; killed none of the other side.
+    Brelyna: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+  [Marcurio, about themself]
+    Marcurio took only light wounds and dealt a fair share of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed none of the 2 who died on the other side.
+  [Aela, about themself]
+    Aela took only light wounds and dealt a fair share of their side's damage.
+    Aela was never in serious danger.
+    Aela killed none of the 2 who died on the other side.
+  [Brelyna, about themself]
+    Brelyna took only light wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed none of the 2 who died on the other side.
+
+==== Fled / large (10) ====
+Six Forsworn are too much: two fall, the party takes a beating and runs, and the Forsworn give up the chase. The battle ends where it was, with four Forsworn alive.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 56 seconds. Kaira, Lydia, Marcurio, Aela and 6 others fought against Forsworn x6. 2 of the 6 enemies were killed; the rest fled, yielded or broke off. Who killed the enemies: Kaira 1 (Forsworn); Lydia 1 (Forsworn). Kaira led the party's damage to the enemy. Lydia, Marcurio, Aela and 5 others also did a real part of it. Lydia, Uthgerd, Borgakh and 2 others took the enemy's blows between them.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 56 seconds.
+    Kaira, Lydia, Marcurio, Aela and 6 others fought against Forsworn x6.
+    2 of the 6 enemies were killed; the rest fled, yielded or broke off.
+    Who killed the enemies: Kaira 1 (Forsworn); Lydia 1 (Forsworn).
+    Kaira led the party's damage to the enemy.
+    Lydia, Marcurio, Aela and 5 others also did a real part of it.
+    Lydia, Uthgerd, Borgakh and 2 others took the enemy's blows between them.
+  [Lydia, about themself]
+    Lydia took solid wounds and dealt a fair share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 1 of the 2 who died on the other side: Forsworn.
+  [Lydia, about the others]
+    Kaira: took solid wounds; dealt a large share of their side's damage; was never near death; drank a potion; killed 1 of the other side.
+    Marcurio: took only light wounds; dealt a fair share of their side's damage; was never near death; killed none of the other side.
+    Aela: took only light wounds; dealt a fair share of their side's damage; was never near death; killed none of the other side.
+    Brelyna: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    J'zargo: took only light wounds; dealt a fair share of their side's damage; was never near death; killed none of the other side.
+    Uthgerd: took solid wounds; dealt a fair share of their side's damage; was never near death; killed none of the other side.
+  [Marcurio, about themself]
+    Marcurio took only light wounds and dealt a fair share of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed none of the 2 who died on the other side.
+  [Aela, about themself]
+    Aela took only light wounds and dealt a fair share of their side's damage.
+    Aela was never in serious danger.
+    Aela killed none of the 2 who died on the other side.
+  [Brelyna, about themself]
+    Brelyna took only light wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed none of the 2 who died on the other side.
+  [J'zargo, about themself]
+    J'zargo took only light wounds and dealt a fair share of their side's damage.
+    J'zargo was never in serious danger.
+    J'zargo killed none of the 2 who died on the other side.
+  [Uthgerd, about themself]
+    Uthgerd took solid wounds and dealt a fair share of their side's damage.
+    Uthgerd was never in serious danger.
+    Uthgerd killed none of the 2 who died on the other side.
+  [Jenassa, about themself]
+    Jenassa took only light wounds and dealt a fair share of their side's damage.
+    Jenassa was never in serious danger.
+    Jenassa killed none of the 2 who died on the other side.
+  [Erik, about themself]
+    Erik took solid wounds and dealt a fair share of their side's damage.
+    Erik was never in serious danger.
+    Erik killed none of the 2 who died on the other side.
+  [Borgakh, about themself]
+    Borgakh took solid wounds and dealt a fair share of their side's damage.
+    Borgakh was never in serious danger.
+    Borgakh killed none of the 2 who died on the other side.

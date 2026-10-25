@@ -78,6 +78,7 @@ namespace BSM::Tracker
 		{
 			std::set<ActorId> witnesses;
 			bool              remembered{ false };
+			bool              cutShort{ false };  // ended by a move: a fight where the player is now is another battle
 			double            closedAt{ 0.0 };  // when the tracker let go of it; the battle's own end is its last blow, which is earlier
 		};
 		std::map<int, Extra> g_extra;
@@ -113,6 +114,23 @@ namespace BSM::Tracker
 		};
 		std::vector<LimbCheck> g_limbChecks;
 		double                 g_injuryScanAt{ 0.0 };
+
+		// Where the battle is being fought, so the player being moved away from it (a teleport, a door, a death-alternative
+		// mod carrying them to an inn) ends it there, and nobody at the new place is taken for a witness or a fighter.
+		// Moved: into another world or interior, or farther in one tick than anyone runs or rides (the tick is 250 ms).
+		constexpr float   kMoved = 4000.0f;
+		const void*       g_siteSpace{ nullptr };
+		RE::NiPoint3      g_sitePos{};
+		// those who stood near the player at the battle site while it was fought
+		std::set<ActorId> g_siteWitnesses;
+		double            g_witnessScanAt{ 0.0 };
+
+		// the world (or the interior) the player is in
+		const void* SpaceOf(RE::PlayerCharacter* a_pc)
+		{
+			if (const auto* ws = a_pc->GetWorldspace()) return ws;
+			return a_pc->GetParentCell();
+		}
 
 		double g_quiet{ 0.0 };
 		// The party is still "in combat" after its battle closed (a follower chasing a deer): no new battle is begun from
@@ -514,7 +532,14 @@ namespace BSM::Tracker
 		void Begin(double a_now)
 		{
 			const auto& cfg = Settings::Get();
-			if (!g_history.empty() && a_now - g_extra[g_history.front().id].closedAt <= cfg.mergeGapSeconds) {
+			auto* pc = RE::PlayerCharacter::GetSingleton();
+			if (pc) {
+				g_siteSpace = SpaceOf(pc);
+				g_sitePos = pc->GetPosition();
+			}
+			g_witnessScanAt = 0.0;
+			// the fight flared up again where it was: same battle (never across a move)
+			if (!g_history.empty() && !g_extra[g_history.front().id].cutShort && a_now - g_extra[g_history.front().id].closedAt <= cfg.mergeGapSeconds) {
 				g_current = std::move(g_history.front());  // the fight flared up again: same battle
 				g_history.pop_front();
 				g_current->endedAt = -1.0;
@@ -529,6 +554,7 @@ namespace BSM::Tracker
 				g_live.clear();
 				g_recentHeals.clear();
 				g_alias.clear();
+				g_siteWitnesses.clear();
 				SKSE::log::info("Battle {} began at '{}'", g_current->id, g_current->location);
 				g_readSettings = true;
 			}
@@ -566,6 +592,18 @@ namespace BSM::Tracker
 			return &p;
 		}
 
+		// everyone alive near the player now, as a witness of the battle being fought here
+		void ScanWitnesses()
+		{
+			auto* pl = RE::ProcessLists::GetSingleton();
+			auto* pc = RE::PlayerCharacter::GetSingleton();
+			if (!pl || !pc) return;
+			for (auto& h : pl->highActorHandles) {
+				const auto a = h.get();
+				if (a && !a->IsDead() && a->GetPosition().GetDistance(pc->GetPosition()) <= Settings::Get().witnessRange) g_siteWitnesses.insert(a->GetFormID());
+			}
+		}
+
 		void End(double a_foughtUntil)
 		{
 			if (!g_current) return;
@@ -593,17 +631,12 @@ namespace BSM::Tracker
 
 			auto& extra = g_extra[b.id];
 			extra.closedAt = Now();
+			extra.cutShort = b.cutShort;
 			g_stale = true;
-			extra.witnesses.clear();
-			if (auto* pl = RE::ProcessLists::GetSingleton()) {
-				auto* pc = RE::PlayerCharacter::GetSingleton();
-				for (auto& h : pl->highActorHandles) {
-					const auto a = h.get();
-					if (a && pc && !a->IsDead() && a->GetPosition().GetDistance(pc->GetPosition()) <= Settings::Get().witnessRange) {
-						extra.witnesses.insert(a->GetFormID());
-					}
-				}
-			}
+			// those who stood near while it was fought; after a move, nobody where the player is now
+			if (!b.cutShort) ScanWitnesses();
+			extra.witnesses = std::move(g_siteWitnesses);
+			g_siteWitnesses.clear();
 			const NarrativeOptions opt = Opts();
 			g_lastMemory = BuildMemory(b, opt);
 			SKSE::log::info("Battle {} ended after {:.0f}s, {} participants, {} witnesses: {}", b.id, b.endedAt - b.startedAt, b.participants.size(),
@@ -928,6 +961,23 @@ namespace BSM::Tracker
 				if (!g_current && pc->IsInCombat() && !g_stale) {
 					Begin(now);
 					Join(pc);
+				}
+				if (g_current) {
+					// the player was moved away from the battle: it ended where it was fought
+					const void* space = SpaceOf(pc);
+					const auto  here = pc->GetPosition();
+					if (space != g_siteSpace || here.GetDistance(g_sitePos) > kMoved) {
+						SKSE::log::info("Battle {}: the player was moved away from it ({}); it ends here", g_current->id,
+							space != g_siteSpace ? "another world or interior" : std::format("{:.0f} units in one tick", here.GetDistance(g_sitePos)));
+						g_current->cutShort = true;
+						End(g_lastBlow);
+					} else {
+						g_sitePos = here;
+						if (now >= g_witnessScanAt) {
+							g_witnessScanAt = now + 1.0;
+							ScanWitnesses();
+						}
+					}
 				}
 				if (g_current) {
 					battle = true;

@@ -156,6 +156,8 @@ namespace
 		std::function<void(Fight&, std::size_t)>             before; // before the party finishes off foe k
 		bool                                                 solo{ true };
 		std::function<void(Fight&)>                          setup{};  // before the first blow: summons cast
+		int                                                  stopAfter{ -1 };  // the fight ends with this many foes down (before: k = stopAfter)
+		bool                                                 cutShort{ false };  // ...because the player was moved away from it
 	};
 
 	std::vector<Foe> Many(const char* a_name, float a_hp, int a_count, std::vector<Foe> a_first = {})
@@ -186,6 +188,10 @@ namespace
 		std::vector<float> credit;  // kills follow the damage dealt: the largest remainder takes the next
 
 		for (std::size_t k = 0; k < foes.size(); ++k) {
+			if (static_cast<int>(k) == a_j.stopAfter) {
+				if (a_j.before) a_j.before(a_f, k);
+				break;
+			}
 			const ActorId foe = a_f.foes[k];
 			// again for each foe: a corpse raised mid-fight joins in
 			auto dealt = a_j.dealt(a_f.party);
@@ -199,8 +205,12 @@ namespace
 				dw += dealt[i];
 			}
 			const float share = foes[k].hp / foeHealth * a_j.taken * partyHealth;
-			for (std::size_t i = 0; i < a_f.party.size() && hw > 0 && share > 0; ++i)
-				if (!a_f.dead[i] && hurt[i] > 0) a_f.Hurt(static_cast<int>(i), foe, share * hurt[i] / hw);
+			// every foe still standing is at it, not only the one about to fall
+			const std::size_t standing = std::min<std::size_t>(foes.size() - k, a_j.stopAfter >= 0 ? foes.size() : 1);
+			for (std::size_t i = 0; i < a_f.party.size() && hw > 0 && share > 0; ++i) {
+				if (a_f.dead[i] || hurt[i] <= 0) continue;
+				for (std::size_t by = 0; by < standing; ++by) a_f.Hurt(static_cast<int>(i), a_f.foes[k + by], share * hurt[i] / hw / standing);
+			}
 			if (a_j.before) a_j.before(a_f, k);
 			dealt.resize(a_f.party.size(), 0.0f);
 			dw = 0;
@@ -227,6 +237,7 @@ namespace
 			a_f.t += 1.0;
 		}
 		b.endedAt = a_f.t + 1.0;
+		b.cutShort = a_j.cutShort;
 	}
 
 	std::vector<Journey> Journeys()
@@ -313,6 +324,27 @@ namespace
 				f.Join({ 0xFF000D01, "Flame Atronach", Role::kSummon, 300, 0 });
 				if (const int brelyna = f.Find("Brelyna"); brelyna >= 0) f.Join({ 0xFF000D02, "Flame Atronach", Role::kSummon, 300, brelyna });
 			} });
+		j.push_back({ "Carried off",
+			"Six Forsworn. Two fall, then the player is struck down and carried away mid-fight (a death-alternative mod like Revenge and "
+			"Respawn, or a teleport): the battle ends there with four Forsworn alive.",
+			[](std::size_t) { return Many("Forsworn", 200, 6); }, 1, 0.5f, Dealt, Taken,
+			[](Fight& f, std::size_t k) {
+				if (k == 2) {
+					f.Hurt(0, f.foes[k], f.party[0].hp, 0.0f);
+					f.b.Down(f.party[0].id, f.t);
+				}
+			} });
+		j.back().stopAfter = 2;
+		j.back().cutShort = true;
+
+		j.push_back({ "Fled",
+			"Six Forsworn are too much: two fall, the party takes a beating and runs, and the Forsworn give up the chase. The battle ends "
+			"where it was, with four Forsworn alive.",
+			[](std::size_t) { return Many("Forsworn", 200, 6); }, 1, 0.8f, Dealt, Taken,
+			[](Fight& f, std::size_t k) {
+				if (k == 2) f.Drink(0, "Potion of Healing", 50);
+			} });
+		j.back().stopAfter = 2;
 		return j;
 	}
 

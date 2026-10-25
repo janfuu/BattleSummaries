@@ -1030,6 +1030,30 @@ namespace
 		Check(Has(m, "took the enemy's blows between them") && Has(m, "and 3 others took the enemy's blows"), "six names over the line: three and \"3 others\"", m);
 	}
 
+	// The player was carried away mid-fight (a death-alternative mod, a teleport): the enemies left alive did not flee
+	void TestCutShort()
+	{
+		Battle b;
+		b.startedAt = 0;
+		b.Join(Info(kHero, "Kaira", Side::kPlayer, 300));
+		b.Join(Info(kBandit1, "Bandit", Side::kEnemy, 100));
+		b.Join(Info(kBandit2, "Bandit", Side::kEnemy, 100));
+		b.Damage(kBandit1, kHero, 100, 0.0f, 1);
+		b.Death(kBandit1, kHero, 1);
+		b.Damage(kHero, kBandit2, 300, 0.0f, 2);
+		b.Down(kHero, 2);
+		b.endedAt = 3;
+		const auto plain = BuildMemory(b, {});
+		Check(Has(plain, "1 of the 2 enemies were killed; the rest fled, yielded or broke off."), "ended where it was: the rest broke off", plain);
+		b.cutShort = true;
+		const auto cut = BuildMemory(b, {});
+		Check(Has(cut, "The fight was cut short; by then 1 of the 2 enemies had been killed.") && !Has(cut, "fled"), "cut short: nobody is said to have fled", cut);
+		b.Damage(kBandit2, kHero, 100, 0.0f, 2.5);
+		b.Death(kBandit2, kHero, 2.5);
+		const auto won = BuildMemory(b, {});
+		Check(Has(won, "All 2 enemies were killed.") && !Has(won, "cut short"), "cut short with every enemy dead: told as won", won);
+	}
+
 	void TestDuration()
 	{
 		const auto is = [](double a_s, const char* a_want) { Check(DurationText(a_s) == a_want, a_want, DurationText(a_s)); };
@@ -1122,6 +1146,7 @@ int main(int argc, char** argv)
 	TestDamageAndItems();
 	TestRoles();
 	TestEvenShares();
+	TestCutShort();
 	TestDuration();
 	TestEdges();
 	std::printf("%d checks, %d failed\n", g_checks, g_failed);
