@@ -50,7 +50,8 @@ SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
 {
 	SKSE::Init(a_skse);
 	InitLog();
-	SKSE::log::info("Battle Summaries {}.{}.{} loading (runtime {})", BSM_VERSION_MAJOR, BSM_VERSION_MINOR, BSM_VERSION_PATCH, a_skse->RuntimeVersion().string());
+	SKSE::log::info("Battle Summaries {}.{}.{}{} loading (runtime {})", BSM_VERSION_MAJOR, BSM_VERSION_MINOR, BSM_VERSION_PATCH, *BSM_VERSION_LABEL ? "-" BSM_VERSION_LABEL : "",
+		a_skse->RuntimeVersion().string());
 	SKSE::GetMessagingInterface()->RegisterListener(OnMessage);
 	SKSE::GetPapyrusInterface()->Register(BSM::RegisterPapyrus);
 	return true;

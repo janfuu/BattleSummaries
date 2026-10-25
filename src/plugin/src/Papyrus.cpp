@@ -36,7 +36,7 @@ namespace BSM
 			// on the main thread, which reads the settings
 			SKSE::GetTaskInterface()->AddTask([path = std::move(a_path), value = std::move(a_value)] { Settings::Override(path, value); });
 		}
-		std::string GetVersion(Tag*) { return std::format("{}.{}.{}", BSM_VERSION_MAJOR, BSM_VERSION_MINOR, BSM_VERSION_PATCH); }
+		std::string GetVersion(Tag*) { return std::format("{}.{}.{}{}", BSM_VERSION_MAJOR, BSM_VERSION_MINOR, BSM_VERSION_PATCH, *BSM_VERSION_LABEL ? "-" BSM_VERSION_LABEL : ""); }
 	}
 
 	bool RegisterPapyrus(RE::BSScript::IVirtualMachine* a_vm)

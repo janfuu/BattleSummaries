@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
-project(BattleSummaries VERSION 1.4.0 LANGUAGES CXX)  # the mod's version: the DLL reports it, the SkyrimNet manifest repeats it
+project(BattleSummaries VERSION 1.4.1 LANGUAGES CXX)  # the mod's version: the DLL reports it, the SkyrimNet manifest repeats it
+# a pre-release label ("beta-1") after the version, or empty for a release: package.sh and the manifests say "1.4.1-beta-1"
+set(BSM_VERSION_LABEL "beta-1")
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -23,7 +25,7 @@ target_link_libraries(BattleSummaries PRIVATE CommonLibSSE::CommonLibSSE nlohman
 target_include_directories(BattleSummaries PRIVATE ${SIMPLEINI_INCLUDE_DIRS})
 target_precompile_headers(BattleSummaries PRIVATE <SKSE/SKSE.h> <RE/Skyrim.h>)
 target_compile_definitions(BattleSummaries PRIVATE _UNICODE UNICODE NOMINMAX
-	BSM_VERSION_MAJOR=${PROJECT_VERSION_MAJOR} BSM_VERSION_MINOR=${PROJECT_VERSION_MINOR} BSM_VERSION_PATCH=${PROJECT_VERSION_PATCH})
+	BSM_VERSION_MAJOR=${PROJECT_VERSION_MAJOR} BSM_VERSION_MINOR=${PROJECT_VERSION_MINOR} BSM_VERSION_PATCH=${PROJECT_VERSION_PATCH} BSM_VERSION_LABEL="${BSM_VERSION_LABEL}")
 set_target_properties(BattleSummaries PROPERTIES OUTPUT_NAME "BattleSummaries")
 
 # Offline tests: build.ps1 builds and runs them before the DLL counts as built.

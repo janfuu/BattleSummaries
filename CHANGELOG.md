@@ -1,6 +1,6 @@
 # Changelog
 
-## Next release
+## 1.4.1 (beta 1)
 
 - Who did the work, not only who struck the last blow: "Most of the party's damage to the enemy was dealt by Lydia",
   and every companion's line now says how much of the fighting they did.
