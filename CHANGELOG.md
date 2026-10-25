@@ -19,6 +19,9 @@
   inn, a teleport, a door), it ends there. Nobody at the new place is told it as a witness or counted as a fighter, and
   enemies still alive are not said to have fled: "The fight was cut short; by then 8 of the 14 enemies had been killed."
   Witnesses are now those who stood near while it was fought, not whoever is near when it ends.
+- The remembered event is posted the moment a battle closes, while you are still there. SkyrimNet files it where you
+  are when it is posted, so posted later, the people behind the next door "remembered" a fight they never saw. A battle
+  cut short by you being moved away is not posted as an event at all (its fighters still get their summary).
 - Death-alternative mods that put you back on your feet (Stay In The Fight, Sacrosanct's Fortitude, Last Man Standing):
   being struck down is now told as "collapsed and helpless for a moment, but got back up", and getting up at a stroke
   with your health restored, by nobody's healing, as "rose again with their strength restored" (no one is credited with

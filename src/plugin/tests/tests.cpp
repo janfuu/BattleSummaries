@@ -1048,6 +1048,15 @@ namespace
 		b.cutShort = true;
 		const auto cut = BuildMemory(b, {});
 		Check(Has(cut, "The fight was cut short; by then 1 of the 2 enemies had been killed.") && !Has(cut, "fled"), "cut short: nobody is said to have fled", cut);
+		Battle none;  // moved away before anyone fell
+		none.startedAt = 0;
+		none.Join(Info(kHero, "Kaira", Side::kPlayer, 300));
+		none.Join(Info(kBandit1, "Bandit", Side::kEnemy, 100));
+		none.Damage(kHero, kBandit1, 100, 0.6f, 1);
+		none.endedAt = 2;
+		none.cutShort = true;
+		const auto early = BuildMemory(none, {});
+		Check(Has(early, "The fight was cut short before the one enemy fell.") && !Has(early, "0 of"), "cut short with none killed: no \"0 of\"", early);
 		b.Damage(kBandit2, kHero, 100, 0.0f, 2.5);
 		b.Death(kBandit2, kHero, 2.5);
 		const auto won = BuildMemory(b, {});

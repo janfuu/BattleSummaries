@@ -542,6 +542,7 @@ namespace BSM::Tracker
 			if (!g_history.empty() && !g_extra[g_history.front().id].cutShort && a_now - g_extra[g_history.front().id].closedAt <= cfg.mergeGapSeconds) {
 				g_current = std::move(g_history.front());  // the fight flared up again: same battle
 				g_history.pop_front();
+				g_extra[g_current->id].remembered = false;  // remembered again, whole, when it ends again
 				g_current->endedAt = -1.0;
 				SKSE::log::info("Battle {} resumed", g_current->id);
 			} else {
@@ -911,19 +912,25 @@ namespace BSM::Tracker
 			return out;
 		}
 
-		// post the remembered event once the battle can no longer resume
-		std::vector<std::string> DueMemories(double a_now)
+		// The remembered event, posted the moment a battle closes. SkyrimNet files an event where the player is when it is
+		// posted, and everyone near them then has it in their history as if they had been there: posted later (it once
+		// waited out the merge gap), a battle walked away from was "remembered" by the people inside the next door. A
+		// battle that flares up again is remembered again, whole, when it closes again. One cut short by the player being
+		// moved away is never posted: they are already somewhere else.
+		std::vector<std::string> DueMemories()
 		{
 			std::vector<std::string> out;
 			const auto&              cfg = Settings::Get();
-			if (!cfg.rememberEvent || g_current) return out;
 			for (auto& b : g_history) {
 				auto& extra = g_extra[b.id];
-				if (extra.remembered || a_now - extra.closedAt <= cfg.mergeGapSeconds) continue;
+				if (extra.remembered) continue;
 				extra.remembered = true;
-				if (Significant(b, cfg.minEnemies, cfg.minSeconds)) {
-					out.push_back(BuildMemory(b, Opts()));
+				if (!cfg.rememberEvent) continue;
+				if (b.cutShort) {
+					SKSE::log::info("Battle {}: not remembered as an event (the player was moved away: it would be filed where they are now)", b.id);
+					continue;
 				}
+				if (Significant(b, cfg.minEnemies, cfg.minSeconds)) out.push_back(BuildMemory(b, Opts()));
 			}
 			return out;
 		}
@@ -1069,7 +1076,7 @@ namespace BSM::Tracker
 					if (g_quiet >= cfg.endGraceSeconds) End(std::min(now - g_quiet, g_lastBlow));
 					else if (now - g_current->startedAt > 3600.0) End(now);  // something kept it open: close it
 				}
-				memories = DueMemories(now);
+				memories = DueMemories();
 			}
 			if (std::exchange(g_readSettings, false)) {
 				SkyrimNet::ReadSettings();

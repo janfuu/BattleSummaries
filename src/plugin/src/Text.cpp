@@ -65,6 +65,8 @@ namespace BSM::Text
 			{ "Outcome", "outcome.some", "{dead} of the {total} {foes} were killed; the rest fled, yielded or broke off.", "" },
 			{ "Outcome", "outcome.cut_short", "The fight was cut short; by then {dead} of the {total} {foes} had been killed.",
 				"the player was moved away while enemies were still alive (a teleport, a door, a death-alternative mod)" },
+			{ "Outcome", "outcome.cut_short_none", "The fight was cut short before any of the {total} {foes} fell.", "the same, with none of them killed" },
+			{ "Outcome", "outcome.cut_short_one", "The fight was cut short before the one enemy fell.", "the same, against one enemy" },
 			{ "Outcome", "tally.line", "Who killed the enemies: {tally}.", "{tally} reads \"Kaira 3 (Bandit x2 and Bandit Chief); Lydia 1 (Bandit)\"" },
 			{ "Outcome", "tally.unknown", "unknown causes", "" },
 			{ "Outcome", "battle.damage_by", "Most of the party's damage to the enemy was dealt by {names}.", "a kill goes to the last blow; this says who did the work: those who stood out, when they did over half of it" },

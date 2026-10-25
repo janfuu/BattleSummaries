@@ -388,7 +388,7 @@ namespace BSM
 			const std::initializer_list<Text::Arg> args{ { "dead", N(dead) }, { "total", N(n) }, { "foes", T(a_foes == Side::kEnemy ? "outcome.word_enemies" : "outcome.word_opponents") } };
 			if (a_b.Ongoing()) return F("outcome.so_far", args);
 			if (dead == n) return n == 1 ? T("outcome.one") : F("outcome.all", args);
-			if (a_b.cutShort) return F("outcome.cut_short", args);
+			if (a_b.cutShort) return (dead > 0 ? F("outcome.cut_short", args) : n == 1 ? T("outcome.cut_short_one") : F("outcome.cut_short_none", args));
 			if (dead == 0) return F("outcome.none", args);
 			return F("outcome.some", args);
 		}
