@@ -91,6 +91,10 @@ namespace BSM
 		auto* p = Find(a_id);
 		if (!p || a_healthPct < 0.0f) return;
 		a_healthPct = std::clamp(a_healthPct, 0.0f, 1.0f);
+		// from the brink to half their health or more between two looks (a quarter second apart in game), with no
+		// healing just before: something put them back on their feet (a heal reported a moment late takes it back)
+		const bool low = p->isDown || p->healthPct < std::max(nearDeathPct, 0.2f);
+		if (p->WasCritical() && !p->dead && low && a_healthPct >= 0.5f && (p->lastHealAt < 0.0 || a_now - p->lastHealAt > 1.5)) p->roseAt = a_now;
 		p->healthPct = a_healthPct;
 		p->minHealthPct = std::min(p->minHealthPct, a_healthPct);
 		// Near death counts when this battle put them there: someone who walked in already at death's door and was
@@ -141,10 +145,12 @@ namespace BSM
 		Sample(a_target, a_healthPctAfter, a_now);
 	}
 
-	void Battle::Heal(ActorId a_target, ActorId a_healer, float a_amount, const std::string& a_source, double)
+	void Battle::Heal(ActorId a_target, ActorId a_healer, float a_amount, const std::string& a_source, double a_now)
 	{
 		auto* t = Find(a_target);
 		if (!t || a_amount <= 0.0f) return;
+		t->lastHealAt = a_now;
+		if (t->roseAt >= 0.0 && a_now - t->roseAt <= 1.5) t->roseAt = -1.0;  // healed after all: no rising of their own
 		t->healingReceived += a_amount;
 		auto& h = t->healFrom[a_healer];
 		h.amount += a_amount;

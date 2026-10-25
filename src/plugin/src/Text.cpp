@@ -112,9 +112,13 @@ namespace BSM::Text
 
 			// ---------------------------------------------------------------- close to death
 			{ "NearDeath", "personal.fact", "{name} {fact}.", "{fact} is brink.down or brink.near_death" },
-			{ "NearDeath", "brink.down", "was struck down{times}{by}: collapsed, helpless and bleeding out, unable to fight",
+			{ "NearDeath", "brink.down", "was struck down{times}{by}: collapsed and helpless for a moment",
 				"{times} is empty or a space and times.*; {by} is empty or a space and brink.by" },
 			{ "NearDeath", "brink.near_death", "was brought to the very edge of death{by}, with almost no health left", "" },
+			{ "NearDeath", "brink.got_up", ", but got back up", "after brink.down: how they came back from it" },
+			{ "NearDeath", "brink.survived", ", but survived", "after brink.near_death" },
+			{ "NearDeath", "brink.rose", ", and rose again with their strength restored",
+				"after either, in place of the two above: back on their feet at a stroke with nobody's healing (a death-alternative mod, a power)" },
 			{ "NearDeath", "brink.by", "by {name}", "" },
 			{ "NearDeath", "brink.friendly", "(by accident: friendly fire)", "added after brink.by when it was their own side" },
 			{ "NearDeath", "times.twice", "twice", "" },
@@ -202,7 +206,7 @@ namespace BSM::Text
 			{ "Others", "other.easy", "None of them was seriously hurt or in any real danger.", "an easy fight: said in place of a line for each" },
 
 			{ "Memory", "memory.rescued", "{name} {brink}, and would most likely have died, but {deeds}: {saviors} saved {name}'s life.", "the remembered paragraph" },
-			{ "Memory", "memory.survived", "{name} {brink}, but survived.", "" },
+			{ "Memory", "memory.survived", "{name} {brink}.", "{brink} ends with how they came back from it (brink.got_up, brink.survived, brink.rose)" },
 
 			// ---------------------------------------------------------------- what a magic effect is called
 			{ "EffectNames", "fx.healed", "healed", "" },

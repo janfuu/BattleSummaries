@@ -418,7 +418,7 @@ namespace
 		const auto lydia = SummaryText(BuildSummary(b, kLydia, "Lydia", {}));
 		Check(Has(lydia, "Dwarven Centurion, who had struck down Lydia, was then killed by Sinmur.") && !Has(lydia, "saved Lydia"), "a foe's kill is told, but is no rescue", lydia);
 		Check(Has(lydia, "Ursine was killed, by whom is not known.") && !Has(lydia, "someone"), "an unseen killer is not 'someone'", lydia);
-		Check(Has(BuildMemory(b, {}), "Lydia was struck down by Dwarven Centurion: collapsed, helpless and bleeding out, unable to fight, but survived."), "and it is remembered so", BuildMemory(b, {}));
+		Check(Has(BuildMemory(b, {}), "Lydia was struck down by Dwarven Centurion: collapsed and helpless for a moment, but got back up."), "and it is remembered so", BuildMemory(b, {}));
 	}
 
 	// Asked for by a player whose followers kept complaining of being "drained and roasted" by the player's area spells.
@@ -452,7 +452,7 @@ namespace
 		const auto hidden = SummaryText(BuildSummary(b, kLydia, "Lydia", quiet));
 		Check(!Has(hidden, "Fireball") && !Has(hidden, "friendly fire") && !Has(hidden, "edge of death by Kaira"), "friendly fire left out", hidden);
 		Check(Has(hidden, "Lydia took only light wounds") && !Has(hidden, "Part of the damage"), "and their damage is no part of the wounds told", hidden);
-		Check(Has(hidden, "Lydia suffered: poisoned by Bandit (Weak Poison).") && Has(hidden, "Lydia was brought to the very edge of death, with almost no health left."), "the rest still told", hidden);
+		Check(Has(hidden, "Lydia suffered: poisoned by Bandit (Weak Poison).") && Has(hidden, "Lydia was brought to the very edge of death, with almost no health left, but survived."), "the rest still told", hidden);
 		Check(!Has(BuildMemory(b, quiet), "Kaira (by accident"), "and left out of what is remembered", BuildMemory(b, quiet));
 	}
 
@@ -1054,6 +1054,51 @@ namespace
 		Check(Has(won, "All 2 enemies were killed.") && !Has(won, "cut short"), "cut short with every enemy dead: told as won", won);
 	}
 
+	// A death-alternative mod puts the player back on their feet at a stroke: told as rising again, not as a rescue, and
+	// never as a death; a heal that brought them back is not taken for it
+	void TestRising()
+	{
+		Battle b;
+		b.startedAt = 0;
+		b.Join(Info(kHero, "Kaira", Side::kPlayer, 300));
+		b.Join(Info(kLydia, "Lydia", Side::kPlayer, 300));
+		b.Join(Info(kChief, "Bandit Chief", Side::kEnemy, 400));
+		b.Damage(kHero, kChief, 300, 0.0f, 1);
+		b.Down(kHero, 1);
+		b.Sample(kHero, 0.0f, 1.2);
+		b.Up(kHero);
+		b.Sample(kHero, 1.0f, 1.5);  // Stay In The Fight: back up with full health, nobody healed
+		b.Damage(kLydia, kChief, 290, 0.03f, 2);
+		b.Heal(kLydia, kLydia, 200, "Potion of Plentiful Healing", 2.5);
+		b.Sample(kLydia, 0.7f, 2.6);  // her own potion: not a rising
+		b.Damage(kChief, kHero, 400, 0.0f, 3);
+		b.Death(kChief, kHero, 3);
+		b.endedAt = 4;
+		const auto told = SummaryText(BuildSummary(b, kLydia, "Lydia", {}));
+		Check(Has(told, "Kaira: ") && Has(told, "was struck down by Bandit Chief: collapsed and helpless for a moment, and rose again with their strength restored"),
+			"back on their feet at a stroke: rose again", told);
+		Check(Has(told, "Lydia was brought to the very edge of death by Bandit Chief, with almost no health left, but survived.") && !Has(told, "Lydia was brought to the very edge of death by Bandit Chief, with almost no health left, and rose"),
+			"a potion that brought them back is no rising", told);
+		const auto memory = BuildMemory(b, {});
+		Check(Has(memory, "Kaira was struck down by Bandit Chief: collapsed and helpless for a moment, and rose again with their strength restored.") && !Has(memory, "survived."),
+			"remembered once, without \"but survived\" on top", memory);
+		Check(!Has(told, "saved Kaira") && !Has(memory, "saved Kaira"), "risen of their own: killing the one who struck them down saved nobody", told + memory);
+
+		Battle late;  // the heal is reported a moment after the health came back
+		late.startedAt = 0;
+		late.Join(Info(kHero, "Kaira", Side::kPlayer, 300));
+		late.Join(Info(kLydia, "Lydia", Side::kPlayer, 300));
+		late.Join(Info(kChief, "Bandit Chief", Side::kEnemy, 400));
+		late.Damage(kHero, kChief, 280, 0.05f, 1);
+		late.Sample(kHero, 0.9f, 2);
+		late.Heal(kHero, kLydia, 250, "Grand Healing", 2.4);
+		late.Damage(kChief, kHero, 400, 0.0f, 3);
+		late.Death(kChief, kHero, 3);
+		late.endedAt = 4;
+		const auto l = SummaryText(BuildSummary(late, kLydia, "Lydia", {}));
+		Check(!Has(l, "rose again"), "a heal reported late still counts as the heal", l);
+	}
+
 	void TestDuration()
 	{
 		const auto is = [](double a_s, const char* a_want) { Check(DurationText(a_s) == a_want, a_want, DurationText(a_s)); };
@@ -1147,6 +1192,7 @@ int main(int argc, char** argv)
 	TestRoles();
 	TestEvenShares();
 	TestCutShort();
+	TestRising();
 	TestDuration();
 	TestEdges();
 	std::printf("%d checks, %d failed\n", g_checks, g_failed);

@@ -27,6 +27,6 @@ What happened to {{ battleSummary.name }} in it:
 - {{ line }}
 {% endfor %}
 {% endif %}
-This is the true account of the battle, and {{ battleSummary.name }} remembers it this way. {{ battleSummary.name }} may feel anything about it that fits their character (pride, shame, gratitude, resentment, bravado), but must not deny or reverse what happened, claim kills or deeds that are not listed, or play down how close to death anyone came or who saved whom. Do not recite this account or its wording; let it shape what is said, and only when the battle is relevant.
+This is the true account of the battle, and {{ battleSummary.name }} remembers it this way. {{ battleSummary.name }} may feel anything about it that fits their character (pride, shame, gratitude, resentment, bravado), but must not deny or reverse what happened, claim kills or deeds that are not listed, or play down how close to death anyone came or who saved whom. Being struck down is not dying: anyone told as struck down or as having risen again is alive, and nobody died unless the account says they were killed. Do not recite this account or its wording; let it shape what is said, and only when the battle is relevant.
 {% endif %}
 {% endif %}

@@ -337,6 +337,33 @@ namespace
 		j.back().stopAfter = 2;
 		j.back().cutShort = true;
 
+		j.push_back({ "Back on your feet",
+			"Six bandits. The player is struck down twice, and each time a death-alternative mod (Stay In The Fight, Sacrosanct's "
+			"Fortitude) puts them straight back on their feet with their health restored. Nobody heals them.",
+			[](std::size_t) { return Many("Bandit", 150, 6); }, 1, 0.3f, Dealt, Taken,
+			[](Fight& f, std::size_t k) {
+				if (k != 1 && k != 4) return;
+				f.Hurt(0, f.foes[k], f.party[0].hp, 0.0f);
+				f.b.Down(f.party[0].id, f.t);
+				f.b.Up(f.party[0].id);
+				f.t += 0.25;
+				f.health[0] = f.party[0].hp;
+				f.b.Sample(f.party[0].id, 1.0f, f.t);
+				f.t += 0.4;
+			} });
+
+		j.push_back({ "Rescued",
+			"Six bandits. The player is struck down; Lydia kills the bandit standing over them and Brelyna heals them when she is "
+			"there. The player gets up slowly, as a follower does.",
+			[](std::size_t) { return Many("Bandit", 150, 6); }, 1, 0.3f, Dealt, Taken,
+			[](Fight& f, std::size_t k) {
+				if (k != 2) return;
+				f.Hurt(0, f.foes[k], f.party[0].hp, 0.0f);
+				f.b.Down(f.party[0].id, f.t);
+				f.Heal(0, f.Find(Role::kSupport), 120, "Healing Hands");
+				f.b.Up(f.party[0].id);
+			} });
+
 		j.push_back({ "Fled",
 			"Six Forsworn are too much: two fall, the party takes a beating and runs, and the Forsworn give up the chase. The battle ends "
 			"where it was, with four Forsworn alive.",

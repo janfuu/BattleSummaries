@@ -118,6 +118,11 @@ namespace BSM
 		bool   isDown{ false };
 		double criticalAt{ -1.0 };  // when they first were near death or down; -1 = never
 		ActorId broughtLowBy{ 0 };  // who dealt the blows that did it
+		// Back from bleedout or death's door at a stroke, with half their health or more and nobody's healing behind it:
+		// a death-alternative mod (Stay In The Fight, Sacrosanct's Fortitude, Last Man Standing) putting them back on
+		// their feet. When it happened; -1 = never.
+		double roseAt{ -1.0 };
+		double lastHealAt{ -1.0 };
 
 		bool    dead{ false };
 		ActorId killer{ 0 };

@@ -262,7 +262,8 @@ namespace BSM
 		Rescue FindRescue(const Battle& a_b, const Participant& a_p, const NarrativeOptions& a_opt)
 		{
 			Rescue r;
-			if (!a_p.WasCritical() || a_p.dead) return r;
+			// put back on their feet by something of their own (a death-alternative mod): nobody else's doing saved them
+			if (!a_p.WasCritical() || a_p.dead || a_p.roseAt >= 0.0) return r;
 			const auto addSavior = [&](ActorId a_id) {
 				if (a_id != 0 && a_id != a_p.info.id && std::ranges::find(r.saviors, a_id) == r.saviors.end()) r.saviors.push_back(a_id);
 			};
@@ -314,16 +315,19 @@ namespace BSM
 			return out;
 		}
 
-		// "was struck down (collapsed, bleeding out) twice by X" / "was brought to the edge of death by X" / ""
-		std::string Brink(const Battle& a_b, const Participant& a_p, const NarrativeOptions& a_opt)
+		// "was struck down twice by X: collapsed and helpless for a moment, but got back up" / "was brought to the very
+		// edge of death by X, ..., but survived" / "". a_recovery: how they came back from it, unless the sentence goes on
+		// to say who saved them.
+		std::string Brink(const Battle& a_b, const Participant& a_p, const NarrativeOptions& a_opt, bool a_recovery = true)
 		{
+			const auto recovery = [&](const char* a_key) { return a_recovery ? T(a_p.roseAt >= 0.0 ? "brink.rose" : a_key) : std::string(); };
 			std::string by = a_p.broughtLowBy != 0 ? " " + F("brink.by", { { "name", NameOf(a_b, a_p.broughtLowBy) } }) : std::string();
 			if (OwnSide(a_b, a_p, a_p.broughtLowBy)) by = a_opt.ignoreFriendlyFire ? std::string() : by + " " + T("brink.friendly");
 			if (a_p.downs > 0) {
 				const std::string times = a_p.downs == 1 ? std::string() : " " + (a_p.downs == 2 ? T("times.twice") : F("times.many", { { "count", N(a_p.downs) } }));
-				return F("brink.down", { { "times", times }, { "by", by } });
+				return F("brink.down", { { "times", times }, { "by", by } }) + recovery("brink.got_up");
 			}
-			if (a_p.nearDeath) return F("brink.near_death", { { "by", by } });
+			if (a_p.nearDeath) return F("brink.near_death", { { "by", by } }) + recovery("brink.survived");
 			return {};
 		}
 
@@ -954,7 +958,7 @@ namespace BSM
 			if (const auto hurt = Injuries(a_b, *p, false); !hurt.empty()) add(F("injury.memory", { { "name", p->info.name }, { "injuries", hurt } }));
 			if (!p->WasCritical()) continue;
 			const auto        r = FindRescue(a_b, *p, a_opt);
-			const std::string brink = Brink(a_b, *p, a_opt);
+			const std::string brink = Brink(a_b, *p, a_opt, r.saviors.empty());
 			if (!r.saviors.empty()) {
 				add(F("memory.rescued", { { "name", p->info.name }, { "brink", brink }, { "deeds", JoinList(r.brief) }, { "saviors", JoinList(Names(a_b, r.saviors)) } }));
 			} else {

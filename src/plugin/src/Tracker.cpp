@@ -569,6 +569,10 @@ namespace BSM::Tracker
 			const auto fid = a_actor->GetFormID();
 			ActorId    key = Key(fid);
 			if (const auto* was = g_current->Find(key); was && was->dead && !a_actor->IsDead()) {
+				// a resurrection (Shades of Mortality), or the ID reused for someone new: logged, to tell which a mod does
+				const auto old = g_live[key].handle.get();
+				SKSE::log::info("Battle {}: {} ({:08X}) is alive again after dying in this battle ({}, {})", g_current->id, was->info.name, fid,
+					old && old.get() == a_actor ? "the same actor" : "another actor", a_actor->IsCommandedActor() ? "commanded" : "not commanded");
 				key = g_nextKey--;  // a living actor under a dead fighter's ID: someone new
 				g_alias[fid] = key;
 				SKSE::log::debug("Battle {}: {:08X} is a new fighter under the ID of {} (dead): kept as {:08X}", g_current->id, fid, was->info.name, key);

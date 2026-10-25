@@ -19,6 +19,12 @@
   inn, a teleport, a door), it ends there. Nobody at the new place is told it as a witness or counted as a fighter, and
   enemies still alive are not said to have fled: "The fight was cut short; by then 8 of the 14 enemies had been killed."
   Witnesses are now those who stood near while it was fought, not whoever is near when it ends.
+- Death-alternative mods that put you back on your feet (Stay In The Fight, Sacrosanct's Fortitude, Last Man Standing):
+  being struck down is now told as "collapsed and helpless for a moment, but got back up", and getting up at a stroke
+  with your health restored, by nobody's healing, as "rose again with their strength restored" (no one is credited with
+  saving you for it). NPCs are also told plainly that being struck down is not dying.
+- If you changed `memory.survived` in your own text file, note that the recovery ("but got back up", "but survived") is
+  now part of `{brink}`.
 - Short lists: past four names, "and 3 others". Help given to one person names them: "Brelyna kept Kaira going with
   healing".
 

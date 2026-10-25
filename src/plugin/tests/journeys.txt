@@ -117,14 +117,14 @@ Three bandits go down without landing a blow.
 ==== Tough / solo (1) ====
 A Briarheart and six Forsworn wear the party down: the player is injured, Lydia nearly falls, and someone dies (Lydia in a duo, Aela in a party). Brelyna heals when she is there; alone, the player drinks potions.
   [remembered event]
-    A battle was fought at the road to Whiterun. It lasted 14 seconds. Kaira fought against Forsworn Briarheart and Forsworn x6. All 7 enemies were killed. Who killed the enemies: Kaira 7. Kaira came out of it injured: a broken arm (dealt by the first Forsworn). Kaira was brought to the very edge of death by the third Forsworn, with almost no health left, but survived.
+    A battle was fought at the road to Whiterun. It lasted 14 seconds. Kaira fought against Forsworn Briarheart and Forsworn x6. All 7 enemies were killed. Who killed the enemies: Kaira 7. Kaira came out of it injured: a broken arm (dealt by the first Forsworn). Kaira was brought to the very edge of death by the third Forsworn, with almost no health left, and rose again with their strength restored.
   [told to everyone]
     A battle was fought at the road to Whiterun. It lasted 14 seconds.
     Kaira fought against Forsworn Briarheart and Forsworn x6.
     All 7 enemies were killed.
     Who killed the enemies: Kaira 7.
   [a witness, about the fighters]
-    Kaira: took more damage than a body can survive in one go, and only kept going thanks to healing; dealt all the damage on their side; was brought to the very edge of death by the third Forsworn, with almost no health left; was injured (a broken arm); drank 2 potions; killed 7 of the other side.
+    Kaira: took more damage than a body can survive in one go, and only kept going thanks to healing; dealt all the damage on their side; was brought to the very edge of death by the third Forsworn, with almost no health left, and rose again with their strength restored; was injured (a broken arm); drank 2 potions; killed 7 of the other side.
 
 ==== Tough / duo (2) ====
 A Briarheart and six Forsworn wear the party down: the player is injured, Lydia nearly falls, and someone dies (Lydia in a duo, Aela in a party). Brelyna heals when she is there; alone, the player drinks potions.
@@ -161,7 +161,7 @@ A Briarheart and six Forsworn wear the party down: the player is injured, Lydia 
     Aela was killed by the fourth Forsworn.
   [Lydia, about themself]
     Lydia took more damage than a body can survive in one go, and only kept going thanks to healing and dealt a large share of their side's damage.
-    Lydia was brought to the very edge of death by the second Forsworn, with almost no health left.
+    Lydia was brought to the very edge of death by the second Forsworn, with almost no health left, but survived.
     The second Forsworn, who had nearly killed Lydia, was then killed by Marcurio.
     While Lydia was at death's door, Brelyna healed Lydia with Healing Hands, restoring a good part of Lydia's health.
     In plain terms: Marcurio and Brelyna saved Lydia's life in this battle. Without that help Lydia would most likely have died.
@@ -202,7 +202,7 @@ A Briarheart and six Forsworn wear the party down: the player is injured, Lydia 
     Aela was killed by the fourth Forsworn.
   [Lydia, about themself]
     Lydia took more damage than a body can survive in one go, and only kept going thanks to healing and dealt a fair share of their side's damage.
-    Lydia was brought to the very edge of death by the second Forsworn, with almost no health left.
+    Lydia was brought to the very edge of death by the second Forsworn, with almost no health left, but survived.
     The second Forsworn, who had nearly killed Lydia, was then killed by Marcurio.
     While Lydia was at death's door, Brelyna healed Lydia with Healing Hands, restoring a good part of Lydia's health.
     In plain terms: Marcurio and Brelyna saved Lydia's life in this battle. Without that help Lydia would most likely have died.
@@ -1084,19 +1084,19 @@ Six bandits. The player sends in a flame atronach, Brelyna another when she is t
 ==== Carried off / solo (1) ====
 Six Forsworn. Two fall, then the player is struck down and carried away mid-fight (a death-alternative mod like Revenge and Respawn, or a teleport): the battle ends there with four Forsworn alive.
   [remembered event]
-    A battle was fought at the road to Whiterun. It lasted 8 seconds. Kaira fought against Forsworn x6. The fight was cut short; by then 2 of the 6 enemies had been killed. Who killed the enemies: Kaira 2 (Forsworn x2). Kaira was struck down by the third Forsworn: collapsed, helpless and bleeding out, unable to fight, but survived.
+    A battle was fought at the road to Whiterun. It lasted 8 seconds. Kaira fought against Forsworn x6. The fight was cut short; by then 2 of the 6 enemies had been killed. Who killed the enemies: Kaira 2 (Forsworn x2). Kaira was struck down by the third Forsworn: collapsed and helpless for a moment, but got back up.
   [told to everyone]
     A battle was fought at the road to Whiterun. It lasted 8 seconds.
     Kaira fought against Forsworn x6.
     The fight was cut short; by then 2 of the 6 enemies had been killed.
     Who killed the enemies: Kaira 2 (Forsworn x2).
   [a witness, about the fighters]
-    Kaira: took a brutal amount of damage; dealt all the damage on their side; was struck down by the third Forsworn: collapsed, helpless and bleeding out, unable to fight; killed 2 of the other side.
+    Kaira: took a brutal amount of damage; dealt all the damage on their side; was struck down by the third Forsworn: collapsed and helpless for a moment, but got back up; killed 2 of the other side.
 
 ==== Carried off / duo (2) ====
 Six Forsworn. Two fall, then the player is struck down and carried away mid-fight (a death-alternative mod like Revenge and Respawn, or a teleport): the battle ends there with four Forsworn alive.
   [remembered event]
-    A battle was fought at the road to Whiterun. It lasted 13 seconds. Kaira and Lydia fought against Forsworn x6. The fight was cut short; by then 2 of the 6 enemies had been killed. Who killed the enemies: Kaira 1 (Forsworn); Lydia 1 (Forsworn). The party shared the damage to the enemy evenly. Kaira bore the brunt of the enemy's blows. Kaira was struck down by the third Forsworn: collapsed, helpless and bleeding out, unable to fight, but survived.
+    A battle was fought at the road to Whiterun. It lasted 13 seconds. Kaira and Lydia fought against Forsworn x6. The fight was cut short; by then 2 of the 6 enemies had been killed. Who killed the enemies: Kaira 1 (Forsworn); Lydia 1 (Forsworn). The party shared the damage to the enemy evenly. Kaira bore the brunt of the enemy's blows. Kaira was struck down by the third Forsworn: collapsed and helpless for a moment, but got back up.
   [told to everyone]
     A battle was fought at the road to Whiterun. It lasted 13 seconds.
     Kaira and Lydia fought against Forsworn x6.
@@ -1109,12 +1109,12 @@ Six Forsworn. Two fall, then the player is struck down and carried away mid-figh
     Lydia was never in serious danger.
     Lydia killed 1 of the 2 who died on the other side: Forsworn.
   [Lydia, about the others]
-    Kaira: took a brutal amount of damage; dealt a fair share of their side's damage; was struck down by the third Forsworn: collapsed, helpless and bleeding out, unable to fight; killed 1 of the other side.
+    Kaira: took a brutal amount of damage; dealt a fair share of their side's damage; was struck down by the third Forsworn: collapsed and helpless for a moment, but got back up; killed 1 of the other side.
 
 ==== Carried off / party (5) ====
 Six Forsworn. Two fall, then the player is struck down and carried away mid-fight (a death-alternative mod like Revenge and Respawn, or a teleport): the battle ends there with four Forsworn alive.
   [remembered event]
-    A battle was fought at the road to Whiterun. It lasted 29 seconds. Kaira, Lydia, Marcurio, Aela and Brelyna fought against Forsworn x6. The fight was cut short; by then 2 of the 6 enemies had been killed. Who killed the enemies: Kaira 1 (Forsworn); Lydia 1 (Forsworn). Kaira led the party's damage to the enemy. Marcurio, Aela and Lydia also did a real part of it. Kaira bore the brunt of the enemy's blows. Kaira was struck down by the third Forsworn: collapsed, helpless and bleeding out, unable to fight, but survived.
+    A battle was fought at the road to Whiterun. It lasted 29 seconds. Kaira, Lydia, Marcurio, Aela and Brelyna fought against Forsworn x6. The fight was cut short; by then 2 of the 6 enemies had been killed. Who killed the enemies: Kaira 1 (Forsworn); Lydia 1 (Forsworn). Kaira led the party's damage to the enemy. Marcurio, Aela and Lydia also did a real part of it. Kaira bore the brunt of the enemy's blows. Kaira was struck down by the third Forsworn: collapsed and helpless for a moment, but got back up.
   [told to everyone]
     A battle was fought at the road to Whiterun. It lasted 29 seconds.
     Kaira, Lydia, Marcurio, Aela and Brelyna fought against Forsworn x6.
@@ -1128,7 +1128,7 @@ Six Forsworn. Two fall, then the player is struck down and carried away mid-figh
     Lydia was never in serious danger.
     Lydia killed 1 of the 2 who died on the other side: Forsworn.
   [Lydia, about the others]
-    Kaira: took a brutal amount of damage; dealt a large share of their side's damage; was struck down by the third Forsworn: collapsed, helpless and bleeding out, unable to fight; killed 1 of the other side.
+    Kaira: took a brutal amount of damage; dealt a large share of their side's damage; was struck down by the third Forsworn: collapsed and helpless for a moment, but got back up; killed 1 of the other side.
     Marcurio: took only light wounds; dealt a fair share of their side's damage; was never near death; killed none of the other side.
     Aela: took only light wounds; dealt a fair share of their side's damage; was never near death; killed none of the other side.
     Brelyna: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
@@ -1148,7 +1148,7 @@ Six Forsworn. Two fall, then the player is struck down and carried away mid-figh
 ==== Carried off / large (10) ====
 Six Forsworn. Two fall, then the player is struck down and carried away mid-fight (a death-alternative mod like Revenge and Respawn, or a teleport): the battle ends there with four Forsworn alive.
   [remembered event]
-    A battle was fought at the road to Whiterun. It lasted 55 seconds. Kaira, Lydia, Marcurio, Aela and 6 others fought against Forsworn x6. The fight was cut short; by then 2 of the 6 enemies had been killed. Who killed the enemies: Kaira 1 (Forsworn); Lydia 1 (Forsworn). Kaira led the party's damage to the enemy. Lydia, Marcurio, Aela and 5 others also did a real part of it. Kaira, Lydia, Uthgerd and Borgakh took the enemy's blows between them. Kaira was struck down by the third Forsworn: collapsed, helpless and bleeding out, unable to fight, but survived.
+    A battle was fought at the road to Whiterun. It lasted 55 seconds. Kaira, Lydia, Marcurio, Aela and 6 others fought against Forsworn x6. The fight was cut short; by then 2 of the 6 enemies had been killed. Who killed the enemies: Kaira 1 (Forsworn); Lydia 1 (Forsworn). Kaira led the party's damage to the enemy. Lydia, Marcurio, Aela and 5 others also did a real part of it. Kaira, Lydia, Uthgerd and Borgakh took the enemy's blows between them. Kaira was struck down by the third Forsworn: collapsed and helpless for a moment, but got back up.
   [told to everyone]
     A battle was fought at the road to Whiterun. It lasted 55 seconds.
     Kaira, Lydia, Marcurio, Aela and 6 others fought against Forsworn x6.
@@ -1162,7 +1162,7 @@ Six Forsworn. Two fall, then the player is struck down and carried away mid-figh
     Lydia was never in serious danger.
     Lydia killed 1 of the 2 who died on the other side: Forsworn.
   [Lydia, about the others]
-    Kaira: took a brutal amount of damage; dealt a large share of their side's damage; was struck down by the third Forsworn: collapsed, helpless and bleeding out, unable to fight; killed 1 of the other side.
+    Kaira: took a brutal amount of damage; dealt a large share of their side's damage; was struck down by the third Forsworn: collapsed and helpless for a moment, but got back up; killed 1 of the other side.
     Marcurio: took only light wounds; dealt a fair share of their side's damage; was never near death; killed none of the other side.
     Aela: took only light wounds; dealt a fair share of their side's damage; was never near death; killed none of the other side.
     Brelyna: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
@@ -1200,6 +1200,254 @@ Six Forsworn. Two fall, then the player is struck down and carried away mid-figh
     Borgakh took only light wounds and dealt a fair share of their side's damage.
     Borgakh was never in serious danger.
     Borgakh killed none of the 2 who died on the other side.
+
+==== Back on your feet / solo (1) ====
+Six bandits. The player is struck down twice, and each time a death-alternative mod (Stay In The Fight, Sacrosanct's Fortitude) puts them straight back on their feet with their health restored. Nobody heals them.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 12 seconds. Kaira fought against Bandit x6. All 6 enemies were killed. Who killed the enemies: Kaira 6. Kaira was struck down twice by the second Bandit: collapsed and helpless for a moment, and rose again with their strength restored.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 12 seconds.
+    Kaira fought against Bandit x6.
+    All 6 enemies were killed.
+    Who killed the enemies: Kaira 6.
+  [a witness, about the fighters]
+    Kaira: took a brutal amount of damage; dealt all the damage on their side; was struck down twice by the second Bandit: collapsed and helpless for a moment, and rose again with their strength restored; killed 6 of the other side.
+
+==== Back on your feet / duo (2) ====
+Six bandits. The player is struck down twice, and each time a death-alternative mod (Stay In The Fight, Sacrosanct's Fortitude) puts them straight back on their feet with their health restored. Nobody heals them.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 16 seconds. Kaira and Lydia fought against Bandit x6. All 6 enemies were killed. Who killed the enemies: Kaira 3 (Bandit x3); Lydia 3 (Bandit x3). The party shared the damage to the enemy evenly. Kaira bore the brunt of the enemy's blows. Kaira was struck down twice by the second Bandit: collapsed and helpless for a moment, and rose again with their strength restored.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 16 seconds.
+    Kaira and Lydia fought against Bandit x6.
+    All 6 enemies were killed.
+    Who killed the enemies: Kaira 3 (Bandit x3); Lydia 3 (Bandit x3).
+    The party shared the damage to the enemy evenly.
+    Kaira bore the brunt of the enemy's blows.
+  [Lydia, about themself]
+    Lydia took solid wounds and dealt a fair share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 3 of the 6 who died on the other side: Bandit x3.
+  [Lydia, about the others]
+    Kaira: took a brutal amount of damage; dealt a fair share of their side's damage; was struck down twice by the second Bandit: collapsed and helpless for a moment, and rose again with their strength restored; killed 3 of the other side.
+
+==== Back on your feet / party (5) ====
+Six bandits. The player is struck down twice, and each time a death-alternative mod (Stay In The Fight, Sacrosanct's Fortitude) puts them straight back on their feet with their health restored. Nobody heals them.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 31 seconds. Kaira, Lydia, Marcurio, Aela and Brelyna fought against Bandit x6. All 6 enemies were killed. Who killed the enemies: Kaira 2 (Bandit x2); Lydia 1 (Bandit); Marcurio 1 (Bandit); Aela 1 (Bandit); Brelyna 1 (Bandit). Kaira led the party's damage to the enemy. Aela, Lydia and Marcurio also did a real part of it. Kaira bore the brunt of the enemy's blows. Kaira was struck down twice by the second Bandit: collapsed and helpless for a moment, and rose again with their strength restored.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 31 seconds.
+    Kaira, Lydia, Marcurio, Aela and Brelyna fought against Bandit x6.
+    All 6 enemies were killed.
+    Who killed the enemies: Kaira 2 (Bandit x2); Lydia 1 (Bandit); Marcurio 1 (Bandit); Aela 1 (Bandit); Brelyna 1 (Bandit).
+    Kaira led the party's damage to the enemy.
+    Aela, Lydia and Marcurio also did a real part of it.
+    Kaira bore the brunt of the enemy's blows.
+  [Lydia, about themself]
+    Lydia took solid wounds and dealt a fair share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 1 of the 6 who died on the other side: Bandit.
+  [Lydia, about the others]
+    Kaira: took a brutal amount of damage; dealt a large share of their side's damage; was struck down twice by the second Bandit: collapsed and helpless for a moment, and rose again with their strength restored; killed 2 of the other side.
+    Marcurio: took solid wounds; dealt a fair share of their side's damage; was never near death; killed 1 of the other side.
+    Aela: took only light wounds; dealt a fair share of their side's damage; was never near death; killed 1 of the other side.
+    Brelyna: took only light wounds; dealt only a small part of their side's damage; was never near death; killed 1 of the other side.
+  [Marcurio, about themself]
+    Marcurio took solid wounds and dealt a fair share of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed 1 of the 6 who died on the other side: Bandit.
+  [Aela, about themself]
+    Aela took only light wounds and dealt a fair share of their side's damage.
+    Aela was never in serious danger.
+    Aela killed 1 of the 6 who died on the other side: Bandit.
+  [Brelyna, about themself]
+    Brelyna took only light wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed 1 of the 6 who died on the other side: Bandit.
+
+==== Back on your feet / large (10) ====
+Six bandits. The player is struck down twice, and each time a death-alternative mod (Stay In The Fight, Sacrosanct's Fortitude) puts them straight back on their feet with their health restored. Nobody heals them.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 55 seconds. Kaira, Lydia, Marcurio, Aela and 6 others fought against Bandit x6. All 6 enemies were killed. Who killed the enemies: Kaira 1 (Bandit); Lydia 1 (Bandit); Marcurio 1 (Bandit); Aela 1 (Bandit); J'zargo 1 (Bandit); Uthgerd 1 (Bandit). Kaira led the party's damage to the enemy. Lydia, Marcurio, J'zargo and 5 others also did a real part of it. Kaira took the largest share of the enemy's blows. Kaira was struck down twice by the second Bandit: collapsed and helpless for a moment, and rose again with their strength restored.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 55 seconds.
+    Kaira, Lydia, Marcurio, Aela and 6 others fought against Bandit x6.
+    All 6 enemies were killed.
+    Who killed the enemies: Kaira 1 (Bandit); Lydia 1 (Bandit); Marcurio 1 (Bandit); Aela 1 (Bandit); J'zargo 1 (Bandit); Uthgerd 1 (Bandit).
+    Kaira led the party's damage to the enemy.
+    Lydia, Marcurio, J'zargo and 5 others also did a real part of it.
+    Kaira took the largest share of the enemy's blows.
+  [Lydia, about themself]
+    Lydia took solid wounds and dealt a fair share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 1 of the 6 who died on the other side: Bandit.
+  [Lydia, about the others]
+    Kaira: took a brutal amount of damage; dealt a large share of their side's damage; was struck down twice by the second Bandit: collapsed and helpless for a moment, and rose again with their strength restored; killed 1 of the other side.
+    Marcurio: took only light wounds; dealt a fair share of their side's damage; was never near death; killed 1 of the other side.
+    Aela: took only light wounds; dealt a fair share of their side's damage; was never near death; killed 1 of the other side.
+    Brelyna: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    J'zargo: took only light wounds; dealt a fair share of their side's damage; was never near death; killed 1 of the other side.
+    Uthgerd: took solid wounds; dealt a fair share of their side's damage; was never near death; killed 1 of the other side.
+  [Marcurio, about themself]
+    Marcurio took only light wounds and dealt a fair share of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed 1 of the 6 who died on the other side: Bandit.
+  [Aela, about themself]
+    Aela took only light wounds and dealt a fair share of their side's damage.
+    Aela was never in serious danger.
+    Aela killed 1 of the 6 who died on the other side: Bandit.
+  [Brelyna, about themself]
+    Brelyna took only light wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed none of the 6 who died on the other side.
+  [J'zargo, about themself]
+    J'zargo took only light wounds and dealt a fair share of their side's damage.
+    J'zargo was never in serious danger.
+    J'zargo killed 1 of the 6 who died on the other side: Bandit.
+  [Uthgerd, about themself]
+    Uthgerd took solid wounds and dealt a fair share of their side's damage.
+    Uthgerd was never in serious danger.
+    Uthgerd killed 1 of the 6 who died on the other side: Bandit.
+  [Jenassa, about themself]
+    Jenassa took only light wounds and dealt a fair share of their side's damage.
+    Jenassa was never in serious danger.
+    Jenassa killed none of the 6 who died on the other side.
+  [Erik, about themself]
+    Erik took solid wounds and dealt a fair share of their side's damage.
+    Erik was never in serious danger.
+    Erik killed none of the 6 who died on the other side.
+  [Borgakh, about themself]
+    Borgakh took solid wounds and dealt a fair share of their side's damage.
+    Borgakh was never in serious danger.
+    Borgakh killed none of the 6 who died on the other side.
+
+==== Rescued / solo (1) ====
+Six bandits. The player is struck down; Lydia kills the bandit standing over them and Brelyna heals them when she is there. The player gets up slowly, as a follower does.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 10 seconds. Kaira fought against Bandit x6. All 6 enemies were killed. Who killed the enemies: Kaira 6. Kaira was struck down by the third Bandit: collapsed and helpless for a moment, but got back up.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 10 seconds.
+    Kaira fought against Bandit x6.
+    All 6 enemies were killed.
+    Who killed the enemies: Kaira 6.
+  [a witness, about the fighters]
+    Kaira: took a brutal amount of damage; dealt all the damage on their side; was struck down by the third Bandit: collapsed and helpless for a moment, but got back up; killed 6 of the other side.
+
+==== Rescued / duo (2) ====
+Six bandits. The player is struck down; Lydia kills the bandit standing over them and Brelyna heals them when she is there. The player gets up slowly, as a follower does.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 15 seconds. Kaira and Lydia fought against Bandit x6. All 6 enemies were killed. Who killed the enemies: Kaira 3 (Bandit x3); Lydia 3 (Bandit x3). The party shared the damage to the enemy evenly. Kaira bore the brunt of the enemy's blows. Lydia also took a share of the enemy's blows. Kaira was struck down by the third Bandit: collapsed and helpless for a moment, but got back up.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 15 seconds.
+    Kaira and Lydia fought against Bandit x6.
+    All 6 enemies were killed.
+    Who killed the enemies: Kaira 3 (Bandit x3); Lydia 3 (Bandit x3).
+    The party shared the damage to the enemy evenly.
+    Kaira bore the brunt of the enemy's blows.
+    Lydia also took a share of the enemy's blows.
+  [Lydia, about themself]
+    Lydia took solid wounds and dealt a fair share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 3 of the 6 who died on the other side: Bandit x3.
+  [Lydia, about the others]
+    Kaira: took a brutal amount of damage; dealt a fair share of their side's damage; was struck down by the third Bandit: collapsed and helpless for a moment, but got back up; killed 3 of the other side.
+
+==== Rescued / party (5) ====
+Six bandits. The player is struck down; Lydia kills the bandit standing over them and Brelyna heals them when she is there. The player gets up slowly, as a follower does.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 29 seconds. Kaira, Lydia, Marcurio, Aela and Brelyna fought against Bandit x6. All 6 enemies were killed. Who killed the enemies: Kaira 2 (Bandit x2); Lydia 1 (Bandit); Marcurio 1 (Bandit); Aela 1 (Bandit); Brelyna 1 (Bandit). Kaira led the party's damage to the enemy. Aela, Lydia and Marcurio also did a real part of it. Kaira bore the brunt of the enemy's blows. Lydia also took a share of the enemy's blows. Brelyna kept Kaira going with healing. Kaira was struck down by the third Bandit: collapsed and helpless for a moment, and would most likely have died, but Marcurio killed the third Bandit and Brelyna healed Kaira: Marcurio and Brelyna saved Kaira's life.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 29 seconds.
+    Kaira, Lydia, Marcurio, Aela and Brelyna fought against Bandit x6.
+    All 6 enemies were killed.
+    Who killed the enemies: Kaira 2 (Bandit x2); Lydia 1 (Bandit); Marcurio 1 (Bandit); Aela 1 (Bandit); Brelyna 1 (Bandit).
+    Kaira led the party's damage to the enemy.
+    Aela, Lydia and Marcurio also did a real part of it.
+    Kaira bore the brunt of the enemy's blows.
+    Lydia also took a share of the enemy's blows.
+    Brelyna kept Kaira going with healing.
+  [Lydia, about themself]
+    Lydia took solid wounds and dealt a fair share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 1 of the 6 who died on the other side: Bandit.
+  [Lydia, about the others]
+    Kaira: took more damage than a body can survive in one go, and only kept going thanks to healing; dealt a large share of their side's damage; was struck down by the third Bandit: collapsed and helpless for a moment, but got back up; was saved by Marcurio and Brelyna; killed 2 of the other side.
+    Marcurio: took solid wounds; dealt a fair share of their side's damage; was never near death; killed 1 of the other side.
+    Aela: took only light wounds; dealt a fair share of their side's damage; was never near death; killed 1 of the other side.
+    Brelyna: took only light wounds; dealt only a small part of their side's damage; was never near death; killed 1 of the other side.
+  [Marcurio, about themself]
+    Marcurio took solid wounds and dealt a fair share of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed 1 of the 6 who died on the other side: Bandit.
+    Marcurio saved Kaira's life. The third Bandit, who had struck down Kaira, was then killed by Marcurio. While Kaira was down, Brelyna healed Kaira with Healing Hands, restoring a good part of Kaira's health.
+  [Aela, about themself]
+    Aela took only light wounds and dealt a fair share of their side's damage.
+    Aela was never in serious danger.
+    Aela killed 1 of the 6 who died on the other side: Bandit.
+  [Brelyna, about themself]
+    Brelyna took only light wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed 1 of the 6 who died on the other side: Bandit.
+    Brelyna saved Kaira's life. The third Bandit, who had struck down Kaira, was then killed by Marcurio. While Kaira was down, Brelyna healed Kaira with Healing Hands, restoring a good part of Kaira's health.
+
+==== Rescued / large (10) ====
+Six bandits. The player is struck down; Lydia kills the bandit standing over them and Brelyna heals them when she is there. The player gets up slowly, as a follower does.
+  [remembered event]
+    A battle was fought at the road to Whiterun. It lasted 53 seconds. Kaira, Lydia, Marcurio, Aela and 6 others fought against Bandit x6. All 6 enemies were killed. Who killed the enemies: Kaira 1 (Bandit); Lydia 1 (Bandit); Marcurio 1 (Bandit); Aela 1 (Bandit); J'zargo 1 (Bandit); Uthgerd 1 (Bandit). Kaira led the party's damage to the enemy. Lydia, Marcurio, J'zargo and 5 others also did a real part of it. Kaira, Lydia, Uthgerd and Borgakh took the enemy's blows between them. Brelyna kept Kaira going with healing. Kaira was struck down by the third Bandit: collapsed and helpless for a moment, and would most likely have died, but Marcurio killed the third Bandit and Brelyna healed Kaira: Marcurio and Brelyna saved Kaira's life.
+  [told to everyone]
+    A battle was fought at the road to Whiterun. It lasted 53 seconds.
+    Kaira, Lydia, Marcurio, Aela and 6 others fought against Bandit x6.
+    All 6 enemies were killed.
+    Who killed the enemies: Kaira 1 (Bandit); Lydia 1 (Bandit); Marcurio 1 (Bandit); Aela 1 (Bandit); J'zargo 1 (Bandit); Uthgerd 1 (Bandit).
+    Kaira led the party's damage to the enemy.
+    Lydia, Marcurio, J'zargo and 5 others also did a real part of it.
+    Kaira, Lydia, Uthgerd and Borgakh took the enemy's blows between them.
+    Brelyna kept Kaira going with healing.
+  [Lydia, about themself]
+    Lydia took solid wounds and dealt a fair share of their side's damage.
+    Lydia was never in serious danger.
+    Lydia killed 1 of the 6 who died on the other side: Bandit.
+  [Lydia, about the others]
+    Kaira: took more damage than a body can survive in one go, and only kept going thanks to healing; dealt a large share of their side's damage; was struck down by the third Bandit: collapsed and helpless for a moment, but got back up; was saved by Marcurio and Brelyna; killed 1 of the other side.
+    Marcurio: took only light wounds; dealt a fair share of their side's damage; was never near death; killed 1 of the other side.
+    Aela: took only light wounds; dealt a fair share of their side's damage; was never near death; killed 1 of the other side.
+    Brelyna: took only light wounds; dealt only a small part of their side's damage; was never near death; killed none of the other side.
+    J'zargo: took only light wounds; dealt a fair share of their side's damage; was never near death; killed 1 of the other side.
+    Uthgerd: took solid wounds; dealt a fair share of their side's damage; was never near death; killed 1 of the other side.
+  [Marcurio, about themself]
+    Marcurio took only light wounds and dealt a fair share of their side's damage.
+    Marcurio was never in serious danger.
+    Marcurio killed 1 of the 6 who died on the other side: Bandit.
+    Marcurio saved Kaira's life. The third Bandit, who had struck down Kaira, was then killed by Marcurio. While Kaira was down, Brelyna healed Kaira with Healing Hands, restoring a good part of Kaira's health.
+  [Aela, about themself]
+    Aela took only light wounds and dealt a fair share of their side's damage.
+    Aela was never in serious danger.
+    Aela killed 1 of the 6 who died on the other side: Bandit.
+  [Brelyna, about themself]
+    Brelyna took only light wounds and dealt only a small part of their side's damage.
+    Brelyna was never in serious danger.
+    Brelyna killed none of the 6 who died on the other side.
+    Brelyna saved Kaira's life. The third Bandit, who had struck down Kaira, was then killed by Marcurio. While Kaira was down, Brelyna healed Kaira with Healing Hands, restoring a good part of Kaira's health.
+  [J'zargo, about themself]
+    J'zargo took only light wounds and dealt a fair share of their side's damage.
+    J'zargo was never in serious danger.
+    J'zargo killed 1 of the 6 who died on the other side: Bandit.
+  [Uthgerd, about themself]
+    Uthgerd took solid wounds and dealt a fair share of their side's damage.
+    Uthgerd was never in serious danger.
+    Uthgerd killed 1 of the 6 who died on the other side: Bandit.
+  [Jenassa, about themself]
+    Jenassa took only light wounds and dealt a fair share of their side's damage.
+    Jenassa was never in serious danger.
+    Jenassa killed none of the 6 who died on the other side.
+  [Erik, about themself]
+    Erik took solid wounds and dealt a fair share of their side's damage.
+    Erik was never in serious danger.
+    Erik killed none of the 6 who died on the other side.
+  [Borgakh, about themself]
+    Borgakh took solid wounds and dealt a fair share of their side's damage.
+    Borgakh was never in serious danger.
+    Borgakh killed none of the 6 who died on the other side.
 
 ==== Fled / solo (1) ====
 Six Forsworn are too much: two fall, the party takes a beating and runs, and the Forsworn give up the chase. The battle ends where it was, with four Forsworn alive.
