@@ -749,7 +749,7 @@ namespace
 		const auto left = fight(true);
 		const auto told = SummaryText(BuildSummary(left, kLydia, "Lydia", {}));
 		Check(!Has(told, "Heimskr") && !Has(told, "Deer") && !Has(told, "caught up"), "non-combatants are left out altogether", told);
-		Check(Has(told, "Kaira and Lydia fought against Bandit and Vigilant of Stendarr.") && Has(told, "All 2 enemies were killed."),
+		Check(Has(told, "Kaira and Lydia fought against Bandit and Vigilant of Stendarr.") && Has(told, "Both enemies were killed."),
 			"an enemy killed unaware still counts", told);
 		Check(Has(told, "Who killed the enemies: Lydia 1 (Bandit); Kaira 1 (Vigilant of Stendarr)."), "and is credited", told);
 		Check(!Has(BuildMemory(left, {}), "Heimskr"), "and nothing of them is remembered", BuildMemory(left, {}));
@@ -1060,7 +1060,7 @@ namespace
 		b.Damage(kBandit2, kHero, 100, 0.0f, 2.5);
 		b.Death(kBandit2, kHero, 2.5);
 		const auto won = BuildMemory(b, {});
-		Check(Has(won, "All 2 enemies were killed.") && !Has(won, "cut short"), "cut short with every enemy dead: told as won", won);
+		Check(Has(won, "Both enemies were killed.") && !Has(won, "cut short"), "cut short with every enemy dead: told as won", won);
 	}
 
 	// A death-alternative mod puts the player back on their feet at a stroke: told as rising again, not as a rescue, and

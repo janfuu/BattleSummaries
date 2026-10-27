@@ -63,6 +63,7 @@ namespace BSM::Text
 			{ "Outcome", "outcome.so_far", "So far {dead} of the {total} {foes} are dead.", "" },
 			{ "Outcome", "outcome.one", "The one enemy was killed.", "" },
 			{ "Outcome", "outcome.all", "All {total} {foes} were killed.", "" },
+			{ "Outcome", "outcome.both", "Both {foes} were killed.", "the same, with two of them" },
 			{ "Outcome", "outcome.none", "None of the {total} {foes} were killed; the fight broke off.", "" },
 			{ "Outcome", "outcome.some", "{dead} of the {total} {foes} were killed; the rest fled, yielded or broke off.", "" },
 			{ "Outcome", "outcome.cut_short", "The fight was cut short; by then {dead} of the {total} {foes} had been killed.",
