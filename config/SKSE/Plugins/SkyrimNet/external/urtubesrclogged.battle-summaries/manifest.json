@@ -22,7 +22,7 @@
   "languages": [
     "en"
   ],
-  "version": "1.4.1-beta-1",
-  "changelog": "Beta. Who did the work in a fight, the part each played and the potions and poisons used. A battle ends where it was fought when you are moved away mid-fight (death-alternative mods, teleports). Being struck down is told as getting back up, or as rising again when a death-alternative mod restores you.",
+  "version": "1.4.1-beta-2",
+  "changelog": "Beta 2. Who did the work in a fight, the part each played and the potions and poisons used. A battle ends where it was fought when you are moved away mid-fight (death-alternative mods, teleports). Being struck down is told as getting back up, or as rising again when a death-alternative mod restores you. A wind-down setting joins fighting that starts again into one battle, told in clashes.",
   "min_skyrimnet_version": "0.25.0"
 }
