@@ -79,6 +79,7 @@ namespace BSM::Tracker
 			std::set<ActorId> witnesses;
 			bool              remembered{ false };
 			bool              cutShort{ false };  // ended by a move: a fight where the player is now is another battle
+			const void*       space{ nullptr };   // the world or interior it was fought in
 			double            closedAt{ 0.0 };  // when the tracker let go of it; the battle's own end is its last blow, which is earlier
 		};
 		std::map<int, Extra> g_extra;
@@ -538,13 +539,15 @@ namespace BSM::Tracker
 				g_sitePos = pc->GetPosition();
 			}
 			g_witnessScanAt = 0.0;
-			// the fight flared up again where it was: same battle (never across a move)
-			if (!g_history.empty() && !g_extra[g_history.front().id].cutShort && a_now - g_extra[g_history.front().id].closedAt <= cfg.mergeGapSeconds) {
+			// The fight flared up again within the wind-down, where it was: the same battle, one more clash. Never across a move,
+			// nor once the player has gone into another world or interior.
+			const auto* last = g_history.empty() ? nullptr : &g_extra[g_history.front().id];
+			if (last && !last->cutShort && !last->remembered && last->space == g_siteSpace && a_now - last->closedAt <= cfg.mergeGapSeconds) {
 				g_current = std::move(g_history.front());  // the fight flared up again: same battle
 				g_history.pop_front();
-				g_extra[g_current->id].remembered = false;  // remembered again, whole, when it ends again
+				++g_current->clashes;
 				g_current->endedAt = -1.0;
-				SKSE::log::info("Battle {} resumed", g_current->id);
+				SKSE::log::info("Battle {} resumed: clash {}", g_current->id, g_current->clashes);
 			} else {
 				g_current.emplace();
 				g_current->id = g_nextId++;
@@ -637,6 +640,7 @@ namespace BSM::Tracker
 			auto& extra = g_extra[b.id];
 			extra.closedAt = Now();
 			extra.cutShort = b.cutShort;
+			extra.space = g_siteSpace;
 			g_stale = true;
 			// those who stood near while it was fought; after a move, nobody where the player is now
 			if (!b.cutShort) ScanWitnesses();
@@ -912,22 +916,26 @@ namespace BSM::Tracker
 			return out;
 		}
 
-		// The remembered event, posted the moment a battle closes. SkyrimNet files an event where the player is when it is
-		// posted, and everyone near them then has it in their history as if they had been there: posted later (it once
-		// waited out the merge gap), a battle walked away from was "remembered" by the people inside the next door. A
-		// battle that flares up again is remembered again, whole, when it closes again. One cut short by the player being
-		// moved away is never posted: they are already somewhere else.
-		std::vector<std::string> DueMemories()
+		// The remembered event, posted once a battle is final: the wind-down (fMergeGapSeconds) has run out with no more
+		// fighting, so all its clashes are in one event. SkyrimNet files an event where the player is when it is posted, and
+		// everyone near them then has it in their history as if they had been there; so it is posted only while the player
+		// is still in the world or interior it was fought in. Gone through a door, or moved away mid-fight (cut short): not
+		// posted. Its fighters still get the summary.
+		std::vector<std::string> DueMemories(double a_now)
 		{
 			std::vector<std::string> out;
 			const auto&              cfg = Settings::Get();
+			auto*                    pc = RE::PlayerCharacter::GetSingleton();
 			for (auto& b : g_history) {
 				auto& extra = g_extra[b.id];
 				if (extra.remembered) continue;
+				const bool away = b.cutShort || !pc || SpaceOf(pc) != extra.space;
+				if (!away && a_now - extra.closedAt <= cfg.mergeGapSeconds) continue;  // still winding down: it may go on
 				extra.remembered = true;
 				if (!cfg.rememberEvent) continue;
-				if (b.cutShort) {
-					SKSE::log::info("Battle {}: not remembered as an event (the player was moved away: it would be filed where they are now)", b.id);
+				if (away) {
+					SKSE::log::info("Battle {}: not remembered as an event (the player {}: it would be filed where they are now)", b.id,
+						b.cutShort ? "was moved away mid-fight" : "left the place before it was final");
 					continue;
 				}
 				if (Significant(b, cfg.minEnemies, cfg.minSeconds)) out.push_back(BuildMemory(b, Opts()));
@@ -1076,7 +1084,7 @@ namespace BSM::Tracker
 					if (g_quiet >= cfg.endGraceSeconds) End(std::min(now - g_quiet, g_lastBlow));
 					else if (now - g_current->startedAt > 3600.0) End(now);  // something kept it open: close it
 				}
-				memories = DueMemories();
+				memories = DueMemories(now);
 			}
 			if (std::exchange(g_readSettings, false)) {
 				SkyrimNet::ReadSettings();

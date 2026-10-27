@@ -28,6 +28,9 @@
   saving you for it). NPCs are also told plainly that being struck down is not dying.
 - If you changed `memory.survived` in your own text file, note that the recovery ("but got back up", "but survived") is
   now part of `{brink}`.
+- A wind-down setting on SkyrimNet's page (default 20 seconds, as before; 0 to 60): fighting that starts again within it,
+  where it was fought, continues the same battle, told as "It was fought in 3 clashes over about 4 minutes." The battle
+  is remembered once, when the wind-down runs out, and only if you are still where it was fought.
 - Short lists: past four names, "and 3 others". Help given to one person names them: "Brelyna kept Kaira going with
   healing".
 

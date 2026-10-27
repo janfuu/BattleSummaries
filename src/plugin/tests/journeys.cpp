@@ -158,6 +158,7 @@ namespace
 		std::function<void(Fight&)>                          setup{};  // before the first blow: summons cast
 		int                                                  stopAfter{ -1 };  // the fight ends with this many foes down (before: k = stopAfter)
 		bool                                                 cutShort{ false };  // ...because the player was moved away from it
+		int                                                  clashes{ 1 };  // stopped and started again within the wind-down
 	};
 
 	std::vector<Foe> Many(const char* a_name, float a_hp, int a_count, std::vector<Foe> a_first = {})
@@ -238,6 +239,7 @@ namespace
 		}
 		b.endedAt = a_f.t + 1.0;
 		b.cutShort = a_j.cutShort;
+		b.clashes = a_j.clashes;
 	}
 
 	std::vector<Journey> Journeys()
@@ -363,6 +365,15 @@ namespace
 				f.Heal(0, f.Find(Role::kSupport), 120, "Healing Hands");
 				f.b.Up(f.party[0].id);
 			} });
+
+		j.push_back({ "Dungeon crawl",
+			"A Dwemer ruin cleared room by room: six Dwarven Spheres and Spiders met two at a time, each group within the wind-down "
+			"of the last. One battle, fought in three clashes.",
+			[](std::size_t) { return Many("Dwarven Spider", 120, 4, { { "Dwarven Sphere", 300 }, { "Dwarven Sphere", 300 } }); }, 1, 0.25f, Dealt, Taken,
+			[](Fight& f, std::size_t k) {
+				if (k == 2 || k == 4) f.t += 60.0;  // on to the next room
+			} });
+		j.back().clashes = 3;
 
 		j.push_back({ "Fled",
 			"Six Forsworn are too much: two fall, the party takes a beating and runs, and the Forsworn give up the chase. The battle ends "

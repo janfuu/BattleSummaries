@@ -849,7 +849,9 @@ namespace BSM
 			const auto               party = OnSide(a_b, Side::kPlayer), enemies = OnSide(a_b, Side::kEnemy), others = OnSide(a_b, Side::kOther);
 			const std::string        where = a_b.location.empty() ? std::string() : " " + F("battle.at", { { "place", a_b.location } });
 			if (a_b.Ongoing()) out.push_back(F("battle.underway", { { "at_place", where } }));
-			else out.push_back(F("battle.fought", { { "at_place", where }, { "duration", DurationText(a_b.endedAt - a_b.startedAt) } }));
+			else if (a_b.clashes > 1) {
+				out.push_back(F("battle.fought_clashes", { { "at_place", where }, { "count", N(a_b.clashes) }, { "duration", DurationText(a_b.endedAt - a_b.startedAt) } }));
+			} else out.push_back(F("battle.fought", { { "at_place", where }, { "duration", DurationText(a_b.endedAt - a_b.startedAt) } }));
 
 			if (!party.empty() && !enemies.empty()) out.push_back(F("battle.sides", { { "party", Grouped(party) }, { "enemies", Grouped(enemies) } }));
 			else if (!enemies.empty()) out.push_back(F("battle.enemies_only", { { "enemies", Grouped(enemies) } }));

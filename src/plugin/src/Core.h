@@ -174,6 +174,9 @@ namespace BSM
 		// The player was moved away from it (a teleport, a door, a death-alternative mod) while it was being fought: it
 		// ended there, and enemies still alive are not told as having fled.
 		bool        cutShort{ false };
+		// Fighting that stopped and started again within the wind-down (a dungeon cleared room by room, enemies arriving in
+		// groups): one battle, fought in this many clashes.
+		int         clashes{ 1 };
 
 		std::vector<Participant> participants;  // in the order they joined
 

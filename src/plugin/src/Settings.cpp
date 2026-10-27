@@ -117,7 +117,17 @@ namespace BSM::Settings
 		else if (a_path == "memory.remember_battles") set(g_data.rememberEvent);
 		else if (a_path == "mods.injuries") set(g_data.injuries);
 		else if (a_path == "mods.dismemberment") set(g_data.dismemberment);
-		else if (a_path == "summary.game_hours") {
+		else if (a_path == "battle.wind_down") {
+			float seconds = g_data.mergeGapSeconds;
+			try {
+				seconds = std::stof(v);
+			} catch (...) {
+				return;
+			}
+			seconds = std::clamp(seconds, 0.0f, 60.0f);
+			if (std::fabs(seconds - g_data.mergeGapSeconds) > 0.01f) SKSE::log::info("Settings: {} = {} (from SkyrimNet's settings page)", a_path, seconds);
+			g_data.mergeGapSeconds = seconds;
+		} else if (a_path == "summary.game_hours") {
 			float hours = g_data.summaryGameHours;
 			try {
 				hours = std::stof(v);
@@ -190,6 +200,7 @@ namespace BSM::Settings
 		}
 		d.nearDeathPct = std::clamp(d.nearDeathPct, 0.01f, 0.9f);
 		d.endGraceSeconds = std::clamp(d.endGraceSeconds, 1.0f, 120.0f);
+		d.mergeGapSeconds = std::clamp(d.mergeGapSeconds, 0.0f, 60.0f);
 		g_data = d;
 		SetVerbose(d.verbose);
 		ResolveInjurySources(d.injurySources);

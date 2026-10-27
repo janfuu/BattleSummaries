@@ -78,8 +78,8 @@ None of these is required; each is picked up when present.
 ## Settings
 
 The settings most players change are on SkyrimNet's own settings page, under Battle Summaries among its plugins:
-friendly fire, bystanders, damage numbers, how long a summary lasts, remembered battles, injuries and
-dismemberment. A change made there takes effect when the next battle begins or a save is loaded, and takes precedence over the ini.
+the wind-down between clashes, friendly fire, bystanders, damage numbers, how long a summary lasts, remembered
+battles, injuries and dismemberment. A change made there takes effect when the next battle begins or a save is loaded, and takes precedence over the ini.
 
 Everything is also in `SKSE/Plugins/BattleSummaries.ini`, read at game start:
 
@@ -88,7 +88,7 @@ Everything is also in `SKSE/Plugins/BattleSummaries.ini`, read at game start:
 | `[General] bEnabled` | true | Master switch |
 | `fNearDeathHealthShare` | 0.15 | Below this share of health an actor counts as having come close to death |
 | `fEndGraceSeconds` | 6 | The battle is over once nobody in it has been in combat for this long |
-| `fMergeGapSeconds` | 20 | Fighting that starts again within this long continues the same battle |
+| `fMergeGapSeconds` | 20 | The wind-down: fighting that starts again within this long, where it was fought, continues the same battle (told as several clashes); 0 to 60 |
 | `fTrackingRange` | 10000 | Actors further than this from the player (game units) are not tracked |
 | `fWitnessRange` | 3500 | Bystanders this close when a battle ends know what happened in it |
 | `[Summary] fSummaryGameHours` | 6 | How long after a battle its summary is still given to dialogue |

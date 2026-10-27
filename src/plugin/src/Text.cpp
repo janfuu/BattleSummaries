@@ -13,6 +13,8 @@ namespace BSM::Text
 			// ---------------------------------------------------------------- the battle as a whole
 			{ "Battle", "battle.underway", "A battle is being fought{at_place} right now.", "{at_place} is empty or a space and battle.at" },
 			{ "Battle", "battle.fought", "A battle was fought{at_place}. It lasted {duration}.", "" },
+			{ "Battle", "battle.fought_clashes", "A battle was fought{at_place}. It was fought in {count} clashes over {duration}.",
+				"fighting that stopped and started again within the wind-down: a dungeon cleared room by room, enemies arriving in groups" },
 			{ "Battle", "battle.at", "at {place}", "" },
 			{ "Battle", "battle.wilds", "the wilds of {place}", "open country: {place} is the worldspace, \"Skyrim\"" },
 			{ "Battle", "battle.sides", "{party} fought against {enemies}.", "" },

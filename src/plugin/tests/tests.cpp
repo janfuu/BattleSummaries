@@ -1108,6 +1108,23 @@ namespace
 		Check(!Has(l, "rose again"), "a heal reported late still counts as the heal", l);
 	}
 
+	// A dungeon cleared room by room: one battle in several clashes, the time told over all of them
+	void TestClashes()
+	{
+		Battle b;
+		b.startedAt = 0;
+		b.location = "Mzinchaleft";
+		b.Join(Info(kHero, "Kaira", Side::kPlayer, 300));
+		b.Join(Info(kBandit1, "Dwarven Sphere", Side::kEnemy, 200));
+		b.Damage(kBandit1, kHero, 200, 0.0f, 5);
+		b.Death(kBandit1, kHero, 5);
+		b.endedAt = 200;
+		Check(Has(BuildMemory(b, {}), "A battle was fought at Mzinchaleft. It lasted about 3 minutes."), "one clash: as before", BuildMemory(b, {}));
+		b.clashes = 3;
+		const auto told = SummaryText(BuildSummary(b, kHero, "Kaira", {}));
+		Check(Has(told, "A battle was fought at Mzinchaleft. It was fought in 3 clashes over about 3 minutes."), "three clashes, one line", told);
+	}
+
 	void TestDuration()
 	{
 		const auto is = [](double a_s, const char* a_want) { Check(DurationText(a_s) == a_want, a_want, DurationText(a_s)); };
@@ -1202,6 +1219,7 @@ int main(int argc, char** argv)
 	TestEvenShares();
 	TestCutShort();
 	TestRising();
+	TestClashes();
 	TestDuration();
 	TestEdges();
 	std::printf("%d checks, %d failed\n", g_checks, g_failed);

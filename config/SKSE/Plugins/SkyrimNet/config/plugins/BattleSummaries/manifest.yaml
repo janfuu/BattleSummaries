@@ -7,6 +7,13 @@ plugin:
 
 schema:
   fields:
+    - name: "Wind-down (seconds)"
+      path: "battle.wind_down"
+      type: "float"
+      description: "After the fighting stops, how long the battle stays open. Fighting that starts again within this time, where it was fought (the next room of a dungeon, more enemies arriving), continues the same battle, told as fought in several clashes, and the timer starts over. The battle is remembered once, when the wind-down runs out. 0 to 60; 0 makes every fight its own battle."
+      defaultValue: 20.0
+      category: "Battle"
+
     - name: "Ignore friendly fire"
       path: "summary.ignore_friendly_fire"
       type: "bool"
