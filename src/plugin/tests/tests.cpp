@@ -1125,6 +1125,25 @@ namespace
 		Check(Has(told, "A battle was fought at Mzinchaleft. It was fought in 3 clashes over about 3 minutes."), "three clashes, one line", told);
 	}
 
+	// The prompt's team guidance goes to those who fought on the player's side, not to enemies or witnesses
+	void TestAlly()
+	{
+		Battle b;
+		b.startedAt = 0;
+		b.Join(Info(kHero, "Kaira", Side::kPlayer, 300));
+		b.Join(Info(kLydia, "Lydia", Side::kPlayer, 300));
+		b.Join(Info(kBandit1, "Bandit", Side::kEnemy, 100));
+		b.Join(Info(kBandit2, "Bandit", Side::kEnemy, 100));
+		b.Damage(kBandit1, kHero, 100, 0.0f, 1);
+		b.Death(kBandit1, kHero, 1);
+		b.Damage(kHero, kBandit2, 40, 0.8f, 2);
+		b.Damage(kBandit2, kLydia, 50, 0.5f, 3);
+		b.endedAt = 4;
+		Check(BuildSummary(b, kLydia, "Lydia", {}).ally, "a follower is an ally", "");
+		Check(!BuildSummary(b, kBandit2, "Bandit", {}).ally, "an enemy is not", "");
+		Check(!BuildSummary(b, 0x999, "Hulda", {}).ally, "nor a witness", "");
+	}
+
 	void TestDuration()
 	{
 		const auto is = [](double a_s, const char* a_want) { Check(DurationText(a_s) == a_want, a_want, DurationText(a_s)); };
@@ -1220,6 +1239,7 @@ int main(int argc, char** argv)
 	TestCutShort();
 	TestRising();
 	TestClashes();
+	TestAlly();
 	TestDuration();
 	TestEdges();
 	std::printf("%d checks, %d failed\n", g_checks, g_failed);

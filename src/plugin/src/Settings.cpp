@@ -113,6 +113,7 @@ namespace BSM::Settings
 		};
 		if (a_path == "summary.ignore_friendly_fire") set(g_data.ignoreFriendlyFire);
 		else if (a_path == "summary.mention_bystanders") set(g_data.mentionBystanders);
+		else if (a_path == "summary.fight_as_team") set(g_data.fightAsTeam);
 		else if (a_path == "summary.show_numbers") set(g_data.showNumbers);
 		else if (a_path == "memory.remember_battles") set(g_data.rememberEvent);
 		else if (a_path == "mods.injuries") set(g_data.injuries);
@@ -159,6 +160,7 @@ namespace BSM::Settings
 			d.summaryGameHours = static_cast<float>(ini.GetDoubleValue("Summary", "fSummaryGameHours", d.summaryGameHours));
 			d.showNumbers = ini.GetBoolValue("Summary", "bShowNumbers", d.showNumbers);
 			d.ignoreFriendlyFire = ini.GetBoolValue("Summary", "bIgnoreFriendlyFire", d.ignoreFriendlyFire);
+			d.fightAsTeam = ini.GetBoolValue("Summary", "bFollowersFightAsTeam", d.fightAsTeam);
 			d.maxOthers = static_cast<int>(ini.GetLongValue("Summary", "iMaxCompanionLines", d.maxOthers));
 			d.maxEffects = static_cast<int>(ini.GetLongValue("Summary", "iMaxEffectsPerList", d.maxEffects));
 

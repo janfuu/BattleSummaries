@@ -24,6 +24,7 @@ namespace BSM
 		bool                     show{ false };
 		bool                     ongoing{ false };
 		bool                     participant{ false };  // false: the viewer only witnessed it
+		bool                     ally{ false };         // the viewer fought on the player's side
 		std::string              name;                  // the viewer's name
 		std::vector<std::string> general;
 		std::vector<std::string> personal;

@@ -926,6 +926,7 @@ namespace BSM
 		const auto* me = a_b.Find(a_viewer);
 		if (me && !a_b.Involved(*me)) me = nullptr;  // in the game's combat state, but never fought: a witness
 		r.participant = me != nullptr;
+		r.ally = me && a_b.EffectiveSide(*me) == Side::kPlayer;
 		if (me) {
 			if (r.name.empty()) r.name = me->info.name;
 			r.personal = Personal(a_b, *me, a_opt);

@@ -94,6 +94,7 @@ Everything is also in `SKSE/Plugins/BattleSummaries.ini`, read at game start:
 | `[Summary] fSummaryGameHours` | 6 | How long after a battle its summary is still given to dialogue |
 | `bShowNumbers` | false | Add raw damage and healing points to the summary |
 | `bIgnoreFriendlyFire` | false | Harm from one's own side, or to a bystander caught in the crossfire during a fight: false tells it as an accident, true leaves it out |
+| `bFollowersFightAsTeam` | true | Those who fought on your side read the results as one party, without belittling each other or themselves; false leaves rivalry and shame to them |
 | `bMentionBystanders` | false | Someone harmed or killed without being a fighter: false leaves them out, true tells the one killed as not engaged in combat |
 | `iMaxCompanionLines` | 6 | Most companions listed one by one |
 | `iMaxEffectsPerList` | 6 | Most magic effects listed per fighter |

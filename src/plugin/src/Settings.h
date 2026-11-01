@@ -16,6 +16,7 @@ namespace BSM::Settings
 		float witnessRange{ 3500.0f };  // bystanders this close at the end know what happened
 		bool  showNumbers{ false };
 		bool  ignoreFriendlyFire{ false };  // false: harm from one's own side is told as an accident; true: left out
+		bool  fightAsTeam{ true };  // the prompt tells the player's side to read the results as one party; off: rivalry is theirs to play
 		int   maxOthers{ 6 };
 		int   maxEffects{ 6 };
 

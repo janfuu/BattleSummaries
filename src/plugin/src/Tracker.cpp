@@ -1341,6 +1341,7 @@ namespace BSM::Tracker
 		j["show"] = r.show;
 		j["ongoing"] = r.ongoing;
 		j["participant"] = r.participant;
+		j["team"] = r.ally && Settings::Get().fightAsTeam;
 		j["name"] = r.name;
 		j["age"] = age;
 		j["general"] = r.general;

@@ -2,7 +2,7 @@
 # BattleSummaries.ini; a change takes effect when the next battle begins or a save is loaded.
 plugin:
   name: BattleSummaries
-  version: "1.4.1-beta-2"
+  version: "1.4.1-beta-3"
   description: "Gives NPCs a factual summary of each battle near the player, in place of the raw combat events."
 
 schema:
@@ -26,6 +26,13 @@ schema:
       type: "bool"
       description: "Someone killed in a battle without being a fighter (a townsman caught in it) is left out of the summaries by default, so followers don't read it as the player murdering people. On: they are told as not actively engaged in combat. Anyone who would fight you on sight counts as an enemy either way, even when killed before they noticed you."
       defaultValue: false
+      category: "Summary"
+
+    - name: "Followers Fight as a Team"
+      path: "summary.fight_as_team"
+      type: "bool"
+      description: "Those who fought on your side are told they fought as one party and to read the results that way, not to belittle each other or themselves over who did the most. Off: the results are theirs to take as they will, rivalry and shame included."
+      defaultValue: true
       category: "Summary"
 
     - name: "Show damage numbers"

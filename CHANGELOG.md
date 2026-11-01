@@ -1,6 +1,10 @@
 # Changelog
 
-## 1.4.1 (beta 2)
+## 1.4.1 (beta 3)
+
+- Followers Fight as a Team, on SkyrimNet's settings page (on by default): those who fought on your side are told they
+  fought as one party and to read the results that way, not to belittle each other or themselves over who did the most.
+  Off: the results are theirs to take as they will, rivalry and shame included.
 
 - Who did the work, not only who struck the last blow: "Most of the party's damage to the enemy was dealt by Lydia",
   and every companion's line now says how much of the fighting they did.
@@ -19,9 +23,9 @@
   inn, a teleport, a door), it ends there. Nobody at the new place is told it as a witness or counted as a fighter, and
   enemies still alive are not said to have fled: "The fight was cut short; by then 8 of the 14 enemies had been killed."
   Witnesses are now those who stood near while it was fought, not whoever is near when it ends.
-- The remembered event is posted the moment a battle closes, while you are still there. SkyrimNet files it where you
-  are when it is posted, so posted later, the people behind the next door "remembered" a fight they never saw. A battle
-  cut short by you being moved away is not posted as an event at all (its fighters still get their summary).
+- The remembered event is only posted while you are still where the battle was fought. SkyrimNet files it where you
+  are when it is posted, so posted elsewhere, the people behind the next door "remembered" a fight they never saw. A
+  battle cut short by you being moved away is not posted as an event at all (its fighters still get their summary).
 - Death-alternative mods that put you back on your feet (Stay In The Fight, Sacrosanct's Fortitude, Last Man Standing):
   being struck down is now told as "collapsed and helpless for a moment, but got back up", and getting up at a stroke
   with your health restored, by nobody's healing, as "rose again with their strength restored" (no one is credited with
