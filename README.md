@@ -75,6 +75,10 @@ None of these is required; each is picked up when present.
 - **Dismemberment** - [Dismembering Framework](https://www.nexusmods.com/skyrimspecialedition/mods/126203) for severed
   limbs, Next-Gen Decapitations for heads, and the game's own beheadings. Told with the kill: who beheaded whom, who severed a limb.
 
+**Not compatible: [NOFF No Offensive Friendly Fire](https://www.nexusmods.com/skyrimspecialedition/mods/54527).** It takes
+the game function this mod reads blows from and does not pass them on, so nobody's damage is seen and the player is
+credited with every kill.
+
 ## Settings
 
 The settings most players change are on SkyrimNet's own settings page, under Battle Summaries among its plugins:

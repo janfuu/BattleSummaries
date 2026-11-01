@@ -5,6 +5,7 @@
 - Followers Fight as a Team, on SkyrimNet's settings page (on by default): those who fought on your side are told they
   fought as one party and to read the results that way, not to belittle each other or themselves over who did the most.
   Off: the results are theirs to take as they will, rivalry and shame included.
+- Not compatible with NOFF No Offensive Friendly Fire: with it, the player is credited with every kill.
 
 - Who did the work, not only who struck the last blow: "Most of the party's damage to the enemy was dealt by Lydia",
   and every companion's line now says how much of the fighting they did.
