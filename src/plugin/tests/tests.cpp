@@ -1144,6 +1144,36 @@ namespace
 		Check(!BuildSummary(b, 0x999, "Hulda", {}).ally, "nor a witness", "");
 	}
 
+	// A bandit's power attack through another bandit: a real death, told apart, not as one of the party's kills
+	void TestEnemyOwnSide()
+	{
+		Battle b;
+		b.startedAt = 0;
+		b.Join(Info(kHero, "Kaira", Side::kPlayer, 300));
+		b.Join(Info(kLydia, "Lydia", Side::kPlayer, 300));
+		b.Join(Info(kBandit1, "Ganeryk", Side::kEnemy, 100));
+		b.Join(Info(kBandit2, "Reginus", Side::kEnemy, 100));
+		b.Damage(kLydia, kBandit2, 30, 0.9f, 0.5);
+		b.Damage(kBandit2, kBandit1, 100, 0.0f, 1);
+		b.Death(kBandit2, kBandit1, 1);
+		b.Damage(kBandit1, kLydia, 100, 0.0f, 2);
+		b.Death(kBandit1, kLydia, 2);
+		b.endedAt = 3;
+		const auto told = SummaryText(BuildSummary(b, kHero, "Kaira", {}));
+		Check(Has(told, "Who killed the enemies: Lydia 1 (Ganeryk).") && !Has(told, "Ganeryk 1"), "an enemy is not one of the killers", told);
+		Check(Has(told, "Reginus was killed by Ganeryk, by accident: they were on the same side."), "the death is still told", told);
+		Check(Has(told, "Both enemies were killed."), "and counted", told);
+
+		Battle one;  // a single enemy who stopped fighting (Sever Actions made them peaceful)
+		one.startedAt = 0;
+		one.Join(Info(kHero, "Kaira", Side::kPlayer, 300));
+		one.Join(Info(kBandit1, "Janekke", Side::kEnemy, 100));
+		one.Damage(kBandit1, kHero, 20, 0.8f, 1);
+		one.endedAt = 2;
+		const auto o = BuildMemory(one, {});
+		Check(Has(o, "The one enemy was not killed; the fight broke off.") && !Has(o, "None of the 1"), "one enemy, not killed", o);
+	}
+
 	void TestDuration()
 	{
 		const auto is = [](double a_s, const char* a_want) { Check(DurationText(a_s) == a_want, a_want, DurationText(a_s)); };
@@ -1240,6 +1270,7 @@ int main(int argc, char** argv)
 	TestRising();
 	TestClashes();
 	TestAlly();
+	TestEnemyOwnSide();
 	TestDuration();
 	TestEdges();
 	std::printf("%d checks, %d failed\n", g_checks, g_failed);

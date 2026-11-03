@@ -65,6 +65,7 @@ namespace BSM::Text
 			{ "Outcome", "outcome.all", "All {total} {foes} were killed.", "" },
 			{ "Outcome", "outcome.both", "Both {foes} were killed.", "the same, with two of them" },
 			{ "Outcome", "outcome.none", "None of the {total} {foes} were killed; the fight broke off.", "" },
+			{ "Outcome", "outcome.none_one", "The one enemy was not killed; the fight broke off.", "the same, with one enemy" },
 			{ "Outcome", "outcome.some", "{dead} of the {total} {foes} were killed; the rest fled, yielded or broke off.", "" },
 			{ "Outcome", "outcome.cut_short", "The fight was cut short; by then {dead} of the {total} {foes} had been killed.",
 				"the player was moved away while enemies were still alive (a teleport, a door, a death-alternative mod)" },

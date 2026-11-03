@@ -333,6 +333,14 @@ namespace BSM
 
 		// enemy-of-a_side kills per killer, most first: "Kaira 3 (Bandit x2, Bandit Chief), Lydia 1 (Bandit)"
 		// a_summons: the summoned creatures among them (told as dispatched), not the rest
+		// killed by someone on their own side (a bandit's power attack through another bandit): a real kill, but not one
+		// the other side made
+		bool OwnSideKill(const Battle& a_b, const Participant& a_v)
+		{
+			const auto* k = a_b.Find(a_v.killer);
+			return k && k->info.id != a_v.info.id && a_b.EffectiveSide(*k) == a_b.EffectiveSide(a_v);
+		}
+
 		std::string KillTally(const Battle& a_b, Side a_victims, bool a_summons = false)
 		{
 			struct Entry
@@ -347,6 +355,7 @@ namespace BSM
 				if (!v->dead || v->info.summon != a_summons) continue;
 				if (a_summons && v->killer == 0) continue;  // dismissed or expired: nobody's doing
 				const auto* k = a_b.Find(v->killer);
+				if (OwnSideKill(a_b, *v)) continue;  // told apart (OwnSideDeaths): not one of the other side's killers
 				const bool  bySummon = k && k->info.summon && k->info.master != 0 && a_b.Find(k->info.master);
 				const auto  credited = bySummon ? k->info.master : v->killer;
 				auto        it = std::ranges::find_if(tally, [&](const Entry& t) { return t.killer == credited; });
@@ -389,7 +398,7 @@ namespace BSM
 			if (a_b.Ongoing()) return F("outcome.so_far", args);
 			if (dead == n) return n == 1 ? T("outcome.one") : F(n == 2 ? "outcome.both" : "outcome.all", args);
 			if (a_b.cutShort) return (dead > 0 ? F("outcome.cut_short", args) : n == 1 ? T("outcome.cut_short_one") : F("outcome.cut_short_none", args));
-			if (dead == 0) return F("outcome.none", args);
+			if (dead == 0) return n == 1 ? T("outcome.none_one") : F("outcome.none", args);
 			return F("outcome.some", args);
 		}
 
@@ -902,6 +911,10 @@ namespace BSM
 				const auto* k = a_b.Find(p->killer);
 				const bool  ownSide = k && k->info.id != p->info.id && a_b.EffectiveSide(*k) == Side::kPlayer;
 				out.push_back(F("killed.line", { { "name", NameOf(a_b, p->info.id) }, { "killed", KilledBy(a_b, p->killer) }, { "own_side", ownSide ? ", " + T("killed.own_side") : std::string() } }));
+			}
+			for (const auto* p : enemies) {
+				if (!p->dead || !OwnSideKill(a_b, *p)) continue;
+				out.push_back(F("killed.line", { { "name", NameOf(a_b, p->info.id) }, { "killed", KilledBy(a_b, p->killer) }, { "own_side", ", " + T("killed.own_side") } }));
 			}
 			for (const auto* p : others) {
 				if (a_b.omitBystanders || !p->dead || !a_b.Innocent(*p)) continue;

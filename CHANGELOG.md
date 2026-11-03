@@ -5,6 +5,9 @@
 - Followers Fight as a Team, on SkyrimNet's settings page (on by default): those who fought on your side are told they
   fought as one party and to read the results that way, not to belittle each other or themselves over who did the most.
   Off: the results are theirs to take as they will, rivalry and shame included.
+- An enemy killed by their own side (a bandit's power attack through another bandit) is told on its own line, not
+  listed among "Who killed the enemies" as if the killer were in your party.
+- One enemy who was not killed: "The one enemy was not killed", not "None of the 1 enemies".
 - Not compatible with NOFF No Offensive Friendly Fire: with it, the player is credited with every kill.
 
 - Who did the work, not only who struck the last blow: "Most of the party's damage to the enemy was dealt by Lydia",
