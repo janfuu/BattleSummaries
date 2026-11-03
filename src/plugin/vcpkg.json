@@ -1,6 +1,6 @@
 {
   "name": "battle-summaries",
-  "version-string": "1.4.1",
+  "version-string": "1.5.0",
   "dependencies": [
     "directxmath",
     "directxtk",

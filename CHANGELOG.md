@@ -1,47 +1,31 @@
 # Changelog
 
-## 1.4.1 (beta 3)
+## 1.5.0
 
-- Followers Fight as a Team, on SkyrimNet's settings page (on by default): those who fought on your side are told they
-  fought as one party and to read the results that way, not to belittle each other or themselves over who did the most.
-  Off: the results are theirs to take as they will, rivalry and shame included.
-- An enemy killed by their own side (a bandit's power attack through another bandit) is told on its own line, not
-  listed among "Who killed the enemies" as if the killer were in your party.
-- One enemy who was not killed: "The one enemy was not killed", not "None of the 1 enemies".
-- Not compatible with NOFF No Offensive Friendly Fire: with it, the player is credited with every kill.
+**Teamwork**
+- Who did the work, not just who landed the last blow: "Most of the party's damage to the enemy was dealt by Lydia".
+- Credit for the part each played: who bore the brunt, who kept the others on their feet with healing, who shielded them with magic, who held the enemy back.
+- Fair to any size of party: an even fight is told as even, and a follower doing their share in a party of ten isn't told they did "only a small part".
+- New setting, "Followers Fight as a Team" (on by default): your followers read the results as one party instead of mocking each other or beating themselves up over who did the most. Like your followers competitive? Turn it off.
+- Potions and poisons used in the fight are mentioned.
+- Summons that drew the enemy's blows are told as their master's: "Kaira's Flame Atronach bore the brunt of the enemy's blows".
 
-- Who did the work, not only who struck the last blow: "Most of the party's damage to the enemy was dealt by Lydia",
-  and every companion's line now says how much of the fighting they did.
-- Credit for the part each played, wherever it was a real part: "Lydia also did a real part of it" (the damage),
-  "Lydia bore the brunt of the enemy's blows" (a real tank, over half of what the party took) or "Kaira, Lydia and
-  Marcurio took the enemy's blows between them", "Marcurio kept the others on their feet with healing", "Marcurio
-  shielded the others with magic", "Jenassa held the enemy back (paralyzed and slowed)".
-- Potions and poisons: "Kaira drank 3 potions in the fight: Potion of Healing x2 and Potion of Fortify Two-handed",
-  "Lydia used a poison in the fight: Deadly Venom".
-- Fair to any size of party: shares are measured against an even split, so an even fight is told as one ("The party
-  shared the damage to the enemy evenly", "The enemy's blows fell evenly across the party"), a duo needs three parts in
-  four to bear the brunt, and a follower doing their part in a party of ten is not told they did "only a small part".
-- Summons that drew the enemy's blows are told as their master's: "Kaira's Flame Atronach bore the brunt of the
-  enemy's blows".
-- A battle stays where it was fought: when you are moved away mid-fight (a death-alternative mod carrying you to an
-  inn, a teleport, a door), it ends there. Nobody at the new place is told it as a witness or counted as a fighter, and
-  enemies still alive are not said to have fled: "The fight was cut short; by then 8 of the 14 enemies had been killed."
-  Witnesses are now those who stood near while it was fought, not whoever is near when it ends.
-- The remembered event is only posted while you are still where the battle was fought. SkyrimNet files it where you
-  are when it is posted, so posted elsewhere, the people behind the next door "remembered" a fight they never saw. A
-  battle cut short by you being moved away is not posted as an event at all (its fighters still get their summary).
-- Death-alternative mods that put you back on your feet (Stay In The Fight, Sacrosanct's Fortitude, Last Man Standing):
-  being struck down is now told as "collapsed and helpless for a moment, but got back up", and getting up at a stroke
-  with your health restored, by nobody's healing, as "rose again with their strength restored" (no one is credited with
-  saving you for it). NPCs are also told plainly that being struck down is not dying.
-- If you changed `memory.survived` in your own text file, note that the recovery ("but got back up", "but survived") is
-  now part of `{brink}`.
-- A wind-down setting on SkyrimNet's page (default 20 seconds, as before; 0 to 60): fighting that starts again within it,
-  where it was fought, continues the same battle, told as "It was fought in 3 clashes over about 4 minutes." The battle
-  is remembered once, when the wind-down runs out, and only if you are still where it was fought.
-- Two enemies killed is told as "Both enemies were killed", not "All 2 enemies".
-- Short lists: past four names, "and 3 others". Help given to one person names them: "Brelyna kept Kaira going with
-  healing".
+**Longer fights**
+- New setting, "Wind-down" (default 20 seconds): fighting that starts again where it was fought (clearing a dungeon room by room, more enemies arriving) stays one battle, told as "It was fought in 3 clashes over about 4 minutes".
+
+**Death-alternative mods**
+- Being struck down is told as getting back up, never as dying. Getting up at a stroke with your health restored (Stay In The Fight, Sacrosanct's Fortitude, Last Man Standing) is told as rising again, with no one credited with saving you.
+- Moved away mid-fight (Revenge and Respawn carrying you to an inn, a teleport, a door)? The battle ends where it was fought, as "cut short". Nobody at the new place is told about it as a witness.
+
+**Bug Fixes**
+- The remembered battle is only posted while you're still where it was fought, so the people behind the next door no longer "remember" a fight they never saw.
+- An enemy killed by their own side is told on its own line instead of being listed among your party's kills.
+- "Both enemies were killed" and "The one enemy was not killed", not "All 2 enemies" and "None of the 1 enemies".
+- Long lists of names are cut short ("and 3 others").
+
+**Heads up**
+- Not compatible with NOFF No Offensive Friendly Fire: with it, you get credit for every kill.
+- Changed `memory.survived` in your own text file? The recovery ("but got back up") is now part of `{brink}`.
 
 ## 1.4.0
 
