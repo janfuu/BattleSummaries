@@ -23,10 +23,6 @@
 - "Both enemies were killed" and "The one enemy was not killed", not "All 2 enemies" and "None of the 1 enemies".
 - Long lists of names are cut short ("and 3 others").
 
-**Heads up**
-- Not compatible with NOFF No Offensive Friendly Fire: with it, you get credit for every kill.
-- Changed `memory.survived` in your own text file? The recovery ("but got back up") is now part of `{brink}`.
-
 ## 1.4.0
 
 **Improvements**
