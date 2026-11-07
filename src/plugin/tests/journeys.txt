@@ -977,12 +977,12 @@ Six bandits. The player sends in a flame atronach, Brelyna another when she is t
 ==== Summoners / duo (2) ====
 Six bandits. The player sends in a flame atronach, Brelyna another when she is there, and the player raises the first bandit to fall. The summons draw most of the enemy's blows. The duo is the player and Brelyna.
   [remembered event]
-    A battle was fought at the road to Whiterun. It lasted 27 seconds. Kaira and Brelyna fought against Bandit x6. All 6 enemies were killed. Who killed the enemies: Kaira 4 (2 through Flame Atronach and Bandit); Brelyna 2 (Bandit x2, 1 through Flame Atronach). Most of the party's damage to the enemy was dealt by Kaira. Brelyna also did a real part of it. Kaira's summons and Brelyna's Flame Atronach took the enemy's blows between them.
+    A battle was fought at the road to Whiterun. It lasted 27 seconds. Kaira and Brelyna fought against Bandit x6. All 6 enemies were killed. Who killed the enemies: Kaira 4 (2 through Flame Atronach and Bandit); Brelyna 2 (Bandit x2, 2 through Flame Atronach). Most of the party's damage to the enemy was dealt by Kaira. Brelyna also did a real part of it. Kaira's summons and Brelyna's Flame Atronach took the enemy's blows between them.
   [told to everyone]
     A battle was fought at the road to Whiterun. It lasted 27 seconds.
     Kaira and Brelyna fought against Bandit x6.
     All 6 enemies were killed.
-    Who killed the enemies: Kaira 4 (2 through Flame Atronach and Bandit); Brelyna 2 (Bandit x2, 1 through Flame Atronach).
+    Who killed the enemies: Kaira 4 (2 through Flame Atronach and Bandit); Brelyna 2 (Bandit x2, 2 through Flame Atronach).
     Most of the party's damage to the enemy was dealt by Kaira.
     Brelyna also did a real part of it.
     Kaira's summons and Brelyna's Flame Atronach took the enemy's blows between them.
@@ -990,7 +990,7 @@ Six bandits. The player sends in a flame atronach, Brelyna another when she is t
     Brelyna took only light wounds and dealt a fair share of their side's damage.
     Brelyna was never in serious danger.
     Brelyna killed 2 of the 6 who died on the other side: Bandit x2.
-    1 of them through Flame Atronach.
+    2 of them through Flame Atronach.
   [Brelyna, about the others]
     None of them was seriously hurt or in any real danger.
 

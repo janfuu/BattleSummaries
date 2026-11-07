@@ -327,9 +327,9 @@ namespace BSM
 		// to say who saved them.
 		std::string Brink(const Battle& a_b, const Participant& a_p, const NarrativeOptions& a_opt, bool a_recovery = true)
 		{
-			// still lying there: how it ends is not known yet. Raised by another mod that said so: in its words.
+			// raised by another mod that said so (Revived): in its words
 			const auto recovery = [&](const char* a_key) {
-				if (!a_recovery || a_p.isDown) return std::string();
+				if (!a_recovery) return std::string();
 				if (a_p.risenAt >= 0.0) return F("brink.risen", { { "how", RisenHow(a_p) } });
 				return T(a_p.roseAt >= 0.0 ? "brink.rose" : a_key);
 			};

@@ -1286,7 +1286,7 @@ namespace
 
 			const auto arthur = SummaryText(BuildSummary(b, kHero, "Arthur", {}));
 			Check(Has(arthur, "Arthur was struck down by the first Wraith"), "the fall is told", arthur);
-			Check(Has(arthur, "Arthur got up again in a gust of wind and a surge of cold blue light, unhurt."), "the rise, in the reviver's words", arthur);
+			Check(Has(arthur, "Arthur was struck down by the first Wraith: collapsed and helpless for a moment, and got up again in a gust of wind and a surge of cold blue light, unhurt.") && !Has(arthur, "got back up"), "the rise, in the reviver's words", arthur);
 			Check(!Has(arthur, "saved Arthur's life") && !Has(arthur, "would most likely have died"), "nobody saved him", arthur);
 			Check(!Has(arthur, "without anyone's rescue"), "no rescue verdict either way", arthur);
 			Check(Has(arthur, "Vaelyra 1 (") && Has(arthur, "through Magdra Ibrai"), "the atronach's kill still counts as a kill", arthur);
@@ -1351,7 +1351,26 @@ namespace
 			b.Revived(kHero, "", 5.0);
 			b.endedAt = 10.0;
 			const auto arthur = SummaryText(BuildSummary(b, kHero, "Arthur", {}));
-			Check(b.Find(kHero)->downs == 1 && Has(arthur, "Arthur got up again."), "a missed fall counts; no words: a plain rise", arthur);
+			Check(b.Find(kHero)->downs == 1 && Has(arthur, "collapsed and helpless for a moment, and got up again."), "a missed fall counts; no words: a plain rise", arthur);
+		}
+
+		// a reported rise whose health comes back at a stroke also looks like a death-alternative mod's rising (1.5.0's
+		// heuristic): told once, in the reviver's words
+		{
+			Battle b;
+			b.startedAt = 0.0;
+			b.Join(Info(kHero, "Arthur", Side::kPlayer, 400));
+			b.Join(Info(kWraith1, "Wraith", Side::kEnemy, 250));
+			b.Damage(kHero, kWraith1, 390, 0.02f, 2);
+			b.Down(kHero, 2.1);
+			b.Revived(kHero, "in a surge of cold blue light", 5.0);
+			b.Up(kHero);
+			b.Sample(kHero, 1.0f, 5.3);
+			b.endedAt = 10.0;
+			const auto told = SummaryText(BuildSummary(b, kHero, "Arthur", {})) + BuildMemory(b, {});
+			Check(b.Find(kHero)->roseAt >= 0.0, "the stroke is seen as a rising too", told);
+			Check(Has(told, "and got up again in a surge of cold blue light") && !Has(told, "rose again") && !Has(told, "got back up") && !Has(told, "saved Arthur"),
+				"risen and rose: the reviver's words, once", told);
 		}
 	}
 }
